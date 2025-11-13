@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS migrator
+WORKDIR /src
+
+# Copy project files
+COPY ["src/Portfolio.Api/Portfolio.Api.csproj", "Portfolio.Api/"]
+COPY ["src/Portfolio.Infrastructure/Portfolio.Infrastructure.csproj", "Portfolio.Infrastructure/"]
+COPY ["src/Portfolio.Application/Portfolio.Application.csproj", "Portfolio.Application/"]
+COPY ["src/Portfolio.Domain/Portfolio.Domain.csproj", "Portfolio.Domain/"]
+
+# Restore dependencies
+RUN dotnet restore "Portfolio.Api/Portfolio.Api.csproj"
+
+# Copy all source files including migrations
+COPY src/ .
+
+# Install EF Core tools
+RUN dotnet tool install --global dotnet-ef --version 9.0.0
+
+# Set PATH to include dotnet tools
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+WORKDIR /src/Portfolio.Api
+
+# Set the entrypoint to run migrations
+ENTRYPOINT ["sh", "-c", "dotnet ef database update -p ../Portfolio.Infrastructure/Portfolio.Infrastructure.csproj -s Portfolio.Api.csproj && echo 'Migrations completed successfully'"]

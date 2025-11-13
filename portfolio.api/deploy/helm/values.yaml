@@ -1,0 +1,98 @@
+# Default values for portfolio-api
+replicaCount: 2
+
+image:
+  repository: portfolio-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: api.portfolio.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: portfolio-api-tls
+      hosts:
+        - api.portfolio.example.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  - name: ASPNETCORE_ENVIRONMENT
+    value: "Production"
+  - name: ASPNETCORE_URLS
+    value: "http://+:8080"
+  - name: ConnectionStrings__DefaultConnection
+    valueFrom:
+      secretKeyRef:
+        name: portfolio-secrets
+        key: database-connection-string
+  - name: Jwt__Secret
+    valueFrom:
+      secretKeyRef:
+        name: portfolio-secrets
+        key: jwt-secret
+  - name: Kafka__Enabled
+    value: "true"
+  - name: Kafka__BootstrapServers
+    value: "kafka-service:9092"
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: postgres
+    database: portfolio
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+kafka:
+  enabled: true
+  replicaCount: 3
+  persistence:
+    enabled: true
+    size: 10Gi

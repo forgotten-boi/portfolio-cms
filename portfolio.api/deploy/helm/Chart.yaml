@@ -1,0 +1,15 @@
+apiVersion: v2
+name: portfolio-api
+description: A Helm chart for Portfolio CMS API
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - portfolio
+  - cms
+  - api
+  - multi-tenant
+
+maintainers:
+  - name: Portfolio Team

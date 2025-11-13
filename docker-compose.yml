@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: portfolio-postgres
+    environment:
+      POSTGRES_USER: portfolio_user
+      POSTGRES_PASSWORD: portfolio_pass
+      POSTGRES_DB: portfolio_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - portfolio-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (.NET 9)
+  backend-api:
+    build:
+      context: ./portfolio.api
+      dockerfile: Dockerfile
+    container_name: portfolio-backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=portfolio_db;Username=portfolio_user;Password=portfolio_pass"
+      JwtSettings__Secret: "YourSuperSecretKeyForJWTTokenGenerationThatIsAtLeast32CharactersLong"
+      JwtSettings__Issuer: "PortfolioCMS"
+      JwtSettings__Audience: "PortfolioCMS"
+      JwtSettings__ExpiryMinutes: "60"
+      KafkaSettings__BootstrapServers: "kafka:9092"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend (Angular 19)
+  frontend:
+    build:
+      context: ./portfolio-cms-web
+      dockerfile: Dockerfile
+    container_name: portfolio-frontend
+    environment:
+      API_URL: http://backend-api:8080
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend-api
+    networks:
+      - portfolio-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Kafka (Optional - for event-driven architecture)
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: portfolio-kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - portfolio-network
+
+  # Zookeeper (Required for Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: portfolio-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - portfolio-network
+
+networks:
+  portfolio-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,0 +1,40 @@
+<div class="users-container">
+  <div class="header">
+    <h1>Users</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading users...</div>
+  
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error" class="users-list">
+    <div *ngIf="users.length === 0" class="no-data">
+      No users found.
+    </div>
+
+    <div class="users-table" *ngIf="users.length > 0">
+      <div class="table-header">
+        <div class="col-name">Name</div>
+        <div class="col-email">Email</div>
+        <div class="col-role">Role</div>
+        <div class="col-date">Created</div>
+      </div>
+
+      <div class="table-row" *ngFor="let user of users">
+        <div class="col-name">
+          <div class="user-info">
+            <div class="avatar">{{ user.firstName.charAt(0) || 'U' }}</div>
+            <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+          </div>
+        </div>
+        <div class="col-email">{{ user.email }}</div>
+        <div class="col-role">
+          <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+            {{ getRoleText(user.role) }}
+          </span>
+        </div>
+        <div class="col-date">{{ user.createdAt | date:'mediumDate' }}</div>
+      </div>
+    </div>
+  </div>
+</div>

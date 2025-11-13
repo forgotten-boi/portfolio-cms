@@ -1,0 +1,41 @@
+<div class="blogs-container">
+  <div class="header">
+    <h1>Blogs</h1>
+    <button class="btn-primary" (click)="createBlog()">Create New Blog</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading blogs...</div>
+  
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error" class="blogs-grid">
+    <div *ngIf="blogs.length === 0" class="no-data">
+      No blogs found. Create your first blog!
+    </div>
+
+    <div *ngFor="let blog of blogs" class="blog-card">
+      <div class="blog-header">
+        <h3>{{ blog.title }}</h3>
+        <span class="status" [ngClass]="getStatusClass(blog.isPublished)">
+          {{ getStatusText(blog.isPublished) }}
+        </span>
+      </div>
+
+      <div class="blog-meta">
+        <span class="views">{{ blog.views }} views</span>
+        <span class="date">{{ blog.createdAt | date:'mediumDate' }}</span>
+      </div>
+
+      <p class="blog-summary">{{ blog.summary }}</p>
+
+      <div class="blog-tags" *ngIf="blog.tags && blog.tags.length > 0">
+        <span class="tag" *ngFor="let tag of blog.tags">{{ tag }}</span>
+      </div>
+
+      <div class="blog-actions">
+        <button class="btn-edit" (click)="editBlog(blog.id)">Edit</button>
+        <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

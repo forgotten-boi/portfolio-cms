@@ -1,0 +1,37 @@
+<div class="tenants-container">
+  <div class="header">
+    <h1>Tenants</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading tenants...</div>
+  
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error" class="tenants-list">
+    <div *ngIf="tenants.length === 0" class="no-data">
+      No tenants found.
+    </div>
+
+    <div class="tenants-grid" *ngIf="tenants.length > 0">
+      <div *ngFor="let tenant of tenants" class="tenant-card">
+        <div class="tenant-header">
+          <h3>{{ tenant.name }}</h3>
+          <span class="status" [ngClass]="getStatusClass(tenant.isActive)">
+            {{ getStatusText(tenant.isActive) }}
+          </span>
+        </div>
+
+        <div class="tenant-info">
+          <div class="info-row">
+            <strong>Subdomain:</strong>
+            <span class="subdomain">{{ tenant.subdomain }}</span>
+          </div>
+          <div class="info-row">
+            <strong>Created:</strong>
+            <span>{{ tenant.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

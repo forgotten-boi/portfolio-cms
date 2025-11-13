@@ -1,0 +1,90 @@
+<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Edit Portfolio' : 'Create New Portfolio' }}</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading...</div>
+  
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <form *ngIf="!loading" [formGroup]="portfolioForm" (ngSubmit)="onSubmit()" class="portfolio-form">
+    <div class="form-group">
+      <label for="title">Title *</label>
+      <input 
+        type="text" 
+        id="title" 
+        formControlName="title" 
+        [class.invalid]="isFieldInvalid('title')"
+        placeholder="Enter portfolio title">
+      <div *ngIf="isFieldInvalid('title')" class="error-message">
+        {{ getErrorMessage('title') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="subtitle">Subtitle *</label>
+      <input 
+        type="text" 
+        id="subtitle" 
+        formControlName="subtitle" 
+        [class.invalid]="isFieldInvalid('subtitle')"
+        placeholder="Enter subtitle">
+      <div *ngIf="isFieldInvalid('subtitle')" class="error-message">
+        {{ getErrorMessage('subtitle') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="bio">Bio *</label>
+      <textarea 
+        id="bio" 
+        formControlName="bio" 
+        rows="5"
+        [class.invalid]="isFieldInvalid('bio')"
+        placeholder="Tell us about yourself..."></textarea>
+      <div *ngIf="isFieldInvalid('bio')" class="error-message">
+        {{ getErrorMessage('bio') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="template">Template *</label>
+      <select 
+        id="template" 
+        formControlName="template" 
+        [class.invalid]="isFieldInvalid('template')">
+        <option *ngFor="let template of templates" [value]="template">
+          {{ template }}
+        </option>
+      </select>
+      <div *ngIf="isFieldInvalid('template')" class="error-message">
+        {{ getErrorMessage('template') }}
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" formControlName="isPublic">
+        <span>Make portfolio public</span>
+      </label>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" formControlName="featuredBlogsEnabled">
+        <span>Enable featured blogs</span>
+      </label>
+    </div>
+
+    <div class="info-box">
+      <p><strong>Note:</strong> After creating the portfolio, you can add work experience, education, skills, projects, and certifications by editing it later.</p>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn-submit" [disabled]="loading">
+        {{ isEditMode ? 'Update' : 'Create' }} Portfolio
+      </button>
+    </div>
+  </form>
+</div>

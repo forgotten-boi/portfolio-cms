@@ -1,0 +1,40 @@
+<div class="dashboard-container">
+  <h1>Dashboard</h1>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="loading" class="loading">Loading dashboard...</div>
+
+  <div class="stats-grid" *ngIf="!loading">
+    <div class="stat-card">
+      <h3>Total Blogs</h3>
+      <p class="stat-number">{{ stats.totalBlogs }}</p>
+      <a routerLink="/blogs" class="stat-link">View all →</a>
+    </div>
+
+    <div class="stat-card">
+      <h3>Published Blogs</h3>
+      <p class="stat-number">{{ stats.publishedBlogs }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Portfolios</h3>
+      <p class="stat-number">{{ stats.totalPortfolios }}</p>
+      <a routerLink="/portfolios" class="stat-link">View all →</a>
+    </div>
+
+    <div class="stat-card">
+      <h3>Users</h3>
+      <p class="stat-number">{{ stats.totalUsers }}</p>
+      <a routerLink="/users" class="stat-link">Manage →</a>
+    </div>
+  </div>
+
+  <div class="quick-actions" *ngIf="!loading">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <button routerLink="/blogs/new" class="btn btn-primary">Create New Blog</button>
+      <button routerLink="/portfolios/new" class="btn btn-primary">Create New Portfolio</button>
+    </div>
+  </div>
+</div>

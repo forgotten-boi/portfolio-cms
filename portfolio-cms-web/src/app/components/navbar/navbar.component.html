@@ -1,0 +1,15 @@
+<nav class="navbar" *ngIf="isAuthenticated">
+  <div class="nav-brand">
+    <h2>Portfolio CMS</h2>
+  </div>
+  <ul class="nav-links">
+    <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+    <li><a routerLink="/blogs" routerLinkActive="active">Blogs</a></li>
+    <li><a routerLink="/portfolios" routerLinkActive="active">Portfolios</a></li>
+    <li><a routerLink="/users" routerLinkActive="active">Users</a></li>
+    <li><a routerLink="/tenants" routerLinkActive="active">Tenants</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn btn-outline" (click)="logout()">Logout</button>
+  </div>
+</nav>

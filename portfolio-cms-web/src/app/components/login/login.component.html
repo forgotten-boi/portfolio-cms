@@ -1,0 +1,59 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1>Portfolio CMS</h1>
+    <h2>Login</h2>
+    
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="tenantId">Tenant ID</label>
+        <input 
+          type="text" 
+          id="tenantId" 
+          [(ngModel)]="tenantId" 
+          name="tenantId" 
+          placeholder="Enter your tenant ID"
+          required
+          class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          [(ngModel)]="email" 
+          name="email" 
+          placeholder="Enter your email"
+          required
+          class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          [(ngModel)]="password" 
+          name="password" 
+          placeholder="Enter your password"
+          required
+          class="form-control">
+      </div>
+
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="loading || !loginForm.form.valid">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+
+    <div class="register-link">
+      <p>Don't have an account? Contact your administrator</p>
+    </div>
+  </div>
+</div>

@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17
     container_name: portfolio-postgres
     environment:
       POSTGRES_USER: portfolio_user
@@ -29,7 +27,7 @@ services:
     container_name: portfolio-backend
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_URLS: http://+:8085
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=portfolio_db;Username=portfolio_user;Password=portfolio_pass"
       JwtSettings__Secret: "YourSuperSecretKeyForJWTTokenGenerationThatIsAtLeast32CharactersLong"
       JwtSettings__Issuer: "PortfolioCMS"
@@ -37,14 +35,14 @@ services:
       JwtSettings__ExpiryMinutes: "60"
       KafkaSettings__BootstrapServers: "kafka:9092"
     ports:
-      - "8080:8080"
+      - "8085:8085"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - portfolio-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -57,7 +55,7 @@ services:
       dockerfile: Dockerfile
     container_name: portfolio-frontend
     environment:
-      API_URL: http://backend-api:8080
+      API_URL: http://backend-api:8085
     ports:
       - "4200:80"
     depends_on:

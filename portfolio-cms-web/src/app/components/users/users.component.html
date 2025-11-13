@@ -1,6 +1,9 @@
 <div class="users-container">
   <div class="header">
     <h1>Users</h1>
+    <button class="btn-create-admin" (click)="openCreateAdminModal()">
+      <span>+</span> Create Admin
+    </button>
   </div>
 
   <div *ngIf="loading" class="loading">Loading users...</div>
@@ -35,6 +38,71 @@
         </div>
         <div class="col-date">{{ user.createdAt | date:'mediumDate' }}</div>
       </div>
+    </div>
+  </div>
+
+  <!-- Create Admin Modal -->
+  <div *ngIf="showCreateAdminModal" class="modal-overlay" (click)="closeCreateAdminModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create Admin User</h2>
+        <button class="close-btn" (click)="closeCreateAdminModal()">×</button>
+      </div>
+      
+      <div *ngIf="createAdminError" class="modal-error">{{ createAdminError }}</div>
+      
+      <form (ngSubmit)="createAdmin()" class="admin-form">
+        <div class="form-group">
+          <label for="firstName">First Name *</label>
+          <input 
+            type="text" 
+            id="firstName" 
+            [(ngModel)]="newAdmin.firstName" 
+            name="firstName"
+            placeholder="Enter first name"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name *</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            [(ngModel)]="newAdmin.lastName" 
+            name="lastName"
+            placeholder="Enter last name"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="newAdmin.email" 
+            name="email"
+            placeholder="Enter email address"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input 
+            type="password" 
+            id="password" 
+            [(ngModel)]="newAdmin.password" 
+            name="password"
+            placeholder="Enter password (min 6 characters)"
+            required>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeCreateAdminModal()">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="creatingAdmin">
+            {{ creatingAdmin ? 'Creating...' : 'Create Admin' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

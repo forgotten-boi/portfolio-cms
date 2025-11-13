@@ -62,10 +62,28 @@ export interface Portfolio {
   bio: string;
   template: 'Modern' | 'Classic' | 'Minimalist' | 'Creative';
   isPublic: boolean;
+  isPublished: boolean;
+  slug?: string;
+  templateId?: number;
+  publishedAt?: Date;
+  templateHtml?: string;
   featuredBlogsEnabled: boolean;
   createdAt: Date;
   updatedAt?: Date;
   data: PortfolioData;
+  fullName?: string;
+  profileImage?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  linkedIn?: string;
+  github?: string;
+  twitter?: string;
+  website?: string;
+  workExperience?: any[];
+  education?: any[];
+  skills?: any[];
+  projects?: any[];
 }
 
 export interface PortfolioData {

@@ -24,6 +24,10 @@ export class PortfolioService {
     return this.http.get<Portfolio>(`${this.baseUrl}/user/${userId}`);
   }
 
+  getBySlug(slug: string): Observable<Portfolio> {
+    return this.http.get<Portfolio>(`${environment.apiUrl}/portfolio/${slug}`);
+  }
+
   create(portfolio: CreatePortfolioDto): Observable<Portfolio> {
     return this.http.post<Portfolio>(this.baseUrl, portfolio);
   }

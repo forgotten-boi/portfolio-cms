@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 import { User } from '../../models';
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
@@ -13,8 +15,21 @@ export class UsersComponent implements OnInit {
   users: User[] = [];
   loading = true;
   error: string | null = null;
+  showCreateAdminModal = false;
+  
+  newAdmin = {
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: ''
+  };
+  creatingAdmin = false;
+  createAdminError: string | null = null;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -25,14 +40,58 @@ export class UsersComponent implements OnInit {
     this.error = null;
     
     this.userService.getAll().subscribe({
-      next: (users) => {
+      next: (users: User[]) => {
         this.users = users;
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error = 'Failed to load users';
         this.loading = false;
         console.error('Error loading users:', err);
+      }
+    });
+  }
+
+  openCreateAdminModal(): void {
+    this.showCreateAdminModal = true;
+    this.createAdminError = null;
+    this.newAdmin = {
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: ''
+    };
+  }
+
+  closeCreateAdminModal(): void {
+    this.showCreateAdminModal = false;
+    this.createAdminError = null;
+  }
+
+  createAdmin(): void {
+    if (!this.newAdmin.email || !this.newAdmin.password || 
+        !this.newAdmin.firstName || !this.newAdmin.lastName) {
+      this.createAdminError = 'All fields are required';
+      return;
+    }
+
+    if (this.newAdmin.password.length < 6) {
+      this.createAdminError = 'Password must be at least 6 characters';
+      return;
+    }
+
+    this.creatingAdmin = true;
+    this.createAdminError = null;
+
+    this.authService.createAdmin(this.newAdmin).subscribe({
+      next: () => {
+        this.closeCreateAdminModal();
+        this.loadUsers();
+      },
+      error: (err: any) => {
+        this.createAdminError = err.error?.message || 'Failed to create admin user';
+        this.creatingAdmin = false;
+        console.error('Error creating admin:', err);
       }
     });
   }
@@ -41,8 +100,8 @@ export class UsersComponent implements OnInit {
     const lowerRole = role?.toLowerCase();
     switch (lowerRole) {
       case 'admin': return 'role-admin';
-      case 'editor': return 'role-editor';
-      case 'viewer': return 'role-viewer';
+      case 'member': return 'role-member';
+      case 'guest': return 'role-guest';
       default: return 'role-guest';
     }
   }

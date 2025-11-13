@@ -1,0 +1,17 @@
+<div class="public-portfolio-container">
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading portfolio...</p>
+  </div>
+
+  <div *ngIf="error" class="error-container">
+    <h1>404</h1>
+    <p>{{ error }}</p>
+    <a routerLink="/" class="back-home">Back to Home</a>
+  </div>
+
+  <div *ngIf="!loading && !error && renderedHtml" 
+       class="portfolio-content" 
+       [innerHTML]="renderedHtml">
+  </div>
+</div>

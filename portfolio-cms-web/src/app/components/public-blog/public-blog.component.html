@@ -1,0 +1,51 @@
+<div class="public-blog-container">
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading blog...</p>
+  </div>
+
+  <div *ngIf="error" class="error-container">
+    <h1>404</h1>
+    <p>{{ error }}</p>
+    <a routerLink="/" class="back-home">Back to Home</a>
+  </div>
+
+  <article *ngIf="!loading && !error && blog" class="blog-article">
+    <header class="blog-header">
+      <div *ngIf="blog.headerImage" class="header-image">
+        <img [src]="blog.headerImage" [alt]="blog.title">
+      </div>
+      <div class="header-content">
+        <h1 class="blog-title">{{ blog.title }}</h1>
+        <p class="blog-summary">{{ blog.summary }}</p>
+        <div class="blog-meta">
+          <span class="author">By {{ blog.authorName || 'Anonymous' }}</span>
+          <span class="separator">•</span>
+          <span class="date">{{ formatDate(blog.publishedAt || blog.createdAt) }}</span>
+        </div>
+        <div *ngIf="blog.tags && blog.tags.length > 0" class="blog-tags">
+          <span *ngFor="let tag of blog.tags" class="tag">{{ tag }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="blog-content" [innerHTML]="safeContent"></div>
+
+    <footer class="blog-footer">
+      <div class="share-section">
+        <h3>Share this article</h3>
+        <div class="share-buttons">
+          <button (click)="shareOnLinkedIn()" class="share-btn linkedin">
+            <span>in</span> LinkedIn
+          </button>
+          <button (click)="shareOnTwitter()" class="share-btn twitter">
+            <span>𝕏</span> Twitter
+          </button>
+          <button (click)="shareOnFacebook()" class="share-btn facebook">
+            <span>f</span> Facebook
+          </button>
+        </div>
+      </div>
+    </footer>
+  </article>
+</div>

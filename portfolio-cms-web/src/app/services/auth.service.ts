@@ -41,6 +41,10 @@ export class AuthService {
     return this.http.post<AuthResult>(`${environment.apiUrl}/auth/register`, request);
   }
 
+  createAdmin(adminData: { email: string; password: string; firstName: string; lastName: string }): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/admin/users`, adminData);
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_ID_KEY);

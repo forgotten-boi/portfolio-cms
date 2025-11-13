@@ -56,6 +56,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'portfolio/:slug',
+    loadComponent: () => import('./components/public-portfolio/public-portfolio.component').then(m => m.PublicPortfolioComponent)
+  },
+  {
+    path: 'blog/:slug',
+    loadComponent: () => import('./components/public-blog/public-blog.component').then(m => m.PublicBlogComponent)
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full'

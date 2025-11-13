@@ -4,6 +4,7 @@ using Portfolio.Application.DTOs;
 using Portfolio.Application.Handlers;
 using Portfolio.Application.Interfaces;
 using Portfolio.Application.Queries;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Portfolio.Api.Endpoints;
 
@@ -157,6 +158,40 @@ public static class BlogEndpoints
             return Results.NoContent();
         }).RequireAuthorization();
 
+        // Public blog endpoint (no auth required)
+        group.MapGet("/blogs/{slug}", async (string slug, IBlogRepository blogRepo) =>
+        {
+            // Default to first tenant for public access
+            var tenantId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            var blog = await blogRepo.GetBySlugAsync(slug, tenantId);
+            
+            if (blog == null || !blog.IsPublished)
+                return Results.NotFound();
+
+            var blogDto = new BlogDto
+            {
+                Id = blog.Id,
+                TenantId = blog.TenantId,
+                AuthorId = blog.AuthorId,
+                Title = blog.Title,
+                Slug = blog.Slug,
+                Content = blog.Content,
+                Summary = blog.Summary,
+                HeaderImageUrl = blog.HeaderImageUrl,
+                IsPublished = blog.IsPublished,
+                PublishedAt = blog.PublishedAt,
+                CreatedAt = blog.CreatedAt,
+                UpdatedAt = blog.UpdatedAt,
+                ViewCount = blog.ViewCount,
+                Tags = blog.Tags.ToList()
+            };
+
+            return Results.Ok(blogDto);
+        })
+        .WithName("GetPublicBlog")
+        .WithDescription("Get published blog by slug (no authentication required)")
+        .AllowAnonymous();
+
         return group;
     }
 }
@@ -207,6 +242,30 @@ public static class PortfolioEndpoints
             return Results.Created($"/api/portfolios/{result.Id}", result);
         });
 
+        portfolios.MapPost("/generate", async (GeneratePortfolioDto dto, HttpContext context, ICommandHandler<GeneratePortfolioCommand, PortfolioDto> handler) =>
+        {
+            var tenantId = context.GetTenantId() ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
+            
+            var userIdClaim = context.User.FindFirst(JwtRegisteredClaimNames.Sub);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+                return Results.Unauthorized();
+
+            try
+            {
+                var result = await handler.HandleAsync(new GeneratePortfolioCommand(userId, tenantId, dto));
+                return Results.Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        })
+        .WithName("GeneratePortfolio")
+        .WithDescription("Generate portfolio from PDF resume or LinkedIn URL")
+        .Produces<PortfolioDto>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status401Unauthorized);
+
         portfolios.MapPut("/{id:guid}", async (Guid id, UpdatePortfolioDto dto, HttpContext context, ICommandHandler<UpdatePortfolioCommand, PortfolioDto> handler) =>
         {
             var tenantId = context.GetTenantId();
@@ -242,6 +301,16 @@ public static class PortfolioEndpoints
             return Results.Ok(result);
         });
 
+        // Public portfolio endpoint (no auth required)
+        group.MapGet("/portfolio/{slug}", async (string slug, IPortfolioRepository portfolioRepo) =>
+        {
+            // TODO: Add query to get by slug - for now return NotFound
+            return Results.NotFound(new { message = "Public portfolio endpoint - implementation pending" });
+        })
+        .WithName("GetPublicPortfolio")
+        .WithDescription("Get public portfolio by slug (no authentication required)")
+        .AllowAnonymous();
+
         return group;
     }
 }
@@ -254,8 +323,26 @@ public static class AuthEndpoints
 
         auth.MapPost("/login", async (LoginRequest request, IAuthService authService) =>
         {
-            var result = await authService.AuthenticateAsync(request.Email, request.Password, request.TenantId);
+            // Use default tenant (Guid.Empty) if TenantId is not provided or is empty
+            var tenantId = request.TenantId == Guid.Empty || request.TenantId == null 
+                ? Guid.Empty 
+                : request.TenantId.Value;
+                
+            var result = await authService.AuthenticateAsync(request.Email, request.Password, tenantId);
             return result.Success ? Results.Ok(result) : Results.Unauthorized();
+        });
+
+        auth.MapPost("/register", async (RegisterUserDto dto, ICommandHandler<RegisterUserCommand, UserDto> handler) =>
+        {
+            try
+            {
+                var result = await handler.HandleAsync(new RegisterUserCommand(dto));
+                return Results.Created($"/api/users/{result.Id}", result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
         });
 
         auth.MapPost("/oauth", async (OAuthRequest request, IAuthService authService) =>
@@ -266,6 +353,42 @@ public static class AuthEndpoints
 
         return group;
     }
+
+    public static RouteGroupBuilder MapAdminEndpoints(this RouteGroupBuilder group)
+    {
+        var admin = group.MapGroup("/admin").RequireAuthorization("Admin");
+
+        admin.MapPost("/users", async (CreateAdminDto dto, ICommandHandler<CreateAdminCommand, UserDto> handler, HttpContext httpContext) =>
+        {
+            try
+            {
+                // Get current user ID from JWT claims
+                var userIdClaim = httpContext.User.FindFirst(JwtRegisteredClaimNames.Sub);
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var requestingUserId))
+                {
+                    return Results.Unauthorized();
+                }
+
+                var result = await handler.HandleAsync(new CreateAdminCommand(dto, requestingUserId));
+                return Results.Created($"/api/users/{result.Id}", result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Results.Unauthorized();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        })
+        .WithName("CreateAdmin")
+        .WithDescription("Admin-only endpoint to create other admin users")
+        .Produces<UserDto>(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status401Unauthorized);
+
+        return group;
+    }
 }
 
-public record LoginRequest(string Email, string Password, Guid TenantId);
+public record LoginRequest(string Email, string Password, Guid? TenantId);

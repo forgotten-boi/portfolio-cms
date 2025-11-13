@@ -6,7 +6,7 @@ public interface IAuthService
 {
     Task<AuthResult> AuthenticateAsync(string email, string password, Guid tenantId, CancellationToken cancellationToken = default);
     Task<AuthResult> AuthenticateWithOAuthAsync(OAuthRequest request, CancellationToken cancellationToken = default);
-    Task<string> GenerateTokenAsync(Guid userId, Guid tenantId, string email, string role, CancellationToken cancellationToken = default);
+    Task<string> GenerateTokenAsync(Guid userId, Guid tenantId, string email, IEnumerable<string> roles, CancellationToken cancellationToken = default);
     Task<bool> ValidateTokenAsync(string token, CancellationToken cancellationToken = default);
     Task<TenantContext?> GetTenantContextFromTokenAsync(string token, CancellationToken cancellationToken = default);
 }

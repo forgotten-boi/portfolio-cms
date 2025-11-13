@@ -15,6 +15,8 @@ public class PortfolioDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Blog> Blogs => Set<Blog>();
     public DbSet<PortfolioEntity> Portfolios => Set<PortfolioEntity>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -129,6 +131,40 @@ public class PortfolioDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Role configuration
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.ToTable("Roles");
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Name).IsRequired().HasMaxLength(50);
+            entity.Property(r => r.Description).HasMaxLength(500);
+            entity.HasIndex(r => r.Name).IsUnique();
+            
+            // Seed default roles
+            entity.HasData(
+                new Role { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Admin", Description = "Administrator role with full access", CreatedAt = DateTime.UtcNow },
+                new Role { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Member", Description = "Regular member with standard access", CreatedAt = DateTime.UtcNow },
+                new Role { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Guest", Description = "Guest user with limited access", CreatedAt = DateTime.UtcNow }
+            );
+        });
+
+        // UserRoleAssignment configuration
+        modelBuilder.Entity<UserRoleAssignment>(entity =>
+        {
+            entity.ToTable("UserRoleAssignments");
+            entity.HasKey(ura => new { ura.UserId, ura.RoleId });
+            
+            entity.HasOne(ura => ura.User)
+                .WithMany(u => u.UserRoleAssignments)
+                .HasForeignKey(ura => ura.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(ura => ura.Role)
+                .WithMany(r => r.UserRoleAssignments)
+                .HasForeignKey(ura => ura.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

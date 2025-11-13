@@ -217,3 +217,249 @@ public class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand, UserD
         };
     }
 }
+
+// Register User Command Handler
+public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, UserDto>
+{
+    private readonly IUserRepository _userRepository;
+    private readonly ITenantRepository _tenantRepository;
+    private readonly IRoleRepository _roleRepository;
+    private readonly IUserRoleAssignmentRepository _userRoleAssignmentRepository;
+    private readonly IMessageBus _messageBus;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public RegisterUserCommandHandler(
+        IUserRepository userRepository,
+        ITenantRepository tenantRepository,
+        IRoleRepository roleRepository,
+        IUserRoleAssignmentRepository userRoleAssignmentRepository,
+        IMessageBus messageBus,
+        IUnitOfWork unitOfWork)
+    {
+        _userRepository = userRepository;
+        _tenantRepository = tenantRepository;
+        _roleRepository = roleRepository;
+        _userRoleAssignmentRepository = userRoleAssignmentRepository;
+        _messageBus = messageBus;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<UserDto> HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default)
+    {
+        // Use default tenant if not provided
+        var tenantId = command.Data.TenantId ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
+        
+        // Verify tenant exists
+        var tenant = await _tenantRepository.GetByIdAsync(tenantId, cancellationToken);
+        if (tenant == null)
+        {
+            throw new InvalidOperationException("Tenant not found");
+        }
+
+        // Check if user already exists
+        var existingUser = await _userRepository.GetByEmailAsync(command.Data.Email, tenantId, cancellationToken);
+        if (existingUser != null)
+        {
+            throw new InvalidOperationException($"User with email '{command.Data.Email}' already exists");
+        }
+
+        // Get Member role
+        var memberRole = await _roleRepository.GetByNameAsync("Member", cancellationToken);
+        if (memberRole == null)
+        {
+            throw new InvalidOperationException("Member role not found");
+        }
+
+        // Hash password
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(command.Data.Password);
+
+        // Create user
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            Email = command.Data.Email,
+            PasswordHash = passwordHash,
+            FirstName = command.Data.FirstName,
+            LastName = command.Data.LastName,
+            ProfileImageUrl = command.Data.ProfileImageUrl,
+            Role = UserRole.User,
+            AuthProvider = AuthProvider.Email,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _userRepository.AddAsync(user, cancellationToken);
+        
+        // Assign Member role
+        var userRoleAssignment = new UserRoleAssignment
+        {
+            UserId = user.Id,
+            RoleId = memberRole.Id,
+            AssignedAt = DateTime.UtcNow
+        };
+        
+        await _userRoleAssignmentRepository.AddAsync(userRoleAssignment, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Publish events
+        var userRegisteredEvent = new UserRegisteredEvent
+        {
+            UserId = user.Id,
+            TenantId = user.TenantId,
+            Email = user.Email,
+            FirstName = user.FirstName ?? string.Empty,
+            LastName = user.LastName ?? string.Empty,
+            RoleId = memberRole.Id
+        };
+        await _messageBus.PublishAsync(userRegisteredEvent, "users.registered", cancellationToken);
+
+        var roleAssignedEvent = new RoleAssignedEvent
+        {
+            UserId = user.Id,
+            RoleId = memberRole.Id,
+            RoleName = memberRole.Name
+        };
+        await _messageBus.PublishAsync(roleAssignedEvent, "roles.assigned", cancellationToken);
+
+        return new UserDto
+        {
+            Id = user.Id,
+            TenantId = user.TenantId,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            ProfileImageUrl = user.ProfileImageUrl,
+            Role = user.Role.ToString(),
+            AuthProvider = user.AuthProvider.ToString(),
+            IsActive = user.IsActive,
+            CreatedAt = user.CreatedAt
+        };
+    }
+}
+
+// Create Admin Command Handler (Admin-only)
+public class CreateAdminCommandHandler : ICommandHandler<CreateAdminCommand, UserDto>
+{
+    private readonly IUserRepository _userRepository;
+    private readonly ITenantRepository _tenantRepository;
+    private readonly IRoleRepository _roleRepository;
+    private readonly IUserRoleAssignmentRepository _userRoleAssignmentRepository;
+    private readonly IMessageBus _messageBus;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CreateAdminCommandHandler(
+        IUserRepository userRepository,
+        ITenantRepository tenantRepository,
+        IRoleRepository roleRepository,
+        IUserRoleAssignmentRepository userRoleAssignmentRepository,
+        IMessageBus messageBus,
+        IUnitOfWork unitOfWork)
+    {
+        _userRepository = userRepository;
+        _tenantRepository = tenantRepository;
+        _roleRepository = roleRepository;
+        _userRoleAssignmentRepository = userRoleAssignmentRepository;
+        _messageBus = messageBus;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<UserDto> HandleAsync(CreateAdminCommand command, CancellationToken cancellationToken = default)
+    {
+        // Verify requesting user has Admin role
+        var requestingUserRoles = await _roleRepository.GetRolesByUserIdAsync(command.RequestingUserId, cancellationToken);
+        if (!requestingUserRoles.Any(r => r.Name == "Admin"))
+        {
+            throw new UnauthorizedAccessException("Only Admins can create other Admins");
+        }
+
+        // Use default tenant if not provided
+        var tenantId = command.Data.TenantId ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
+        
+        // Verify tenant exists
+        var tenant = await _tenantRepository.GetByIdAsync(tenantId, cancellationToken);
+        if (tenant == null)
+        {
+            throw new InvalidOperationException("Tenant not found");
+        }
+
+        // Check if user already exists
+        var existingUser = await _userRepository.GetByEmailAsync(command.Data.Email, tenantId, cancellationToken);
+        if (existingUser != null)
+        {
+            throw new InvalidOperationException($"User with email '{command.Data.Email}' already exists");
+        }
+
+        // Get Admin role
+        var adminRole = await _roleRepository.GetByNameAsync("Admin", cancellationToken);
+        if (adminRole == null)
+        {
+            throw new InvalidOperationException("Admin role not found");
+        }
+
+        // Hash password
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(command.Data.Password);
+
+        // Create user with Admin UserRole enum
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            Email = command.Data.Email,
+            PasswordHash = passwordHash,
+            FirstName = command.Data.FirstName,
+            LastName = command.Data.LastName,
+            ProfileImageUrl = command.Data.ProfileImageUrl,
+            Role = UserRole.Admin,
+            AuthProvider = AuthProvider.Email,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _userRepository.AddAsync(user, cancellationToken);
+        
+        // Assign Admin role via UserRoleAssignment
+        var userRoleAssignment = new UserRoleAssignment
+        {
+            UserId = user.Id,
+            RoleId = adminRole.Id,
+            AssignedAt = DateTime.UtcNow
+        };
+        
+        await _userRoleAssignmentRepository.AddAsync(userRoleAssignment, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Publish events
+        var adminCreatedEvent = new AdminCreatedEvent
+        {
+            AdminUserId = user.Id,
+            TenantId = user.TenantId,
+            Email = user.Email,
+            CreatedByUserId = command.RequestingUserId
+        };
+        await _messageBus.PublishAsync(adminCreatedEvent, "admins.created", cancellationToken);
+
+        var roleAssignedEvent = new RoleAssignedEvent
+        {
+            UserId = user.Id,
+            RoleId = adminRole.Id,
+            RoleName = adminRole.Name,
+            AssignedByUserId = command.RequestingUserId
+        };
+        await _messageBus.PublishAsync(roleAssignedEvent, "roles.assigned", cancellationToken);
+
+        return new UserDto
+        {
+            Id = user.Id,
+            TenantId = user.TenantId,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            ProfileImageUrl = user.ProfileImageUrl,
+            Role = user.Role.ToString(),
+            AuthProvider = user.AuthProvider.ToString(),
+            IsActive = user.IsActive,
+            CreatedAt = user.CreatedAt
+        };
+    }
+}

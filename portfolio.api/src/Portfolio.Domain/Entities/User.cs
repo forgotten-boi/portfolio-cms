@@ -19,6 +19,7 @@ public class User
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;
+    public ICollection<UserRoleAssignment> UserRoleAssignments { get; set; } = new List<UserRoleAssignment>();
 }
 
 public enum UserRole

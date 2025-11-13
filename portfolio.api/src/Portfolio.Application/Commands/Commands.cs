@@ -44,6 +44,28 @@ public class CreateUserCommand : Command<UserDto>
     }
 }
 
+public class RegisterUserCommand : Command<UserDto>
+{
+    public RegisterUserDto Data { get; }
+
+    public RegisterUserCommand(RegisterUserDto data)
+    {
+        Data = data;
+    }
+}
+
+public class CreateAdminCommand : Command<UserDto>
+{
+    public CreateAdminDto Data { get; }
+    public Guid RequestingUserId { get; }
+
+    public CreateAdminCommand(CreateAdminDto data, Guid requestingUserId)
+    {
+        Data = data;
+        RequestingUserId = requestingUserId;
+    }
+}
+
 public class UpdateUserCommand : Command<UserDto>
 {
     public Guid UserId { get; }
@@ -110,6 +132,20 @@ public class CreatePortfolioCommand : Command<PortfolioDto>
     {
         TenantId = tenantId;
         UserId = userId;
+        Data = data;
+    }
+}
+
+public class GeneratePortfolioCommand : Command<PortfolioDto>
+{
+    public Guid UserId { get; }
+    public Guid TenantId { get; }
+    public GeneratePortfolioDto Data { get; }
+
+    public GeneratePortfolioCommand(Guid userId, Guid tenantId, GeneratePortfolioDto data)
+    {
+        UserId = userId;
+        TenantId = tenantId;
         Data = data;
     }
 }

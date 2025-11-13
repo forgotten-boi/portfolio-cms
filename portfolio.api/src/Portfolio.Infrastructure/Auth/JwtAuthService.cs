@@ -12,15 +12,17 @@ namespace Portfolio.Infrastructure.Auth;
 public class JwtAuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IRoleRepository _roleRepository;
     private readonly IConfiguration _configuration;
     private readonly string _jwtSecret;
     private readonly string _jwtIssuer;
     private readonly string _jwtAudience;
     private readonly int _jwtExpiryMinutes;
 
-    public JwtAuthService(IUserRepository userRepository, IConfiguration configuration)
+    public JwtAuthService(IUserRepository userRepository, IRoleRepository roleRepository, IConfiguration configuration)
     {
         _userRepository = userRepository;
+        _roleRepository = roleRepository;
         _configuration = configuration;
         _jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-min-32-chars-long-for-security";
         _jwtIssuer = configuration["Jwt:Issuer"] ?? "portfolio-api";
@@ -30,6 +32,13 @@ public class JwtAuthService : IAuthService
 
     public async Task<AuthResult> AuthenticateAsync(string email, string password, Guid tenantId, CancellationToken cancellationToken = default)
     {
+        // If tenantId is Guid.Empty, use the default tenant (first tenant in system or specific default)
+        if (tenantId == Guid.Empty)
+        {
+            // Use the default tenant ID (update this to match your default tenant's actual ID)
+            tenantId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        }
+        
         var user = await _userRepository.GetByEmailAsync(email, tenantId, cancellationToken);
         
         if (user == null || !user.IsActive)
@@ -63,7 +72,17 @@ public class JwtAuthService : IAuthService
         user.LastLoginAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user, cancellationToken);
 
-        var token = await GenerateTokenAsync(user.Id, user.TenantId, user.Email, user.Role.ToString(), cancellationToken);
+        // Get user roles from UserRoleAssignments
+        var userRoles = await _roleRepository.GetRolesByUserIdAsync(user.Id, cancellationToken);
+        var roleNames = userRoles.Select(r => r.Name).ToList();
+        
+        // Fallback to UserRole enum if no roles assigned
+        if (!roleNames.Any())
+        {
+            roleNames.Add(user.Role.ToString());
+        }
+
+        var token = await GenerateTokenAsync(user.Id, user.TenantId, user.Email, roleNames, cancellationToken);
 
         return new AuthResult
         {
@@ -137,7 +156,17 @@ public class JwtAuthService : IAuthService
             await _userRepository.UpdateAsync(user, cancellationToken);
         }
 
-        var token = await GenerateTokenAsync(user.Id, user.TenantId, user.Email, user.Role.ToString(), cancellationToken);
+        // Get user roles from UserRoleAssignments
+        var userRoles = await _roleRepository.GetRolesByUserIdAsync(user.Id, cancellationToken);
+        var roleNames = userRoles.Select(r => r.Name).ToList();
+        
+        // Fallback to UserRole enum if no roles assigned
+        if (!roleNames.Any())
+        {
+            roleNames.Add(user.Role.ToString());
+        }
+
+        var token = await GenerateTokenAsync(user.Id, user.TenantId, user.Email, roleNames, cancellationToken);
 
         return new AuthResult
         {
@@ -147,19 +176,24 @@ public class JwtAuthService : IAuthService
         };
     }
 
-    public Task<string> GenerateTokenAsync(Guid userId, Guid tenantId, string email, string role, CancellationToken cancellationToken = default)
+    public Task<string> GenerateTokenAsync(Guid userId, Guid tenantId, string email, IEnumerable<string> roles, CancellationToken cancellationToken = default)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("tenantId", tenantId.ToString()),
-            new Claim(ClaimTypes.Role, role)
+            new Claim("tenantId", tenantId.ToString())
         };
+
+        // Add role claims - each role as a separate claim
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var token = new JwtSecurityToken(
             issuer: _jwtIssuer,

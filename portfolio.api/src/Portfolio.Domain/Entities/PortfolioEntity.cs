@@ -6,6 +6,7 @@ public class PortfolioEntity
     public Guid TenantId { get; set; }
     public Guid UserId { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Bio { get; set; }
     public string? ProfileImageUrl { get; set; }
@@ -14,12 +15,15 @@ public class PortfolioEntity
     public string? GitHubUrl { get; set; }
     public string? WebsiteUrl { get; set; }
     public PortfolioTemplate Template { get; set; } = PortfolioTemplate.Modern;
+    public int TemplateId { get; set; } = 1;
+    public bool IsPublished { get; set; } = false;
     public bool FeaturedBlogsEnabled { get; set; } = false;
     public int MaxFeaturedBlogs { get; set; } = 5;
     public PortfolioData Data { get; set; } = new();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public DateTime? LastGeneratedAt { get; set; }
+    public DateTime? PublishedAt { get; set; }
     
     // Navigation properties
     public Tenant Tenant { get; set; } = null!;

@@ -150,3 +150,58 @@ public class PortfolioRepository : Repository<PortfolioEntity>, IPortfolioReposi
             .ToListAsync(cancellationToken);
     }
 }
+
+public class RoleRepository : Repository<Role>, IRoleRepository
+{
+    public RoleRepository(PortfolioDbContext context) : base(context)
+    {
+    }
+
+    public async Task<Role?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .FirstOrDefaultAsync(r => r.Name == name, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Role>> GetRolesByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserRoleAssignments
+            .Where(ura => ura.UserId == userId)
+            .Select(ura => ura.Role)
+            .ToListAsync(cancellationToken);
+    }
+}
+
+public class UserRoleAssignmentRepository : IUserRoleAssignmentRepository
+{
+    private readonly PortfolioDbContext _context;
+
+    public UserRoleAssignmentRepository(PortfolioDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task AddAsync(UserRoleAssignment assignment, CancellationToken cancellationToken = default)
+    {
+        await _context.UserRoleAssignments.AddAsync(assignment, cancellationToken);
+    }
+
+    public async Task RemoveAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default)
+    {
+        var assignment = await _context.UserRoleAssignments
+            .FirstOrDefaultAsync(ura => ura.UserId == userId && ura.RoleId == roleId, cancellationToken);
+        if (assignment != null)
+        {
+            _context.UserRoleAssignments.Remove(assignment);
+        }
+    }
+
+    public async Task<IEnumerable<UserRoleAssignment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserRoleAssignments
+            .Where(ura => ura.UserId == userId)
+            .Include(ura => ura.Role)
+            .ToListAsync(cancellationToken);
+    }
+}
+

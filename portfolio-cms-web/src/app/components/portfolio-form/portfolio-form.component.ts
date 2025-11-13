@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
-import { CreatePortfolioDto } from '../../models';
+import { CreatePortfolioDto, GeneratePortfolioDto } from '../../models';
 
 @Component({
   selector: 'app-portfolio-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './portfolio-form.component.html',
   styleUrl: './portfolio-form.component.scss'
 })
@@ -16,9 +16,19 @@ export class PortfolioFormComponent implements OnInit {
   isEditMode = false;
   portfolioId?: string;
   loading = false;
+  generating = false;
   error: string | null = null;
+  showGenerateModal = false;
+  selectedFile: File | null = null;
+  linkedInUrl = '';
 
-  templates = ['Modern', 'Classic', 'Minimalist', 'Creative'];
+  templates = [
+    { id: 1, name: 'Modern', description: 'Purple gradient with modern cards' },
+    { id: 2, name: 'Classic', description: 'Professional serif typography' },
+    { id: 3, name: 'Minimal', description: 'Clean black and white design' },
+    { id: 4, name: 'Creative', description: 'Terminal/hacker theme' },
+    { id: 5, name: 'Vibrant', description: 'Pink gradient with emoji icons' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -43,7 +53,7 @@ export class PortfolioFormComponent implements OnInit {
       title: ['', [Validators.required, Validators.maxLength(100)]],
       subtitle: ['', [Validators.required, Validators.maxLength(200)]],
       bio: ['', [Validators.required, Validators.maxLength(1000)]],
-      template: ['Modern', [Validators.required]],
+      template: [1, [Validators.required]],
       isPublic: [false],
       featuredBlogsEnabled: [false]
     });
@@ -99,6 +109,98 @@ export class PortfolioFormComponent implements OnInit {
         this.loading = false;
         console.error('Error saving portfolio:', err);
       }
+    });
+  }
+
+  openGenerateModal(): void {
+    this.showGenerateModal = true;
+    this.error = null;
+  }
+
+  closeGenerateModal(): void {
+    this.showGenerateModal = false;
+    this.selectedFile = null;
+    this.linkedInUrl = '';
+    this.error = null;
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      this.selectedFile = file;
+      this.error = null;
+    } else {
+      this.error = 'Please select a PDF file';
+      this.selectedFile = null;
+    }
+  }
+
+  async generatePortfolio(): Promise<void> {
+    if (!this.selectedFile && !this.linkedInUrl) {
+      this.error = 'Please provide either a PDF resume or LinkedIn URL';
+      return;
+    }
+
+    this.generating = true;
+    this.error = null;
+
+    try {
+      const generateData: GeneratePortfolioDto = {
+        templateId: this.portfolioForm.get('template')?.value || 1
+      };
+
+      if (this.selectedFile) {
+        // Convert PDF to base64
+        const base64 = await this.fileToBase64(this.selectedFile);
+        generateData.pdfBase64 = base64;
+      }
+
+      if (this.linkedInUrl) {
+        generateData.linkedInProfileUrl = this.linkedInUrl;
+      }
+
+      this.portfolioService.generate(generateData).subscribe({
+        next: (portfolio) => {
+          this.generating = false;
+          this.closeGenerateModal();
+          
+          // Pre-fill form with generated data
+          this.portfolioForm.patchValue({
+            title: portfolio.title,
+            subtitle: portfolio.subtitle,
+            bio: portfolio.bio,
+            template: portfolio.template || 1,
+            isPublic: portfolio.isPublic || false,
+            featuredBlogsEnabled: portfolio.featuredBlogsEnabled || false
+          });
+
+          // Show success message
+          alert('Portfolio generated successfully! Review and save your portfolio.');
+        },
+        error: (err) => {
+          this.generating = false;
+          this.error = err.error?.detail || 'Failed to generate portfolio';
+          console.error('Generate error:', err);
+        }
+      });
+    } catch (err) {
+      this.generating = false;
+      this.error = 'Failed to process file';
+      console.error('File processing error:', err);
+    }
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
 

@@ -14,6 +14,7 @@ using Portfolio.Infrastructure.Messaging;
 using Portfolio.Infrastructure.Persistence;
 using Portfolio.Infrastructure.Repositories;
 using Serilog;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,8 @@ builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleAssignmentRepository, UserRoleAssignmentRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Message Bus (check if Kafka is enabled or use in-memory)
@@ -62,11 +65,14 @@ builder.Services.AddScoped<IAuthService, JwtAuthService>();
 builder.Services.AddScoped<ICommandHandler<CreateTenantCommand, TenantDto>, CreateTenantCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdateTenantCommand, TenantDto>, UpdateTenantCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<CreateUserCommand, UserDto>, CreateUserCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<RegisterUserCommand, UserDto>, RegisterUserCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<CreateAdminCommand, UserDto>, CreateAdminCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdateUserCommand, UserDto>, UpdateUserCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<CreateBlogCommand, BlogDto>, CreateBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdateBlogCommand, BlogDto>, UpdateBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<DeleteBlogCommand, bool>, DeleteBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<CreatePortfolioCommand, PortfolioDto>, CreatePortfolioCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<GeneratePortfolioCommand, PortfolioDto>, GeneratePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdatePortfolioCommand, PortfolioDto>, UpdatePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<ImportLinkedInCommand, PortfolioDto>, ImportLinkedInCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<ImportResumeCommand, PortfolioDto>, ImportResumeCommandHandler>();
@@ -103,11 +109,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidAudience = jwtAudience,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Admin policy - requires Admin role
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    
+    // Member policy - requires Member or Admin role
+    options.AddPolicy("Member", policy => policy.RequireRole("Member", "Admin"));
+    
+    // Guest policy - any authenticated user (Guest, Member, or Admin)
+    options.AddPolicy("Guest", policy => policy.RequireAuthenticatedUser());
+});
 
 // CORS
 builder.Services.AddCors(options =>
@@ -157,5 +174,6 @@ app.MapGroup("/api").MapUserEndpoints();
 app.MapGroup("/api").MapBlogEndpoints();
 app.MapGroup("/api").MapPortfolioEndpoints();
 app.MapGroup("/api").MapAuthEndpoints();
+app.MapGroup("/api").MapAdminEndpoints();
 
 app.Run();

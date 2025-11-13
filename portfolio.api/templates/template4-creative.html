@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}} - Creative Portfolio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff00; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        header { border: 2px solid #00ff00; padding: 40px; margin-bottom: 40px; position: relative; }
+        header::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid #00ff00; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 0 0 10px #00ff00; }
+        .subtitle { color: #00cc00; margin-bottom: 20px; }
+        .bio { color: #00dd00; margin-bottom: 20px; }
+        .social-links a { color: #00ff00; text-decoration: none; margin-right: 20px; border: 1px solid #00ff00; padding: 8px 16px; display: inline-block; margin-bottom: 10px; }
+        .social-links a:hover { background: #00ff00; color: #0a0a0a; }
+        section { border-left: 3px solid #00ff00; padding-left: 20px; margin-bottom: 40px; }
+        h2 { font-size: 1.8em; color: #00ff00; margin-bottom: 20px; text-transform: uppercase; }
+        h2::before { content: '> '; }
+        .work-item, .education-item, .project-item { margin-bottom: 25px; padding: 15px; border: 1px solid #003300; background: rgba(0, 255, 0, 0.05); }
+        .work-item h3, .education-item h3, .project-item h3 { color: #00ff00; margin-bottom: 8px; }
+        .work-item h3::before, .education-item h3::before, .project-item h3::before { content: '# '; color: #00cc00; }
+        .meta { color: #00aa00; font-size: 0.9em; margin-bottom: 10px; }
+        .meta::before { content: '@ '; }
+        .skills { display: flex; flex-wrap: wrap; gap: 10px; }
+        .skill { border: 1px solid #00ff00; padding: 6px 12px; background: rgba(0, 255, 0, 0.1); }
+        footer { text-align: center; padding: 40px; border-top: 2px solid #00ff00; margin-top: 40px; color: #00aa00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{TITLE}}</h1>
+            {{#if SUBTITLE}}<p class="subtitle">{{SUBTITLE}}</p>{{/if}}
+            {{#if BIO}}<p class="bio">{{BIO}}</p>{{/if}}
+            <div class="social-links">
+                {{#if LINKEDIN_URL}}<a href="{{LINKEDIN_URL}}">[ LinkedIn ]</a>{{/if}}
+                {{#if GITHUB_URL}}<a href="{{GITHUB_URL}}">[ GitHub ]</a>{{/if}}
+                {{#if WEBSITE_URL}}<a href="{{WEBSITE_URL}}">[ Website ]</a>{{/if}}
+                {{#if RESUME_URL}}<a href="{{RESUME_URL}}">[ Resume ]</a>{{/if}}
+            </div>
+        </header>
+
+        {{#if WORK_EXPERIENCES}}
+        <section>
+            <h2>Work Experience</h2>
+            {{#each WORK_EXPERIENCES}}
+            <div class="work-item">
+                <h3>{{Position}}</h3>
+                <p class="meta">{{Company}} | {{StartDate}} - {{#if IsCurrent}}PRESENT{{else}}{{EndDate}}{{/if}}</p>
+                {{#if Description}}<p>{{Description}}</p>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if SKILLS}}
+        <section>
+            <h2>Skills</h2>
+            <div class="skills">
+                {{#each SKILLS}}<span class="skill">{{Name}}</span>{{/each}}
+            </div>
+        </section>
+        {{/if}}
+
+        {{#if EDUCATION}}
+        <section>
+            <h2>Education</h2>
+            {{#each EDUCATION}}
+            <div class="education-item">
+                <h3>{{Degree}}</h3>
+                <p class="meta">{{Institution}} | {{StartDate}} - {{EndDate}}</p>
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if PROJECTS}}
+        <section>
+            <h2>Projects</h2>
+            {{#each PROJECTS}}
+            <div class="project-item">
+                <h3>{{Name}}</h3>
+                {{#if Description}}<p>{{Description}}</p>{{/if}}
+                {{#if Url}}<p><a href="{{Url}}" style="color: #00ff00; text-decoration: underline;">View Project</a></p>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        <footer>
+            <p>[ {{TITLE}} ] [ 2024 ]</p>
+            <p style="margin-top: 10px;">$ whoami</p>
+        </footer>
+    </div>
+</body>
+</html>

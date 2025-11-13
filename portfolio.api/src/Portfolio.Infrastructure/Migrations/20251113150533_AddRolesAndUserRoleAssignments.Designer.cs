@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Portfolio.Infrastructure.Data;
@@ -11,9 +12,11 @@ using Portfolio.Infrastructure.Data;
 namespace Portfolio.Infrastructure.Migrations
 {
     [DbContext(typeof(PortfolioDbContext))]
-    partial class PortfolioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113150533_AddRolesAndUserRoleAssignments")]
+    partial class AddRolesAndUserRoleAssignments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,9 +106,6 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Property<string>("GitHubUrl")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime?>("LastGeneratedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -118,14 +118,7 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Property<string>("ProfileImageUrl")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("PublishedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("ResumeUrl")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Subtitle")
@@ -134,9 +127,6 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Property<string>("Template")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("integer");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -198,21 +188,21 @@ namespace Portfolio.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2025, 11, 13, 17, 21, 5, 261, DateTimeKind.Utc).AddTicks(3663),
+                            CreatedAt = new DateTime(2025, 11, 13, 15, 5, 32, 656, DateTimeKind.Utc).AddTicks(6535),
                             Description = "Administrator role with full access",
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2025, 11, 13, 17, 21, 5, 261, DateTimeKind.Utc).AddTicks(3934),
+                            CreatedAt = new DateTime(2025, 11, 13, 15, 5, 32, 656, DateTimeKind.Utc).AddTicks(6754),
                             Description = "Regular member with standard access",
                             Name = "Member"
                         },
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CreatedAt = new DateTime(2025, 11, 13, 17, 21, 5, 261, DateTimeKind.Utc).AddTicks(3938),
+                            CreatedAt = new DateTime(2025, 11, 13, 15, 5, 32, 656, DateTimeKind.Utc).AddTicks(6757),
                             Description = "Guest user with limited access",
                             Name = "Guest"
                         });

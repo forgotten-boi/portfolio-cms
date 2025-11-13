@@ -37,3 +37,16 @@ public interface IPortfolioRepository : IRepository<PortfolioEntity>
     Task<PortfolioEntity?> GetByUserIdAsync(Guid userId, Guid tenantId, CancellationToken cancellationToken = default);
     Task<IEnumerable<PortfolioEntity>> GetByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default);
 }
+
+public interface IRoleRepository : IRepository<Role>
+{
+    Task<Role?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Role>> GetRolesByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+}
+
+public interface IUserRoleAssignmentRepository
+{
+    Task AddAsync(UserRoleAssignment assignment, CancellationToken cancellationToken = default);
+    Task RemoveAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<UserRoleAssignment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+}

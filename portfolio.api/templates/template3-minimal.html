@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #000; background: #fff; }
+        .container { max-width: 800px; margin: 0 auto; padding: 80px 40px; }
+        header { text-align: center; margin-bottom: 80px; }
+        h1 { font-size: 3em; font-weight: 300; letter-spacing: -1px; margin-bottom: 10px; }
+        .subtitle { font-size: 1em; color: #666; font-weight: 300; margin-bottom: 20px; }
+        .bio { font-size: 0.95em; color: #666; max-width: 600px; margin: 0 auto 30px; }
+        .social-links a { color: #000; text-decoration: none; margin: 0 15px; font-size: 0.9em; border-bottom: 1px solid #000; padding-bottom: 2px; }
+        section { margin-bottom: 60px; }
+        h2 { font-size: 1.2em; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
+        .work-item, .education-item, .project-item { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .work-item:last-child, .education-item:last-child, .project-item:last-child { border-bottom: none; }
+        .work-item h3, .education-item h3, .project-item h3 { font-size: 1.1em; font-weight: 500; margin-bottom: 5px; }
+        .meta { color: #999; font-size: 0.85em; margin-bottom: 10px; }
+        .skills { display: flex; flex-wrap: wrap; gap: 20px; }
+        .skill { font-size: 0.9em; color: #666; }
+        footer { text-align: center; padding: 40px 0; color: #999; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{TITLE}}</h1>
+            {{#if SUBTITLE}}<p class="subtitle">{{SUBTITLE}}</p>{{/if}}
+            {{#if BIO}}<p class="bio">{{BIO}}</p>{{/if}}
+            <div class="social-links">
+                {{#if LINKEDIN_URL}}<a href="{{LINKEDIN_URL}}">LinkedIn</a>{{/if}}
+                {{#if GITHUB_URL}}<a href="{{GITHUB_URL}}">GitHub</a>{{/if}}
+                {{#if WEBSITE_URL}}<a href="{{WEBSITE_URL}}">Website</a>{{/if}}
+            </div>
+        </header>
+
+        {{#if WORK_EXPERIENCES}}
+        <section>
+            <h2>Experience</h2>
+            {{#each WORK_EXPERIENCES}}
+            <div class="work-item">
+                <h3>{{Position}}</h3>
+                <p class="meta">{{Company}} · {{StartDate}} - {{#if IsCurrent}}Present{{else}}{{EndDate}}{{/if}}</p>
+                {{#if Description}}<p>{{Description}}</p>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if SKILLS}}
+        <section>
+            <h2>Skills</h2>
+            <div class="skills">
+                {{#each SKILLS}}<span class="skill">{{Name}}</span>{{/each}}
+            </div>
+        </section>
+        {{/if}}
+
+        {{#if EDUCATION}}
+        <section>
+            <h2>Education</h2>
+            {{#each EDUCATION}}
+            <div class="education-item">
+                <h3>{{Degree}}</h3>
+                <p class="meta">{{Institution}} · {{StartDate}} - {{EndDate}}</p>
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        {{#if PROJECTS}}
+        <section>
+            <h2>Projects</h2>
+            {{#each PROJECTS}}
+            <div class="project-item">
+                <h3>{{Name}}</h3>
+                {{#if Description}}<p>{{Description}}</p>{{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{/if}}
+
+        <footer>{{TITLE}} · 2024</footer>
+    </div>
+</body>
+</html>

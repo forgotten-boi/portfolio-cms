@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Portfolio, CreatePortfolioDto } from '../models';
+import { Portfolio, CreatePortfolioDto, GeneratePortfolioDto } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +34,10 @@ export class PortfolioService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  generate(data: GeneratePortfolioDto): Observable<Portfolio> {
+    return this.http.post<Portfolio>(`${environment.apiUrl}/api/portfolios/generate`, data);
   }
 
   importFromLinkedIn(userId: string, linkedInData: any): Observable<Portfolio> {

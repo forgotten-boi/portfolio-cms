@@ -19,11 +19,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API (.NET 9)
+  # Backend API (.NET 10)
   backend-api:
-    build:
-      context: ./portfolio.api
-      dockerfile: Dockerfile
+    image: portfolio-backend-api:10.0
     container_name: portfolio-backend
     environment:
       ASPNETCORE_ENVIRONMENT: Development

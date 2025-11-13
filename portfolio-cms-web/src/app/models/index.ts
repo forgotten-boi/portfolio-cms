@@ -122,10 +122,25 @@ export interface CreatePortfolioDto {
   data?: PortfolioData;
 }
 
+export interface GeneratePortfolioDto {
+  pdfBase64?: string;
+  linkedInProfileUrl?: string;
+  templateId?: number;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
   tenantId: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  profileImageUrl?: string;
+  tenantId?: string;
 }
 
 export interface AuthResult {

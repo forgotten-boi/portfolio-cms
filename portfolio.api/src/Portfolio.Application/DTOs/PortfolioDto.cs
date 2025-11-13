@@ -8,6 +8,7 @@ public class PortfolioDto
     public Guid TenantId { get; set; }
     public Guid UserId { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Bio { get; set; }
     public string? ProfileImageUrl { get; set; }
@@ -16,11 +17,14 @@ public class PortfolioDto
     public string? GitHubUrl { get; set; }
     public string? WebsiteUrl { get; set; }
     public string Template { get; set; } = string.Empty;
+    public int TemplateId { get; set; }
+    public bool IsPublished { get; set; }
     public bool FeaturedBlogsEnabled { get; set; }
     public int MaxFeaturedBlogs { get; set; }
     public PortfolioData Data { get; set; } = new();
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public DateTime? PublishedAt { get; set; }
 }
 
 public class CreatePortfolioDto
@@ -60,4 +64,12 @@ public class ImportResumeDto
 {
     public string ResumeUrl { get; set; } = string.Empty;
     public string? ResumeText { get; set; }
+}
+
+public class GeneratePortfolioDto
+{
+    public string? PdfUrl { get; set; }
+    public string? LinkedInUrl { get; set; }
+    public string? ResumeText { get; set; }
+    public int TemplateId { get; set; } = 1;
 }

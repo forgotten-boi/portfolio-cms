@@ -41,7 +41,7 @@ export class PortfolioService {
   }
 
   generate(data: GeneratePortfolioDto): Observable<Portfolio> {
-    return this.http.post<Portfolio>(`${environment.apiUrl}/api/portfolios/generate`, data);
+    return this.http.post<Portfolio>(`${environment.apiUrl}/portfolios/generate`, data);
   }
 
   importFromLinkedIn(userId: string, linkedInData: any): Observable<Portfolio> {

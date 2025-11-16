@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Portfolio.Application\Portfolio.Application.csproj" />
     <ProjectReference Include="..\Portfolio.Infrastructure\Portfolio.Infrastructure.csproj" />
+    <ProjectReference Include="..\Portfolio.ServiceDefaults\Portfolio.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>

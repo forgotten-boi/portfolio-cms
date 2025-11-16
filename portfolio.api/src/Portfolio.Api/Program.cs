@@ -13,11 +13,14 @@ using Portfolio.Infrastructure.Data;
 using Portfolio.Infrastructure.Messaging;
 using Portfolio.Infrastructure.Persistence;
 using Portfolio.Infrastructure.Repositories;
+using Portfolio.ServiceDefaults;
 using Serilog;
 using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -158,6 +161,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseSerilogRequestLogging();
+
+app.UseServiceDefaults();
 
 app.UseAuthentication();
 app.UseAuthorization();

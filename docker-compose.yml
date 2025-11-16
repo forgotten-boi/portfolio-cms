@@ -32,6 +32,12 @@ services:
       JwtSettings__Audience: "PortfolioCMS"
       JwtSettings__ExpiryMinutes: "60"
       KafkaSettings__BootstrapServers: "kafka:9092"
+      # Development-specific settings
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft: "Warning"
+      AllowedOrigins: "http://localhost:4200,http://localhost:3000,http://localhost:80"
+      EnableDetailedErrors: "true"
+      EnableSensitiveDataLogging: "false"
     ports:
       - "8085:8085"
     depends_on:

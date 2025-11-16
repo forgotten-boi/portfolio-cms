@@ -114,6 +114,52 @@ dotnet build -c Release
 
 ---
 
+## 🧠 .NET Aspire Orchestration
+
+Use the new Aspire AppHost when you want a single command that boots the API plus every dependent service (PostgreSQL, Kafka, Redis, and pgAdmin) with consistent configuration and health probes.
+
+### Prerequisites
+- .NET SDK 10.0 (Preview) with the Aspire workload: `dotnet workload install aspire`
+- Docker Desktop running (Aspire uses containers behind the scenes)
+
+### Run the distributed app
+
+```powershell
+cd portfolio.api
+dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
+```
+
+If you haven't built the frontend container image yet, build it before starting the AppHost so the AppHost can reuse the image:
+
+```powershell
+cd ..\portfolio-cms-web
+docker build -t portfolio-frontend:latest -f Dockerfile ./
+```
+
+You can toggle mock-mode when launching the AppHost by setting the environment variable `USE_MOCKS`.
+When `USE_MOCKS=true`, the AppHost will skip starting Kafka, Zookeeper, and Redis and the API will use the in-memory message bus.
+Example (PowerShell):
+
+```powershell
+$env:USE_MOCKS='true'
+dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
+```
+
+The command spins up the following resources and keeps the logs multiplexed in a single console:
+
+| Resource | Description | Access |
+|----------|-------------|--------|
+| `portfolio-api` | .NET Minimal API with ServiceDefaults health checks (`/health`, `/healthz`) | http://localhost:8085
+| `portfolio-frontend` | Angular frontend (built image `portfolio-frontend:latest`). Aspire maps container port 80 to host 4200 when launching with the AppHost. | http://localhost:4200
+| `postgres` | PostgreSQL 17 database seeded with the default creds | localhost:5432
+| `pgadmin` | Browser UI for PostgreSQL management | http://localhost:5050
+| `kafka` + `zookeeper` | Messaging backbone for async flows | Broker exposed at `kafka:9092`
+| `redis` | Optional caching layer shared with the API | localhost:6379
+
+Stop the distributed environment at any time with **Ctrl+C**. Aspire automatically tears down containers to avoid dangling resources.
+
+---
+
 ## 🏗️ Architecture
 
 ```

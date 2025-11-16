@@ -1,6 +1,6 @@
 # Portfolio CMS Backend API
 
-A production-ready, multi-tenant Portfolio CMS backend built with .NET 9, Clean Architecture, and CQRS pattern.
+A production-ready, multi-tenant Portfolio CMS backend built with .NET 10, Clean Architecture, and CQRS pattern.
 
 ## 🏗️ Architecture
 

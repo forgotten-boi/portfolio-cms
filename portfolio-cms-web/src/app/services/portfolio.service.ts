@@ -10,7 +10,7 @@ import { Portfolio, CreatePortfolioDto, GeneratePortfolioDto } from '../models';
 export class PortfolioService {
   private readonly baseUrl = `${environment.apiUrl}/portfolios`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<Portfolio[]> {
     return this.http.get<Portfolio[]>(this.baseUrl);
@@ -25,7 +25,7 @@ export class PortfolioService {
   }
 
   getBySlug(slug: string): Observable<Portfolio> {
-    return this.http.get<Portfolio>(`${environment.apiUrl}/portfolio/${slug}`);
+    return this.http.get<Portfolio>(`${environment.apiUrl.replace('/api', '')}/api/portfolio/${slug}`);
   }
 
   create(portfolio: CreatePortfolioDto): Observable<Portfolio> {

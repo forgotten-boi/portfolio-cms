@@ -36,6 +36,7 @@ public interface IPortfolioRepository : IRepository<PortfolioEntity>
 {
     Task<PortfolioEntity?> GetByUserIdAsync(Guid userId, Guid tenantId, CancellationToken cancellationToken = default);
     Task<IEnumerable<PortfolioEntity>> GetByTenantIdAsync(Guid tenantId, CancellationToken cancellationToken = default);
+    Task<PortfolioEntity?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
 }
 
 public interface IRoleRepository : IRepository<Role>

@@ -116,47 +116,55 @@ dotnet build -c Release
 
 ## 🧠 .NET Aspire Orchestration
 
-Use the new Aspire AppHost when you want a single command that boots the API plus every dependent service (PostgreSQL, Kafka, Redis, and pgAdmin) with consistent configuration and health probes.
+Use the custom orchestration host when you want a single command that boots the API plus every dependent service (PostgreSQL, Kafka, Redis, pgAdmin, and the Angular frontend) with consistent configuration and health probes.
 
 ### Prerequisites
-- .NET SDK 10.0 (Preview) with the Aspire workload: `dotnet workload install aspire`
-- Docker Desktop running (Aspire uses containers behind the scenes)
+- .NET SDK 10.0
+- Docker Desktop running
 
-### Run the distributed app
+### Run the orchestration host
 
 ```powershell
 cd portfolio.api
 dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
 ```
 
-If you haven't built the frontend container image yet, build it before starting the AppHost so the AppHost can reuse the image:
+**What happens:**
+1. Automatically builds the frontend Docker image if it doesn't exist
+2. Starts PostgreSQL + pgAdmin
+3. Conditionally starts Kafka/Zookeeper (skipped if `USE_MOCKS=true`)
+4. Starts the .NET API with proper configuration
+5. Starts the Angular frontend container
 
-```powershell
-cd ..\portfolio-cms-web
-docker build -t portfolio-frontend:latest -f Dockerfile ./
-```
+**Environment variables:**
+- `USE_MOCKS=true` - Skips Kafka/Zookeeper/Redis, uses in-memory message bus
+- `REBUILD_FRONTEND=true` - Forces frontend image rebuild even if it exists
 
-You can toggle mock-mode when launching the AppHost by setting the environment variable `USE_MOCKS`.
-When `USE_MOCKS=true`, the AppHost will skip starting Kafka, Zookeeper, and Redis and the API will use the in-memory message bus.
-Example (PowerShell):
+**Toggle mock mode (PowerShell):**
 
 ```powershell
 $env:USE_MOCKS='true'
 dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
 ```
 
-The command spins up the following resources and keeps the logs multiplexed in a single console:
+**Force frontend rebuild:**
+
+```powershell
+$env:REBUILD_FRONTEND='true'
+dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
+```
+
+The orchestration host spins up the following resources:
 
 | Resource | Description | Access |
 |----------|-------------|--------|
 | `portfolio-api` | .NET Minimal API with ServiceDefaults health checks (`/health`, `/healthz`) | http://localhost:8085
-| `portfolio-frontend` | Angular frontend (built image `portfolio-frontend:latest`). Aspire maps container port 80 to host 4200 when launching with the AppHost. | http://localhost:4200
+| `portfolio-frontend` | Angular frontend (auto-built Docker image). Maps container port 80 to host 4200. | http://localhost:4200
 | `postgres` | PostgreSQL 17 database seeded with the default creds | localhost:5432
 | `pgadmin` | Browser UI for PostgreSQL management | http://localhost:5050
-| `kafka` + `zookeeper` | Messaging backbone for async flows | Broker exposed at `kafka:9092`
-| `redis` | Optional caching layer shared with the API | localhost:6379
+| `kafka` + `zookeeper` | Messaging backbone for async flows (skipped in mock mode) | Broker exposed at `kafka:9092`
 
-Stop the distributed environment at any time with **Ctrl+C**. Aspire automatically tears down containers to avoid dangling resources.
+Stop all services at any time with **Ctrl+C**. The orchestrator automatically cleans up containers.
 
 ---
 

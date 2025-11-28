@@ -18,10 +18,15 @@ using Serilog;
 using System.Security.Claims;
 using System.Text;
 
+try
+{
+Console.WriteLine("STEP 1: Creating builder...");
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine("STEP 2: Adding service defaults...");
 builder.AddServiceDefaults();
 
+Console.WriteLine("STEP 3: Configuring Serilog...");
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -130,14 +135,15 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Guest", policy => policy.RequireAuthenticatedUser());
 });
 
-// CORS
+// CORS - Allow frontend origin
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true) // Allow any origin in development
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -145,8 +151,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+Console.WriteLine("STEP 4: Building app...");
 var app = builder.Build();
 
+Console.WriteLine("STEP 5: Configuring middleware...");
 // Configure the HTTP request pipeline
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -182,4 +190,18 @@ app.MapGroup("/api").MapPortfolioEndpoints();
 app.MapGroup("/api").MapAuthEndpoints();
 app.MapGroup("/api").MapAdminEndpoints();
 
+Console.WriteLine("STEP 6: Starting application...");
 app.Run();
+Console.WriteLine("STEP 7: Application stopped normally.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FATAL ERROR: Application failed to start");
+    Console.WriteLine($"Error: {ex.GetType().Name}: {ex.Message}");
+    Console.WriteLine($"Stack: {ex.StackTrace}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+    }
+    Environment.Exit(1);
+}

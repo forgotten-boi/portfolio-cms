@@ -224,7 +224,7 @@ try
         StartInfo = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"run --project \"{apiPath}\" --no-build",
+            Arguments = $"run --project \"{apiPath}\" --launch-profile aspire",
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -284,17 +284,20 @@ try
     Console.WriteLine("\n=======================================================");
     Console.WriteLine("  🚀 All services started successfully!");
     Console.WriteLine("=======================================================");
-    Console.WriteLine("  Frontend:    http://localhost:4200");
-    Console.WriteLine("  API:         http://localhost:8085");
-    Console.WriteLine("  Swagger:     http://localhost:8085/swagger");
-    Console.WriteLine("  pgAdmin:     http://localhost:5050");
-    Console.WriteLine("  PostgreSQL:  localhost:5432");
+    Console.WriteLine("  📊 Orchestration: Running (this console)");
+    Console.WriteLine("-------------------------------------------------------");
+    Console.WriteLine("  🌐 Frontend:      http://localhost:4200");
+    Console.WriteLine("  🔌 API:           http://localhost:8085");
+    Console.WriteLine("  📖 Swagger:       http://localhost:8085/swagger");
+    Console.WriteLine("  💓 Health Check:  http://localhost:8085/health");
+    Console.WriteLine("  🗄️  pgAdmin:       http://localhost:5050");
+    Console.WriteLine("  🐘 PostgreSQL:    localhost:5432");
     if (!useMocks)
     {
-        Console.WriteLine("  Kafka:       localhost:9092");
+        Console.WriteLine("  📨 Kafka:         localhost:9092");
     }
-    Console.WriteLine("-------------------------------------------------------");
-    Console.WriteLine("  Press Ctrl+C to stop all services");
+    Console.WriteLine("=======================================================");
+    Console.WriteLine("  ⚠️  Press Ctrl+C to stop all services");
     Console.WriteLine("=======================================================\n");
 
     // Wait for cancellation

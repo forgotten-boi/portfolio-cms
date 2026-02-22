@@ -1,6 +1,6 @@
 <div class="blogs-container">
   <div class="header">
-    <h1>Blogs</h1>
+    <h1>My Blogs</h1>
     <button class="btn-primary" (click)="createBlog()">Create New Blog</button>
   </div>
 
@@ -34,7 +34,23 @@
 
       <div class="blog-actions">
         <button class="btn-edit" (click)="editBlog(blog.id)">Edit</button>
+        <button
+          class="btn-publish"
+          [class.btn-unpublish]="blog.isPublished"
+          (click)="togglePublish(blog)">
+          {{ blog.isPublished ? 'Unpublish' : 'Publish' }}
+        </button>
         <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">Delete</button>
+      </div>
+
+      <div class="share-actions" *ngIf="blog.isPublished">
+        <span class="share-label">Share:</span>
+        <button class="btn-share btn-linkedin" (click)="shareOnLinkedIn(blog)" title="Share on LinkedIn">
+          <span class="share-icon">in</span> LinkedIn
+        </button>
+        <button class="btn-share btn-facebook" (click)="shareOnFacebook(blog)" title="Share on Facebook">
+          <span class="share-icon">f</span> Facebook
+        </button>
       </div>
     </div>
   </div>

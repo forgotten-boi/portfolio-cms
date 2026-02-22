@@ -172,12 +172,82 @@
       }
     }
 
+    &.btn-publish {
+      background: #c6f6d5;
+      color: #22543d;
+
+      &:hover {
+        background: #9ae6b4;
+      }
+
+      &.btn-unpublish {
+        background: #fefcbf;
+        color: #744210;
+
+        &:hover {
+          background: #faf089;
+        }
+      }
+    }
+
     &.btn-delete {
       background: #fff5f5;
       color: #e53e3e;
 
       &:hover {
         background: #fed7d7;
+      }
+    }
+  }
+}
+
+.share-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+
+  .share-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #718096;
+    margin-right: 0.25rem;
+  }
+
+  .btn-share {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.375rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .share-icon {
+      font-weight: 800;
+    }
+
+    &.btn-linkedin {
+      background: #0077b5;
+      color: white;
+
+      &:hover {
+        background: #005885;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.btn-facebook {
+      background: #1877f2;
+      color: white;
+
+      &:hover {
+        background: #0d5fca;
+        transform: translateY(-1px);
       }
     }
   }

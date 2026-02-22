@@ -28,7 +28,7 @@ export class BlogsComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    this.blogService.getAll().subscribe({
+    this.blogService.getMyBlogs().subscribe({
       next: (blogs) => {
         this.blogs = blogs;
         this.loading = false;
@@ -42,11 +42,27 @@ export class BlogsComponent implements OnInit {
   }
 
   createBlog(): void {
-    this.router.navigate(['/dashboard/blogs/new']);
+    this.router.navigate(['/blogs/new']);
   }
 
   editBlog(id: string): void {
-    this.router.navigate(['/dashboard/blogs/edit', id]);
+    this.router.navigate(['/blogs/edit', id]);
+  }
+
+  togglePublish(blog: Blog): void {
+    const newState = !blog.isPublished;
+    this.blogService.togglePublish(blog.id, newState).subscribe({
+      next: (updated) => {
+        const index = this.blogs.findIndex(b => b.id === blog.id);
+        if (index !== -1) {
+          this.blogs[index] = updated;
+        }
+      },
+      error: (err) => {
+        alert(`Failed to ${newState ? 'publish' : 'unpublish'} blog`);
+        console.error('Error toggling publish:', err);
+      }
+    });
   }
 
   deleteBlog(id: string, title: string): void {
@@ -61,6 +77,16 @@ export class BlogsComponent implements OnInit {
         }
       });
     }
+  }
+
+  shareOnLinkedIn(blog: Blog): void {
+    const url = encodeURIComponent(`${window.location.origin}/blog/${blog.slug}`);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  }
+
+  shareOnFacebook(blog: Blog): void {
+    const url = encodeURIComponent(`${window.location.origin}/blog/${blog.slug}`);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
   }
 
   getStatusClass(isPublished: boolean): string {

@@ -63,12 +63,12 @@ export class PortfoliosComponent implements OnInit {
     }
   }
 
-  getVisibilityClass(isPublic: boolean): string {
-    return isPublic ? 'visibility-public' : 'visibility-private';
+  getVisibilityClass(isPublished: boolean): string {
+    return isPublished ? 'visibility-public' : 'visibility-private';
   }
 
-  getVisibilityText(isPublic: boolean): string {
-    return isPublic ? 'Public' : 'Private';
+  getVisibilityText(isPublished: boolean): string {
+    return isPublished ? 'Public' : 'Private';
   }
 
   getTotalItems(portfolio: Portfolio): number {

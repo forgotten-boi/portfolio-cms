@@ -49,6 +49,10 @@ export const routes: Routes = [
       {
         path: 'portfolios/edit/:id',
         loadComponent: () => import('./components/portfolio-form/portfolio-form.component').then(m => m.PortfolioFormComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent)
       }
     ]
   },

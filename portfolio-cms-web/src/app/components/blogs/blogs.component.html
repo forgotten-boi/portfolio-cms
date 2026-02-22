@@ -22,7 +22,7 @@
       </div>
 
       <div class="blog-meta">
-        <span class="views">{{ blog.views }} views</span>
+        <span class="views">{{ blog.views || 0 }} views</span>
         <span class="date">{{ blog.createdAt | date:'mediumDate' }}</span>
       </div>
 

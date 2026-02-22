@@ -135,7 +135,7 @@ export interface CreatePortfolioDto {
   subtitle: string;
   bio: string;
   template: string;
-  isPublic: boolean;
+  isPublished: boolean;
   featuredBlogsEnabled: boolean;
   data?: PortfolioData;
 }

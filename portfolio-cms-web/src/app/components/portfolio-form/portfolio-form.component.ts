@@ -54,7 +54,7 @@ export class PortfolioFormComponent implements OnInit {
       subtitle: ['', [Validators.required, Validators.maxLength(200)]],
       bio: ['', [Validators.required, Validators.maxLength(1000)]],
       template: ['Modern', [Validators.required]],
-      isPublic: [false],
+      isPublished: [false],
       featuredBlogsEnabled: [false]
     });
   }
@@ -68,7 +68,7 @@ export class PortfolioFormComponent implements OnInit {
           subtitle: portfolio.subtitle,
           bio: portfolio.bio,
           template: portfolio.template,
-          isPublic: portfolio.isPublic,
+          isPublished: portfolio.isPublished,
           featuredBlogsEnabled: portfolio.featuredBlogsEnabled
         });
         this.loading = false;
@@ -170,7 +170,7 @@ export class PortfolioFormComponent implements OnInit {
             subtitle: portfolio.subtitle,
             bio: portfolio.bio,
             template: portfolio.template || 1,
-            isPublic: portfolio.isPublic || false,
+            isPublished: portfolio.isPublished || false,
             featuredBlogsEnabled: portfolio.featuredBlogsEnabled || false
           });
 

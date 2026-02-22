@@ -4,7 +4,7 @@
     <h2>Login</h2>
     
     <form (ngSubmit)="login()" #loginForm="ngForm">
-      <div class="form-group">
+      <div class="form-group" *ngIf="showTenantId">
         <label for="tenantId">Tenant ID</label>
         <input 
           type="text" 
@@ -12,7 +12,6 @@
           [(ngModel)]="tenantId" 
           name="tenantId" 
           placeholder="Enter your tenant ID"
-          required
           class="form-control">
       </div>
 
@@ -47,7 +46,7 @@
       <button 
         type="submit" 
         class="btn btn-primary"
-        [disabled]="loading || !loginForm.form.valid">
+        [disabled]="loading || !isFormValid">
         {{ loading ? 'Logging in...' : 'Login' }}
       </button>
     </form>

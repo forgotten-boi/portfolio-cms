@@ -93,6 +93,35 @@ public class CreatePortfolioCommandHandler : ICommandHandler<CreatePortfolioComm
     }
 }
 
+// Delete Portfolio Command Handler
+public class DeletePortfolioCommandHandler : ICommandHandler<DeletePortfolioCommand, bool>
+{
+    private readonly IPortfolioRepository _portfolioRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public DeletePortfolioCommandHandler(
+        IPortfolioRepository portfolioRepository,
+        IUnitOfWork unitOfWork)
+    {
+        _portfolioRepository = portfolioRepository;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<bool> HandleAsync(DeletePortfolioCommand command, CancellationToken cancellationToken = default)
+    {
+        var portfolio = await _portfolioRepository.GetByIdAsync(command.PortfolioId, cancellationToken);
+        if (portfolio == null || portfolio.TenantId != command.TenantId)
+        {
+            throw new KeyNotFoundException($"Portfolio with ID '{command.PortfolioId}' not found in this tenant.");
+        }
+
+        await _portfolioRepository.DeleteAsync(command.PortfolioId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+}
+
 // Generate Portfolio Command Handler (PDF/LinkedIn import)
 public class GeneratePortfolioCommandHandler : ICommandHandler<GeneratePortfolioCommand, PortfolioDto>
 {

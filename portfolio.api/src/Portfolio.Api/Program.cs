@@ -79,6 +79,7 @@ builder.Services.AddScoped<ICommandHandler<UpdateUserCommand, UserDto>, UpdateUs
 builder.Services.AddScoped<ICommandHandler<CreateBlogCommand, BlogDto>, CreateBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdateBlogCommand, BlogDto>, UpdateBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<DeleteBlogCommand, bool>, DeleteBlogCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<DeletePortfolioCommand, bool>, DeletePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<CreatePortfolioCommand, PortfolioDto>, CreatePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<GeneratePortfolioCommand, PortfolioDto>, GeneratePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdatePortfolioCommand, PortfolioDto>, UpdatePortfolioCommandHandler>();
@@ -193,6 +194,11 @@ app.MapGroup("/api").MapAdminEndpoints();
 Console.WriteLine("STEP 6: Starting application...");
 app.Run();
 Console.WriteLine("STEP 7: Application stopped normally.");
+}
+catch (HostAbortedException)
+{
+    // Expected when EF Core tools (dotnet ef) run - they abort the host after getting DbContext config
+    // Do NOT call Environment.Exit here, or EF tools will fail
 }
 catch (Exception ex)
 {

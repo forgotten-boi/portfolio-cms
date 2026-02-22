@@ -11,6 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - portfolio-network
     healthcheck:
@@ -27,10 +28,10 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8085
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=portfolio_db;Username=portfolio_user;Password=portfolio_pass"
-      JwtSettings__Secret: "YourSuperSecretKeyForJWTTokenGenerationThatIsAtLeast32CharactersLong"
-      JwtSettings__Issuer: "PortfolioCMS"
-      JwtSettings__Audience: "PortfolioCMS"
-      JwtSettings__ExpiryMinutes: "60"
+      Jwt__Secret: "YourSuperSecretKeyForJWTTokenGenerationThatIsAtLeast32CharactersLong"
+      Jwt__Issuer: "portfolio-api"
+      Jwt__Audience: "portfolio-client"
+      Jwt__ExpiryMinutes: "60"
       KafkaSettings__BootstrapServers: "kafka:9092"
       # Development-specific settings
       Logging__LogLevel__Default: "Information"

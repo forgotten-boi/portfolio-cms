@@ -23,11 +23,11 @@ export class PortfolioFormComponent implements OnInit {
   linkedInUrl = '';
 
   templates = [
-    { id: 1, name: 'Modern', description: 'Purple gradient with modern cards' },
-    { id: 2, name: 'Classic', description: 'Professional serif typography' },
-    { id: 3, name: 'Minimal', description: 'Clean black and white design' },
-    { id: 4, name: 'Creative', description: 'Terminal/hacker theme' },
-    { id: 5, name: 'Vibrant', description: 'Pink gradient with emoji icons' }
+    { id: 'Modern', name: 'Modern', description: 'Purple gradient with modern cards' },
+    { id: 'Classic', name: 'Classic', description: 'Professional serif typography' },
+    { id: 'Minimal', name: 'Minimal', description: 'Clean black and white design' },
+    { id: 'Creative', name: 'Creative', description: 'Terminal/hacker theme' },
+    { id: 'Vibrant', name: 'Vibrant', description: 'Pink gradient with emoji icons' }
   ];
 
   constructor(
@@ -53,7 +53,7 @@ export class PortfolioFormComponent implements OnInit {
       title: ['', [Validators.required, Validators.maxLength(100)]],
       subtitle: ['', [Validators.required, Validators.maxLength(200)]],
       bio: ['', [Validators.required, Validators.maxLength(1000)]],
-      template: [1, [Validators.required]],
+      template: ['Modern', [Validators.required]],
       isPublic: [false],
       featuredBlogsEnabled: [false]
     });

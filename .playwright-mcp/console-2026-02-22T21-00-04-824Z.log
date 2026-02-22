@@ -1,0 +1,2 @@
+[   56424ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8085/api/portfolios:0
+[   56431ms] [ERROR] Error saving portfolio: HttpErrorResponse @ http://localhost:4200/chunk-SFZM5L5D.js:444

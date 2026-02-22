@@ -1,0 +1,2 @@
+[  369523ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8085/api/portfolios:0
+[  369533ms] [ERROR] Error saving portfolio: HttpErrorResponse @ http://localhost:4200/chunk-SFZM5L5D.js:444

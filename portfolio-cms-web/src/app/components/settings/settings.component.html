@@ -1,0 +1,46 @@
+<div class="settings-container">
+  <h1>Settings</h1>
+  <p class="settings-description">Configure application behavior and display options.</p>
+
+  <div class="settings-card">
+    <h2>Login Settings</h2>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <label for="showTenantId" class="setting-label">Show Tenant ID on Login</label>
+        <p class="setting-help">When enabled, the Tenant ID field will be visible on the login page. When disabled, the default tenant will be used automatically.</p>
+      </div>
+      <div class="setting-control">
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            id="showTenantId"
+            [(ngModel)]="settings.showTenantId"
+            name="showTenantId">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="setting-item" *ngIf="!settings.showTenantId">
+      <div class="setting-info">
+        <label for="defaultTenantId" class="setting-label">Default Tenant ID</label>
+        <p class="setting-help">The tenant ID used when the Tenant ID field is hidden.</p>
+      </div>
+      <div class="setting-control setting-control-wide">
+        <input
+          type="text"
+          id="defaultTenantId"
+          class="form-control"
+          [(ngModel)]="settings.defaultTenantId"
+          name="defaultTenantId"
+          placeholder="00000000-0000-0000-0000-000000000001">
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" (click)="onSave()">Save Settings</button>
+    <span class="save-success" *ngIf="saved">✓ Settings saved successfully</span>
+  </div>
+</div>

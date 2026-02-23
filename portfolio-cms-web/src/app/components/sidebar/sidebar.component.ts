@@ -21,7 +21,7 @@ export class SidebarComponent implements OnInit {
     { icon: '🎯', labelKey: 'nav.jobMatcher', route: '/dashboard/job-matcher', exact: false },
     { icon: '📑', labelKey: 'nav.resumeGen', route: '/dashboard/resume-generator', exact: false },
     { icon: '📊', labelKey: 'nav.analytics', route: '/dashboard/analytics', exact: false },
-    { icon: '🌐', labelKey: 'nav.portfolioMgr', route: '/dashboard/portfolios', exact: false },
+    { icon: '🌐', labelKey: 'nav.portfolioMgr', route: '/dashboard/portfolio-manager', exact: false },
     { icon: '⚙️', labelKey: 'nav.settings', route: '/dashboard/settings', exact: false }
   ];
 

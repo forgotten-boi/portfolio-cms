@@ -374,6 +374,11 @@ export class TranslationService {
         'pm.issuer': 'Issuing Organization',
         'pm.issueDate': 'Issue Date',
         'pm.expiryDate': 'Expiry Date',
+        'pm.confirmDeleteTitle': 'Delete Portfolio',
+        'pm.confirmDeleteMsg': 'Are you sure you want to delete this portfolio? This action cannot be undone.',
+        'pm.cancel': 'Cancel',
+        'pm.delete': 'Delete',
+        'pm.backToList': 'Back to List',
 
         // ── CV Manager ──
         'cv.title': 'CV Manager',
@@ -760,6 +765,11 @@ export class TranslationService {
         'pm.issuer': 'Organización Emisora',
         'pm.issueDate': 'Fecha de Emisión',
         'pm.expiryDate': 'Fecha de Vencimiento',
+        'pm.confirmDeleteTitle': 'Eliminar Portafolio',
+        'pm.confirmDeleteMsg': '¿Estás seguro de que quieres eliminar este portafolio? Esta acción no se puede deshacer.',
+        'pm.cancel': 'Cancelar',
+        'pm.delete': 'Eliminar',
+        'pm.backToList': 'Volver a la Lista',
 
         // ── CV Manager ──
         'cv.title': 'Gestor de CV',

@@ -69,6 +69,10 @@ export const routes: Routes = [
       {
         path: 'analytics',
         loadComponent: () => import('./components/analytics/analytics.component').then(m => m.AnalyticsComponent)
+      },
+      {
+        path: 'portfolio-manager',
+        loadComponent: () => import('./components/portfolio-manager/portfolio-manager.component').then(m => m.PortfolioManagerComponent)
       }
     ]
   },

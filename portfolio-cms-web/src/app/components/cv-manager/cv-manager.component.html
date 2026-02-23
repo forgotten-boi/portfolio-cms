@@ -1,0 +1,182 @@
+<div class="cv-manager-container">
+  <div class="page-header">
+    <h1 class="page-title">{{ 'cv.title' | translate }}</h1>
+    <div class="header-actions">
+      <button class="btn-save" (click)="save()" [disabled]="saving">
+        {{ saving ? ('cv.saving' | translate) : ('cv.saveChanges' | translate) }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <div *ngIf="successMsg" class="alert alert-success">{{ successMsg }}</div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>{{ 'common.loading' | translate }}</span>
+  </div>
+
+  <div class="cv-layout" *ngIf="!loading">
+    <!-- Left Panel: Section Navigation -->
+    <div class="cv-sidebar">
+      <div class="section-nav">
+        <button *ngFor="let section of sections"
+                class="section-btn"
+                [class.active]="section.id === activeSection"
+                (click)="selectSection(section.id)">
+          <span class="section-icon">{{ section.icon }}</span>
+          <span class="section-name">{{ section.nameKey | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Panel: Section Editor -->
+    <div class="cv-main">
+      <!-- Summary Section -->
+      <div class="section-editor" *ngIf="activeSection === 'summary'">
+        <h2 class="section-title">📝 {{ 'cv.summary' | translate }}</h2>
+        <p class="section-desc">{{ 'cv.summaryDesc' | translate }}</p>
+        <textarea class="form-textarea" [(ngModel)]="summary" rows="6"
+                  [placeholder]="'cv.summaryPlaceholder' | translate"></textarea>
+      </div>
+
+      <!-- Skills Section -->
+      <div class="section-editor" *ngIf="activeSection === 'skills'">
+        <h2 class="section-title">⚡ {{ 'cv.skills' | translate }}</h2>
+        <p class="section-desc">{{ 'cv.skillsDesc' | translate }}</p>
+
+        <div class="items-list">
+          <div class="item-card" *ngFor="let skill of skills; let i = index">
+            <div class="item-main">
+              <span class="item-name">{{ skill.name }}</span>
+              <span class="item-badge">{{ skill.category }}</span>
+              <span class="skill-level">{{ getSkillLevelLabel(skill.level) }}</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-bar-fill" [style.width.%]="skill.level * 20"></div>
+            </div>
+            <button class="btn-remove" (click)="removeSkill(i)">×</button>
+          </div>
+        </div>
+
+        <div class="add-form">
+          <input class="form-input" [(ngModel)]="newSkill.name" [placeholder]="'cv.skillName' | translate" />
+          <input class="form-input sm" [(ngModel)]="newSkill.category" [placeholder]="'cv.category' | translate" />
+          <select class="form-select" [(ngModel)]="newSkill.level">
+            <option [ngValue]="1">Beginner</option>
+            <option [ngValue]="2">Elementary</option>
+            <option [ngValue]="3">Intermediate</option>
+            <option [ngValue]="4">Advanced</option>
+            <option [ngValue]="5">Expert</option>
+          </select>
+          <button class="btn-add" (click)="addSkill()">+ {{ 'cv.add' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- Experience Section -->
+      <div class="section-editor" *ngIf="activeSection === 'experience'">
+        <h2 class="section-title">💼 {{ 'cv.experience' | translate }}</h2>
+        <p class="section-desc">{{ 'cv.experienceDesc' | translate }}</p>
+
+        <div class="items-list">
+          <div class="item-card experience-card" *ngFor="let exp of experiences; let i = index">
+            <div class="exp-header">
+              <div>
+                <span class="item-name">{{ exp.position }}</span>
+                <span class="exp-company">{{ exp.company }}</span>
+              </div>
+              <button class="btn-remove" (click)="removeExperience(i)">×</button>
+            </div>
+            <p class="exp-desc">{{ exp.description }}</p>
+          </div>
+        </div>
+
+        <div class="add-form stacked">
+          <input class="form-input" [(ngModel)]="newExperience.company" [placeholder]="'cv.company' | translate" />
+          <input class="form-input" [(ngModel)]="newExperience.position" [placeholder]="'cv.position' | translate" />
+          <textarea class="form-textarea sm" [(ngModel)]="newExperience.description" rows="3"
+                    [placeholder]="'cv.achievements' | translate"></textarea>
+          <button class="btn-add" (click)="addExperience()">+ {{ 'cv.addExperience' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- Projects Section -->
+      <div class="section-editor" *ngIf="activeSection === 'projects'">
+        <h2 class="section-title">🔧 {{ 'cv.projects' | translate }}</h2>
+        <p class="section-desc">{{ 'cv.projectsDesc' | translate }}</p>
+
+        <div class="items-list">
+          <div class="item-card" *ngFor="let proj of projects; let i = index">
+            <div class="item-main">
+              <span class="item-name">{{ proj.name }}</span>
+              <button class="btn-remove" (click)="removeProject(i)">×</button>
+            </div>
+            <p class="exp-desc">{{ proj.description }}</p>
+            <div class="tech-tags">
+              <span class="tech-tag" *ngFor="let t of proj.technologies">{{ t }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-form stacked">
+          <input class="form-input" [(ngModel)]="newProject.name" [placeholder]="'cv.projectName' | translate" />
+          <textarea class="form-textarea sm" [(ngModel)]="newProject.description" rows="2"
+                    [placeholder]="'cv.projectDesc' | translate"></textarea>
+          <div class="tech-input-row">
+            <input class="form-input" [(ngModel)]="newTechInput" placeholder="Technology" (keydown.enter)="addTech()" />
+            <button class="btn-sm" (click)="addTech()">+</button>
+          </div>
+          <div class="tech-tags" *ngIf="newProject.technologies?.length">
+            <span class="tech-tag" *ngFor="let t of newProject.technologies; let i = index">
+              {{ t }} <span class="tag-remove" (click)="removeTech(i)">×</span>
+            </span>
+          </div>
+          <button class="btn-add" (click)="addProject()">+ {{ 'cv.addProject' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- Education Section -->
+      <div class="section-editor" *ngIf="activeSection === 'education'">
+        <h2 class="section-title">🎓 {{ 'cv.education' | translate }}</h2>
+
+        <div class="items-list">
+          <div class="item-card" *ngFor="let edu of educations; let i = index">
+            <div class="item-main">
+              <span class="item-name">{{ edu.degree }} — {{ edu.fieldOfStudy }}</span>
+              <button class="btn-remove" (click)="removeEducation(i)">×</button>
+            </div>
+            <p class="exp-company">{{ edu.institution }}</p>
+          </div>
+        </div>
+
+        <div class="add-form stacked">
+          <input class="form-input" [(ngModel)]="newEducation.institution" [placeholder]="'cv.institution' | translate" />
+          <input class="form-input" [(ngModel)]="newEducation.degree" [placeholder]="'cv.degree' | translate" />
+          <input class="form-input" [(ngModel)]="newEducation.fieldOfStudy" [placeholder]="'cv.fieldOfStudy' | translate" />
+          <button class="btn-add" (click)="addEducation()">+ {{ 'cv.addEducation' | translate }}</button>
+        </div>
+      </div>
+
+      <!-- Certifications Section -->
+      <div class="section-editor" *ngIf="activeSection === 'certifications'">
+        <h2 class="section-title">🏅 {{ 'cv.certifications' | translate }}</h2>
+
+        <div class="items-list">
+          <div class="item-card" *ngFor="let cert of certifications; let i = index">
+            <div class="item-main">
+              <span class="item-name">{{ cert.name }}</span>
+              <span class="exp-company">{{ cert.issuingOrganization }}</span>
+              <button class="btn-remove" (click)="removeCertification(i)">×</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-form stacked">
+          <input class="form-input" [(ngModel)]="newCertification.name" [placeholder]="'cv.certName' | translate" />
+          <input class="form-input" [(ngModel)]="newCertification.issuingOrganization" [placeholder]="'cv.issuer' | translate" />
+          <button class="btn-add" (click)="addCertification()">+ {{ 'cv.addCert' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

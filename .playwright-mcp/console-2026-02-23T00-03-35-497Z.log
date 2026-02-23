@@ -1,0 +1,4 @@
+[18803016ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8085/api/portfolios:0
+[18803023ms] [ERROR] Error loading portfolios: HttpErrorResponse @ http://localhost:4200/chunk-JRXKJDEM.js:487
+[18803034ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8085/api/users:0
+[18803035ms] [ERROR] Error loading users: HttpErrorResponse @ http://localhost:4200/chunk-JRXKJDEM.js:496

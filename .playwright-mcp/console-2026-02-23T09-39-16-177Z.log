@@ -1,0 +1,2 @@
+[  239885ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8085/api/portfolio/John-Doe-Portfolio:0
+[  239888ms] [ERROR] Error loading portfolio: HttpErrorResponse @ http://localhost:4200/chunk-LPUISOO2.js:127

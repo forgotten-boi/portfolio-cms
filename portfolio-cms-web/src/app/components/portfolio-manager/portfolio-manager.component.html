@@ -1,0 +1,325 @@
+<div class="portfolio-manager">
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>{{ 'pm.loading' | translate }}</p>
+  </div>
+
+  <!-- No Portfolio Yet -->
+  <div class="empty-state" *ngIf="!loading && !portfolio">
+    <div class="empty-icon">📁</div>
+    <h2>{{ 'pm.noPortfolio' | translate }}</h2>
+    <p>{{ 'pm.noPortfolioDesc' | translate }}</p>
+    <button class="btn-create" (click)="createPortfolio()">
+      <span>🚀</span> {{ 'pm.createPortfolio' | translate }}
+    </button>
+  </div>
+
+  <!-- Portfolio Editor -->
+  <div class="editor-layout" *ngIf="!loading && portfolio">
+    <!-- Header Bar -->
+    <div class="editor-header">
+      <div class="header-left">
+        <h1>{{ 'pm.title' | translate }}</h1>
+        <span class="status-badge" [class.published]="isPublished" [class.draft]="!isPublished">
+          {{ isPublished ? ('pm.published' | translate) : ('pm.draft' | translate) }}
+        </span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-toggle-publish" [class.unpublish]="isPublished" (click)="togglePublish()" [disabled]="saving">
+          {{ isPublished ? ('pm.unpublish' | translate) : ('pm.publish' | translate) }}
+        </button>
+        <button class="btn-save" (click)="save()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-sm"></span>
+          {{ saving ? ('pm.saving' | translate) : ('pm.saveChanges' | translate) }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Share Bar (visible when published) -->
+    <div class="share-bar" *ngIf="isPublished && publicUrl">
+      <div class="share-url">
+        <span class="url-label">{{ 'pm.publicUrl' | translate }}:</span>
+        <a [href]="publicUrl" target="_blank" class="url-link">{{ publicUrl }}</a>
+        <button class="btn-copy" (click)="copyPublicUrl()" title="Copy link">📋</button>
+      </div>
+      <div class="share-buttons">
+        <button class="share-btn linkedin" (click)="shareOnLinkedIn()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </button>
+        <button class="share-btn facebook" (click)="shareOnFacebook()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+      </div>
+    </div>
+
+    <!-- Success / Error Messages -->
+    <div class="toast success" *ngIf="successMsg">✅ {{ successMsg }}</div>
+    <div class="toast error" *ngIf="error">❌ {{ error }}</div>
+
+    <!-- Main Content -->
+    <div class="editor-content">
+      <!-- Section Navigation Sidebar -->
+      <aside class="section-nav">
+        <h3>{{ 'pm.sections' | translate }}</h3>
+        <ul>
+          <li *ngFor="let section of sections"
+              [class.active]="activeSection === section.key"
+              (click)="selectSection(section.key)">
+            <span class="section-icon">{{ section.icon }}</span>
+            <span class="section-name">{{ section.nameKey | translate }}</span>
+          </li>
+        </ul>
+        <div class="template-select">
+          <label>{{ 'pm.template' | translate }}</label>
+          <select [(ngModel)]="template">
+            <option *ngFor="let t of templates" [value]="t.id">{{ t.label }}</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- Section Editor Panel -->
+      <main class="section-editor">
+        <!-- About Section -->
+        <div class="section-panel" *ngIf="activeSection === 'about'">
+          <h2><span>👤</span> {{ 'pm.aboutSection' | translate }}</h2>
+          <div class="form-group">
+            <label>{{ 'pm.portfolioTitle' | translate }}</label>
+            <input type="text" [(ngModel)]="title" placeholder="My Portfolio" />
+          </div>
+          <div class="form-group">
+            <label>{{ 'pm.portfolioSubtitle' | translate }}</label>
+            <input type="text" [(ngModel)]="subtitle" placeholder="Full Stack Developer" />
+          </div>
+          <div class="form-group">
+            <label>{{ 'pm.portfolioBio' | translate }}</label>
+            <textarea [(ngModel)]="bio" rows="5" placeholder="Write about yourself..."></textarea>
+          </div>
+        </div>
+
+        <!-- Experience Section -->
+        <div class="section-panel" *ngIf="activeSection === 'experience'">
+          <h2><span>💼</span> {{ 'pm.experienceSection' | translate }}</h2>
+
+          <!-- Existing items -->
+          <div class="item-list">
+            <div class="item-card" *ngFor="let exp of data.workExperiences; let i = index">
+              <div class="item-header">
+                <div>
+                  <strong>{{ exp.position }}</strong>
+                  <span class="item-sub">{{ exp.company }}</span>
+                </div>
+                <button class="btn-remove" (click)="removeExperience(i)" title="Remove">🗑️</button>
+              </div>
+              <p class="item-desc" *ngIf="exp.description">{{ exp.description }}</p>
+            </div>
+          </div>
+
+          <!-- Add New -->
+          <div class="add-form">
+            <h4>{{ 'pm.addExperience' | translate }}</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.position' | translate }} *</label>
+                <input type="text" [(ngModel)]="newExperience.position" placeholder="Software Engineer" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.company' | translate }} *</label>
+                <input type="text" [(ngModel)]="newExperience.company" placeholder="Google" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.startDate' | translate }}</label>
+                <input type="date" [(ngModel)]="newExperience.startDate" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.endDate' | translate }}</label>
+                <input type="date" [(ngModel)]="newExperience.endDate" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>{{ 'pm.description' | translate }}</label>
+              <textarea [(ngModel)]="newExperience.description" rows="3" placeholder="Describe your role..."></textarea>
+            </div>
+            <button class="btn-add" (click)="addExperience()">+ {{ 'pm.add' | translate }}</button>
+          </div>
+        </div>
+
+        <!-- Education Section -->
+        <div class="section-panel" *ngIf="activeSection === 'education'">
+          <h2><span>🎓</span> {{ 'pm.educationSection' | translate }}</h2>
+
+          <div class="item-list">
+            <div class="item-card" *ngFor="let edu of data.education; let i = index">
+              <div class="item-header">
+                <div>
+                  <strong>{{ edu.degree }}</strong>
+                  <span class="item-sub">{{ edu.institution }}</span>
+                  <span class="item-sub" *ngIf="edu.fieldOfStudy"> — {{ edu.fieldOfStudy }}</span>
+                </div>
+                <button class="btn-remove" (click)="removeEducation(i)" title="Remove">🗑️</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="add-form">
+            <h4>{{ 'pm.addEducation' | translate }}</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.degree' | translate }} *</label>
+                <input type="text" [(ngModel)]="newEducation.degree" placeholder="B.Sc. Computer Science" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.institution' | translate }} *</label>
+                <input type="text" [(ngModel)]="newEducation.institution" placeholder="MIT" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.fieldOfStudy' | translate }}</label>
+                <input type="text" [(ngModel)]="newEducation.fieldOfStudy" placeholder="Computer Science" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.gradDate' | translate }}</label>
+                <input type="date" [(ngModel)]="newEducation.graduationDate" />
+              </div>
+            </div>
+            <button class="btn-add" (click)="addEducation()">+ {{ 'pm.add' | translate }}</button>
+          </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="section-panel" *ngIf="activeSection === 'skills'">
+          <h2><span>⚡</span> {{ 'pm.skillsSection' | translate }}</h2>
+
+          <div class="skills-grid">
+            <div class="skill-chip" *ngFor="let skill of data.skills; let i = index">
+              <span class="skill-name">{{ skill.name }}</span>
+              <div class="skill-bar">
+                <div class="skill-fill" [style.width.%]="skill.level"></div>
+              </div>
+              <span class="skill-level">{{ skill.level }}%</span>
+              <button class="btn-remove-sm" (click)="removeSkill(i)">✕</button>
+            </div>
+          </div>
+
+          <div class="add-form">
+            <h4>{{ 'pm.addSkill' | translate }}</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.skillName' | translate }} *</label>
+                <input type="text" [(ngModel)]="newSkill.name" placeholder="TypeScript" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.category' | translate }}</label>
+                <input type="text" [(ngModel)]="newSkill.category" placeholder="Frontend" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.level' | translate }} ({{ newSkill.level }}%)</label>
+                <input type="range" [(ngModel)]="newSkill.level" min="10" max="100" step="5" />
+              </div>
+            </div>
+            <button class="btn-add" (click)="addSkill()">+ {{ 'pm.add' | translate }}</button>
+          </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="section-panel" *ngIf="activeSection === 'projects'">
+          <h2><span>🔧</span> {{ 'pm.projectsSection' | translate }}</h2>
+
+          <div class="item-list">
+            <div class="item-card" *ngFor="let project of data.projects; let i = index">
+              <div class="item-header">
+                <div>
+                  <strong>{{ project.name }}</strong>
+                  <a *ngIf="project.url" [href]="project.url" target="_blank" class="item-link">🔗</a>
+                </div>
+                <button class="btn-remove" (click)="removeProject(i)" title="Remove">🗑️</button>
+              </div>
+              <p class="item-desc" *ngIf="project.description">{{ project.description }}</p>
+              <div class="tech-chips" *ngIf="project.technologies?.length">
+                <span class="tech-chip" *ngFor="let t of project.technologies">{{ t }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="add-form">
+            <h4>{{ 'pm.addProject' | translate }}</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.projectName' | translate }} *</label>
+                <input type="text" [(ngModel)]="newProject.name" placeholder="Portfolio CMS" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.projectUrl' | translate }}</label>
+                <input type="text" [(ngModel)]="newProject.url" placeholder="https://github.com/..." />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>{{ 'pm.description' | translate }}</label>
+              <textarea [(ngModel)]="newProject.description" rows="3" placeholder="Describe the project..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>{{ 'pm.technologies' | translate }}</label>
+              <div class="tech-input-row">
+                <input type="text" [(ngModel)]="newTech" placeholder="Angular" (keyup.enter)="addTech()" />
+                <button class="btn-add-sm" (click)="addTech()">+</button>
+              </div>
+              <div class="tech-chips" *ngIf="newProject.technologies?.length">
+                <span class="tech-chip" *ngFor="let t of newProject.technologies; let j = index">
+                  {{ t }} <button class="chip-remove" (click)="removeTech(j)">✕</button>
+                </span>
+              </div>
+            </div>
+            <button class="btn-add" (click)="addProject()">+ {{ 'pm.add' | translate }}</button>
+          </div>
+        </div>
+
+        <!-- Certifications Section -->
+        <div class="section-panel" *ngIf="activeSection === 'certifications'">
+          <h2><span>🏅</span> {{ 'pm.certsSection' | translate }}</h2>
+
+          <div class="item-list">
+            <div class="item-card" *ngFor="let cert of data.certifications; let i = index">
+              <div class="item-header">
+                <div>
+                  <strong>{{ cert.name }}</strong>
+                  <span class="item-sub">{{ cert.issuingOrganization }}</span>
+                </div>
+                <button class="btn-remove" (click)="removeCertification(i)" title="Remove">🗑️</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="add-form">
+            <h4>{{ 'pm.addCert' | translate }}</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.certName' | translate }} *</label>
+                <input type="text" [(ngModel)]="newCertification.name" placeholder="AWS Solutions Architect" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.issuer' | translate }}</label>
+                <input type="text" [(ngModel)]="newCertification.issuingOrganization" placeholder="Amazon Web Services" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'pm.issueDate' | translate }}</label>
+                <input type="date" [(ngModel)]="newCertification.issueDate" />
+              </div>
+              <div class="form-group">
+                <label>{{ 'pm.expiryDate' | translate }}</label>
+                <input type="date" [(ngModel)]="newCertification.expirationDate" />
+              </div>
+            </div>
+            <button class="btn-add" (click)="addCertification()">+ {{ 'pm.add' | translate }}</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

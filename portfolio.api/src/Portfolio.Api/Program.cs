@@ -13,12 +13,20 @@ using Portfolio.Infrastructure.Data;
 using Portfolio.Infrastructure.Messaging;
 using Portfolio.Infrastructure.Persistence;
 using Portfolio.Infrastructure.Repositories;
+using Portfolio.ServiceDefaults;
 using Serilog;
 using System.Security.Claims;
 using System.Text;
 
+try
+{
+Console.WriteLine("STEP 1: Creating builder...");
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine("STEP 2: Adding service defaults...");
+builder.AddServiceDefaults();
+
+Console.WriteLine("STEP 3: Configuring Serilog...");
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -71,6 +79,7 @@ builder.Services.AddScoped<ICommandHandler<UpdateUserCommand, UserDto>, UpdateUs
 builder.Services.AddScoped<ICommandHandler<CreateBlogCommand, BlogDto>, CreateBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdateBlogCommand, BlogDto>, UpdateBlogCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<DeleteBlogCommand, bool>, DeleteBlogCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<DeletePortfolioCommand, bool>, DeletePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<CreatePortfolioCommand, PortfolioDto>, CreatePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<GeneratePortfolioCommand, PortfolioDto>, GeneratePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<UpdatePortfolioCommand, PortfolioDto>, UpdatePortfolioCommandHandler>();
@@ -91,6 +100,7 @@ builder.Services.AddScoped<IQueryHandler<GetBlogsByAuthorQuery, IEnumerable<Blog
 builder.Services.AddScoped<IQueryHandler<GetPortfolioByIdQuery, PortfolioDto?>, GetPortfolioByIdQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetPortfolioByUserIdQuery, PortfolioDto?>, GetPortfolioByUserIdQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetPortfoliosByTenantQuery, IEnumerable<PortfolioDto>>, GetPortfoliosByTenantQueryHandler>();
+builder.Services.AddScoped<IQueryHandler<GetPortfolioBySlugQuery, PortfolioDto?>, GetPortfolioBySlugQueryHandler>();
 
 // JWT Authentication
 var jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-min-32-chars-long-for-security";
@@ -126,14 +136,15 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Guest", policy => policy.RequireAuthenticatedUser());
 });
 
-// CORS
+// CORS - Allow frontend origin
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true) // Allow any origin in development
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -141,8 +152,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+Console.WriteLine("STEP 4: Building app...");
 var app = builder.Build();
 
+Console.WriteLine("STEP 5: Configuring middleware...");
 // Configure the HTTP request pipeline
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -158,6 +171,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseSerilogRequestLogging();
+
+app.UseServiceDefaults();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -176,4 +191,23 @@ app.MapGroup("/api").MapPortfolioEndpoints();
 app.MapGroup("/api").MapAuthEndpoints();
 app.MapGroup("/api").MapAdminEndpoints();
 
+Console.WriteLine("STEP 6: Starting application...");
 app.Run();
+Console.WriteLine("STEP 7: Application stopped normally.");
+}
+catch (HostAbortedException)
+{
+    // Expected when EF Core tools (dotnet ef) run - they abort the host after getting DbContext config
+    // Do NOT call Environment.Exit here, or EF tools will fail
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FATAL ERROR: Application failed to start");
+    Console.WriteLine($"Error: {ex.GetType().Name}: {ex.Message}");
+    Console.WriteLine($"Stack: {ex.StackTrace}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+    }
+    Environment.Exit(1);
+}

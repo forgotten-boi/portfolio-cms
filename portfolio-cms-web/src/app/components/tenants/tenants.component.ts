@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TenantService } from '../../services/tenant.service';
 import { Tenant } from '../../models';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-tenants',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './tenants.component.html',
   styleUrl: './tenants.component.scss'
 })
@@ -14,7 +16,10 @@ export class TenantsComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private tenantService: TenantService) {}
+  constructor(
+    private tenantService: TenantService,
+    private translationService: TranslationService
+  ) {}
 
   ngOnInit(): void {
     this.loadTenants();
@@ -42,6 +47,6 @@ export class TenantsComponent implements OnInit {
   }
 
   getStatusText(isActive: boolean): string {
-    return isActive ? 'Active' : 'Inactive';
+    return isActive ? this.translationService.t('tenants.active') : this.translationService.t('tenants.inactive');
   }
 }

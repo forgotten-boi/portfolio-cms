@@ -10,7 +10,7 @@
   h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text);
     margin: 0;
   }
 }
@@ -19,20 +19,20 @@
   text-align: center;
   padding: 2rem;
   font-size: 1.1rem;
-  color: #718096;
+  color: var(--text-muted);
 }
 
 .error {
-  color: #e53e3e;
-  background: #fff5f5;
-  border: 1px solid #feb2b2;
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-bg);
   border-radius: 8px;
 }
 
 .no-data {
   text-align: center;
   padding: 3rem;
-  color: #718096;
+  color: var(--text-muted);
   font-size: 1.1rem;
 }
 
@@ -43,15 +43,15 @@
 }
 
 .tenant-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px var(--shadow-lg);
   }
 }
 
@@ -61,13 +61,13 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--border);
 
   h3 {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text);
     flex: 1;
   }
 }
@@ -80,13 +80,13 @@
   white-space: nowrap;
 
   &.status-active {
-    background: #c6f6d5;
-    color: #22543d;
+    background: var(--success-bg);
+    color: var(--success-text);
   }
 
   &.status-inactive {
-    background: #fed7d7;
-    color: #742a2a;
+    background: var(--danger-bg);
+    color: var(--danger-text);
   }
 }
 
@@ -102,20 +102,20 @@
     font-size: 0.95rem;
 
     strong {
-      color: #2d3748;
+      color: var(--text-heading);
       font-weight: 600;
     }
 
     span {
-      color: #4a5568;
+      color: var(--text-secondary);
     }
 
     .subdomain {
       font-family: monospace;
-      background: #f7fafc;
+      background: var(--meta-bg);
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
-      color: #667eea;
+      color: var(--primary);
       font-weight: 600;
     }
   }

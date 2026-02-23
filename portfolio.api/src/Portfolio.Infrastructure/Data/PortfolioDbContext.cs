@@ -142,11 +142,11 @@ public class PortfolioDbContext : DbContext
             entity.Property(r => r.Description).HasMaxLength(500);
             entity.HasIndex(r => r.Name).IsUnique();
             
-            // Seed default roles
+            // Seed default roles (dates must match snapshot to avoid PendingModelChangesWarning)
             entity.HasData(
-                new Role { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Admin", Description = "Administrator role with full access", CreatedAt = DateTime.UtcNow },
-                new Role { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Member", Description = "Regular member with standard access", CreatedAt = DateTime.UtcNow },
-                new Role { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Guest", Description = "Guest user with limited access", CreatedAt = DateTime.UtcNow }
+                new Role { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Admin", Description = "Administrator role with full access", CreatedAt = new DateTime(2025, 11, 13, 17, 21, 5, 261, DateTimeKind.Utc).AddTicks(3663) },
+                new Role { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Member", Description = "Regular member with standard access", CreatedAt = new DateTime(2025, 11, 13, 17, 21, 5, 261, DateTimeKind.Utc).AddTicks(3934) },
+                new Role { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Guest", Description = "Guest user with limited access", CreatedAt = new DateTime(2025, 11, 13, 17, 21, 5, 261, DateTimeKind.Utc).AddTicks(3938) }
             );
         });
 

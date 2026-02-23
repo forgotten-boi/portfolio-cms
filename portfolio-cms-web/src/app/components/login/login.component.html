@@ -1,41 +1,40 @@
 <div class="login-container">
   <div class="login-card">
     <h1>Portfolio CMS</h1>
-    <h2>Login</h2>
+    <h2>{{ 'login.title' | translate }}</h2>
     
     <form (ngSubmit)="login()" #loginForm="ngForm">
-      <div class="form-group">
-        <label for="tenantId">Tenant ID</label>
+      <div class="form-group" *ngIf="showTenantId">
+        <label for="tenantId">{{ 'login.tenantId' | translate }}</label>
         <input 
           type="text" 
           id="tenantId" 
           [(ngModel)]="tenantId" 
           name="tenantId" 
-          placeholder="Enter your tenant ID"
-          required
+          [placeholder]="'login.tenantIdPlaceholder' | translate"
           class="form-control">
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">{{ 'login.email' | translate }}</label>
         <input 
           type="email" 
           id="email" 
           [(ngModel)]="email" 
           name="email" 
-          placeholder="Enter your email"
+          [placeholder]="'login.emailPlaceholder' | translate"
           required
           class="form-control">
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">{{ 'login.password' | translate }}</label>
         <input 
           type="password" 
           id="password" 
           [(ngModel)]="password" 
           name="password" 
-          placeholder="Enter your password"
+          [placeholder]="'login.passwordPlaceholder' | translate"
           required
           class="form-control">
       </div>
@@ -47,13 +46,13 @@
       <button 
         type="submit" 
         class="btn btn-primary"
-        [disabled]="loading || !loginForm.form.valid">
-        {{ loading ? 'Logging in...' : 'Login' }}
+        [disabled]="loading || !isFormValid">
+        {{ loading ? ('login.submitting' | translate) : ('login.submit' | translate) }}
       </button>
     </form>
 
     <div class="register-link">
-      <p>Don't have an account? <a routerLink="/register">Create one here</a></p>
+      <p>{{ 'login.noAccount' | translate }} <a routerLink="/register">{{ 'login.register' | translate }}</a></p>
     </div>
   </div>
 </div>

@@ -33,6 +33,10 @@ export class BlogService {
     return this.http.get<Blog>(`${this.baseUrl}/slug/${slug}`);
   }
 
+  getPublicBySlug(slug: string): Observable<Blog> {
+    return this.http.get<Blog>(`${this.baseUrl}/${slug}`);
+  }
+
   create(blog: CreateBlogDto): Observable<Blog> {
     return this.http.post<Blog>(this.baseUrl, blog);
   }

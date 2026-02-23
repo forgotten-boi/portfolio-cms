@@ -1,0 +1,31 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+.main-area {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.with-sidebar {
+    margin-left: 220px;
+  }
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .main-area.with-sidebar {
+    margin-left: 64px;
+  }
+  .main-content {
+    padding: 16px;
+  }
+}

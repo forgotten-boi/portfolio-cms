@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - Development
+  postgres:
+    image: postgres:17
+    container_name: portfolio-postgres-dev
+    environment:
+      POSTGRES_USER: portfolio_dev_user
+      POSTGRES_PASSWORD: portfolio_dev_pass
+      POSTGRES_DB: portfolio_dev
+      POSTGRES_INITDB_ARGS: "-c log_statement=all -c log_duration=on"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - portfolio-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio_dev_user -d portfolio_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.portfolio.description=Portfolio CMS PostgreSQL Database"
+
+  # pgAdmin - Database Management UI
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: portfolio-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@portfolio.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      SCRIPT_NAME: /pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - portfolio-dev-network
+    volumes:
+      - pgadmin_dev_data:/var/lib/pgadmin
+    labels:
+      - "com.portfolio.description=Portfolio CMS pgAdmin Database UI"
+
+  # Kafka - Message Queue
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: portfolio-kafka-dev
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - portfolio-dev-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "com.portfolio.description=Portfolio CMS Kafka Message Queue"
+
+  # Zookeeper - Kafka Coordination
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: portfolio-zookeeper-dev
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 5
+      ZOOKEEPER_INIT_LIMIT: 10
+    ports:
+      - "2181:2181"
+    networks:
+      - portfolio-dev-network
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "com.portfolio.description=Portfolio CMS Zookeeper Coordination"
+
+  # Redis - Caching (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: portfolio-redis-dev
+    ports:
+      - "6379:6379"
+    networks:
+      - portfolio-dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_dev_data:/data
+    labels:
+      - "com.portfolio.description=Portfolio CMS Redis Cache"
+    environment:
+      - REDIS_PASSWORD=redis_dev_password
+
+networks:
+  portfolio-dev-network:
+    driver: bridge
+    labels:
+      - "com.portfolio.description=Development network for Portfolio CMS"
+
+volumes:
+  postgres_dev_data:
+    labels:
+      - "com.portfolio.description=PostgreSQL development data volume"
+  pgadmin_dev_data:
+    labels:
+      - "com.portfolio.description=pgAdmin development data volume"
+  redis_dev_data:
+    labels:
+      - "com.portfolio.description=Redis development data volume"

@@ -149,6 +149,12 @@ public class PortfolioRepository : Repository<PortfolioEntity>, IPortfolioReposi
             .Where(p => p.TenantId == tenantId)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<PortfolioEntity?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .FirstOrDefaultAsync(p => p.Slug == slug && p.IsPublished, cancellationToken);
+    }
 }
 
 public class RoleRepository : Repository<Role>, IRoleRepository

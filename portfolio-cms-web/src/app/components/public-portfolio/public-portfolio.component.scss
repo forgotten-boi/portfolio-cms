@@ -71,3 +71,58 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+// ── Share Bar ──
+.share-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+
+  .share-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.95rem;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.2s;
+
+    &:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    &.linkedin {
+      background: #0077b5;
+    }
+
+    &.facebook {
+      background: #1877f2;
+    }
+
+    &.copy {
+      background: #667eea;
+    }
+  }
+}

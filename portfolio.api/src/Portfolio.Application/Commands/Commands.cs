@@ -122,6 +122,18 @@ public class DeleteBlogCommand : Command<bool>
 }
 
 // Portfolio Commands
+public class DeletePortfolioCommand : Command<bool>
+{
+    public Guid PortfolioId { get; }
+    public Guid TenantId { get; }
+
+    public DeletePortfolioCommand(Guid portfolioId, Guid tenantId)
+    {
+        PortfolioId = portfolioId;
+        TenantId = tenantId;
+    }
+}
+
 public class CreatePortfolioCommand : Command<PortfolioDto>
 {
     public Guid TenantId { get; }

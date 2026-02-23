@@ -30,9 +30,10 @@ VALUES
 CREATE UNIQUE INDEX "IX_Roles_Name" ON "Roles" ("Name");
 CREATE INDEX "IX_UserRoleAssignments_RoleId" ON "UserRoleAssignments" ("RoleId");
 
--- Assign Admin role to existing test user
+-- Assign Admin role to admin test user
 INSERT INTO "UserRoleAssignments" ("UserId", "RoleId", "AssignedAt", "AssignedBy")
-VALUES ('b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e'::uuid, '11111111-1111-1111-1111-111111111111'::uuid, NOW(), NULL);
+VALUES ('a1000000-0000-0000-0000-000000000001'::uuid, '11111111-1111-1111-1111-111111111111'::uuid, NOW(), NULL)
+ON CONFLICT DO NOTHING;
 
 -- Insert migration history record
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")

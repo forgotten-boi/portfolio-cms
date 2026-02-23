@@ -55,7 +55,6 @@ public class UpdatePortfolioDto
     public bool? IsPublished { get; set; }
     public int? MaxFeaturedBlogs { get; set; }
     public PortfolioData? Data { get; set; }
-    public bool? IsPublished { get; set; }
 }
 
 public class ImportLinkedInDto

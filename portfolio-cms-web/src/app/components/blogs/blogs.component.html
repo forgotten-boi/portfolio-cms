@@ -33,6 +33,8 @@
       </div>
 
       <div class="blog-actions">
+        <a *ngIf="blog.isPublished && blog.slug" class="btn-view" [href]="'/blog/' + blog.slug" target="_blank">🔗 {{ 'blogs.view' | translate }}</a>
+        <button *ngIf="blog.isPublished && blog.slug" class="btn-copy" (click)="copyBlogLink(blog.slug)">📋 {{ 'blogs.copyLink' | translate }}</button>
         <button class="btn-edit" (click)="editBlog(blog.id)">{{ 'blogs.edit' | translate }}</button>
         <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">{{ 'blogs.delete' | translate }}</button>
       </div>

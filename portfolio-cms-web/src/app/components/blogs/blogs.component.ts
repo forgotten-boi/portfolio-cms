@@ -73,4 +73,11 @@ export class BlogsComponent implements OnInit {
   getStatusText(isPublished: boolean): string {
     return isPublished ? this.translationService.t('blogs.published') : this.translationService.t('blogs.draft');
   }
+
+  copyBlogLink(slug: string): void {
+    const url = `${window.location.origin}/blog/${slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Blog link copied to clipboard!');
+    });
+  }
 }

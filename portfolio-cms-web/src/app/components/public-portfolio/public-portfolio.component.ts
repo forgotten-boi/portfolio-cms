@@ -15,6 +15,7 @@ export class PublicPortfolioComponent implements OnInit {
   loading = true;
   error: string | null = null;
   renderedHtml: SafeHtml | null = null;
+  linkCopied = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -127,5 +128,26 @@ export class PublicPortfolioComponent implements OnInit {
     }
 
     this.renderedHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  get currentUrl(): string {
+    return window.location.href;
+  }
+
+  shareOnLinkedIn(): void {
+    const url = encodeURIComponent(this.currentUrl);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  }
+
+  shareOnFacebook(): void {
+    const url = encodeURIComponent(this.currentUrl);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  }
+
+  copyLink(): void {
+    navigator.clipboard.writeText(this.currentUrl).then(() => {
+      this.linkCopied = true;
+      setTimeout(() => this.linkCopied = false, 2000);
+    });
   }
 }

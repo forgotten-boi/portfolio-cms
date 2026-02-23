@@ -154,7 +154,7 @@
   padding-top: 1rem;
   border-top: 1px solid var(--border);
 
-  button {
+  a, button {
     flex: 1;
     padding: 0.5rem 1rem;
     border: none;
@@ -162,23 +162,46 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+  }
 
-    &.btn-edit {
-      background: var(--bg-secondary);
-      color: var(--text-heading);
+  .btn-view {
+    background: var(--accent);
+    color: #fff;
 
-      &:hover {
-        background: var(--border);
-      }
+    &:hover {
+      opacity: 0.85;
     }
+  }
 
-    &.btn-delete {
+  .btn-copy {
+    background: var(--bg-secondary);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+
+    &:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+  }
+
+  .btn-edit {
+    background: var(--bg-secondary);
+    color: var(--text-heading);
+
+    &:hover {
+      background: var(--border);
+    }
+  }
+
+  .btn-delete {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+
+    &:hover {
       background: var(--danger-bg);
-      color: var(--danger-text);
-
-      &:hover {
-        background: var(--danger-bg);
-      }
     }
   }
 }

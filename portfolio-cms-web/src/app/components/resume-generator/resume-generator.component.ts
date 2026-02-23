@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { NotificationService } from '../../services/notification.service';
 
 interface ResumeTemplate {
   id: string;
@@ -83,7 +84,7 @@ export class ResumeGeneratorComponent implements OnInit {
     { id: '3', name: 'Startup Resume', template: 'Creative', targetCompany: 'YC Startup', tone: 'creative', createdAt: new Date(Date.now() - 86400000 * 7), format: 'DOCX' }
   ];
 
-  constructor() {}
+  constructor(private notificationService: NotificationService) {}
 
   ngOnInit(): void {}
 
@@ -102,7 +103,7 @@ export class ResumeGeneratorComponent implements OnInit {
 
   exportAs(format: string): void {
     // Placeholder for export functionality
-    alert(`Exporting as ${format}...`);
+    this.notificationService.info(`Exporting as ${format}...`);
   }
 
   deleteVariant(id: string): void {

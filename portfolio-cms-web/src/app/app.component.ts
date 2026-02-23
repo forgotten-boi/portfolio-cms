@@ -8,11 +8,9 @@ import { TranslationService } from './services/translation.service';
 import { AuthService } from './services/auth.service';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 
-
-  @Component({
-    selector: 'app-root',
-    imports: [RouterOutlet, CommonModule, SidebarComponent, TopbarComponent, NotificationsComponent],
-    
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, CommonModule, SidebarComponent, TopbarComponent, NotificationsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

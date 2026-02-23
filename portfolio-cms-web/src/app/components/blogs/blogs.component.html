@@ -8,6 +8,18 @@
   
   <div *ngIf="error" class="error">{{ error }}</div>
 
+  <!-- Delete confirmation modal -->
+  <div *ngIf="confirmDeleteId" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-blog-dialog-title">
+    <div class="modal-dialog">
+      <h3 id="delete-blog-dialog-title">Delete Blog</h3>
+      <p>Are you sure you want to delete this blog? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="!loading && !error" class="blogs-grid">
     <div *ngIf="blogs.length === 0" class="no-data">
       {{ 'blogs.empty' | translate }}
@@ -42,7 +54,14 @@
           (click)="togglePublish(blog)">
           {{ blog.isPublished ? ('blogs.unpublish' | translate) : ('blogs.publish' | translate) }}
         </button>
-        <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">{{ 'blogs.delete' | translate }}</button>
+        <button
+          *ngIf="blog.isPublished && blog.slug"
+          class="btn-copy-link"
+          (click)="copyPublicLink(blog)"
+          title="Copy public link">
+          Copy Link
+        </button>
+        <button class="btn-delete" (click)="deleteBlog(blog.id)">Delete</button>
       </div>
 
       <div class="share-actions" *ngIf="blog.isPublished">
@@ -57,3 +76,4 @@
     </div>
   </div>
 </div>
+

@@ -57,7 +57,6 @@ export class PortfolioFormComponent implements OnInit {
       subtitle: ['', [Validators.required, Validators.maxLength(200)]],
       bio: ['', [Validators.required, Validators.maxLength(1000)]],
       template: ['Modern', [Validators.required]],
-      isPublic: [false],
       isPublished: [false],
       featuredBlogsEnabled: [false]
     });

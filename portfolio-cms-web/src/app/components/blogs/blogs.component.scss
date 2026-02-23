@@ -213,30 +213,29 @@
     background: var(--bg-secondary);
     color: var(--text-heading);
 
-    &.btn-copy-link {
-      background: var(--copy-link-bg);
-      color: var(--copy-link-text);
-
-      &:hover {
-        background: var(--copy-link-hover-bg);
-      }
-    }
-
-    &.btn-delete {
-      background: var(--danger-bg);
-      color: var(--danger-text);
-
     &:hover {
       background: var(--border);
     }
   }
+
+  .btn-copy-link {
+    background: var(--bg-secondary);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+
+    &:hover {
+      background: var(--accent);
+      color: #fff;
+    }
   }
+
   .btn-delete {
     background: var(--danger-bg);
     color: var(--danger-text);
 
     &:hover {
       background: var(--danger-bg);
+      opacity: 0.85;
     }
   }
 }

@@ -1,26 +1,26 @@
 <div class="users-container">
   <div class="header">
-    <h1>Users</h1>
+    <h1>{{ 'users.title' | translate }}</h1>
     <button class="btn-create-admin" (click)="openCreateAdminModal()">
-      <span>+</span> Create Admin
+      <span>+</span> {{ 'users.createAdmin' | translate }}
     </button>
   </div>
 
-  <div *ngIf="loading" class="loading">Loading users...</div>
+  <div *ngIf="loading" class="loading">{{ 'users.loading' | translate }}</div>
   
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="!loading && !error" class="users-list">
     <div *ngIf="users.length === 0" class="no-data">
-      No users found.
+      {{ 'users.empty' | translate }}
     </div>
 
     <div class="users-table" *ngIf="users.length > 0">
       <div class="table-header">
-        <div class="col-name">Name</div>
-        <div class="col-email">Email</div>
-        <div class="col-role">Role</div>
-        <div class="col-date">Created</div>
+        <div class="col-name">{{ 'users.name' | translate }}</div>
+        <div class="col-email">{{ 'users.email' | translate }}</div>
+        <div class="col-role">{{ 'users.role' | translate }}</div>
+        <div class="col-date">{{ 'users.created' | translate }}</div>
       </div>
 
       <div class="table-row" *ngFor="let user of users">
@@ -45,7 +45,7 @@
   <div *ngIf="showCreateAdminModal" class="modal-overlay" (click)="closeCreateAdminModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>Create Admin User</h2>
+        <h2>{{ 'users.createAdminTitle' | translate }}</h2>
         <button class="close-btn" (click)="closeCreateAdminModal()">×</button>
       </div>
       
@@ -53,7 +53,7 @@
       
       <form (ngSubmit)="createAdmin()" class="admin-form">
         <div class="form-group">
-          <label for="firstName">First Name *</label>
+          <label for="firstName">{{ 'users.firstName' | translate }} *</label>
           <input 
             type="text" 
             id="firstName" 
@@ -64,7 +64,7 @@
         </div>
 
         <div class="form-group">
-          <label for="lastName">Last Name *</label>
+          <label for="lastName">{{ 'users.lastName' | translate }} *</label>
           <input 
             type="text" 
             id="lastName" 
@@ -75,7 +75,7 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Email *</label>
+          <label for="email">{{ 'users.email' | translate }} *</label>
           <input 
             type="email" 
             id="email" 
@@ -86,7 +86,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password">Password *</label>
+          <label for="password">{{ 'users.password' | translate }} *</label>
           <input 
             type="password" 
             id="password" 
@@ -94,12 +94,13 @@
             name="password"
             placeholder="Enter password (min 6 characters)"
             required>
+          <small class="hint">{{ 'users.passwordHint' | translate }}</small>
         </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn-cancel" (click)="closeCreateAdminModal()">Cancel</button>
+          <button type="button" class="btn-cancel" (click)="closeCreateAdminModal()">{{ 'users.cancel' | translate }}</button>
           <button type="submit" class="btn-submit" [disabled]="creatingAdmin">
-            {{ creatingAdmin ? 'Creating...' : 'Create Admin' }}
+            {{ creatingAdmin ? ('users.creating' | translate) : ('users.createAdmin' | translate) }}
           </button>
         </div>
       </form>

@@ -251,8 +251,15 @@ public static class PortfolioEndpoints
             if (userId == null || !Guid.TryParse(userId, out var parsedUserId))
                 return Results.Unauthorized();
 
-            var result = await handler.HandleAsync(new CreatePortfolioCommand(tenantId.Value, parsedUserId, dto));
-            return Results.Created($"/api/portfolios/{result.Id}", result);
+            try
+            {
+                var result = await handler.HandleAsync(new CreatePortfolioCommand(tenantId.Value, parsedUserId, dto));
+                return Results.Created($"/api/portfolios/{result.Id}", result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
         });
 
         portfolios.MapPost("/generate", async (GeneratePortfolioDto dto, HttpContext context, ICommandHandler<GeneratePortfolioCommand, PortfolioDto> handler) =>
@@ -278,6 +285,22 @@ public static class PortfolioEndpoints
         .Produces<PortfolioDto>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized);
+
+        portfolios.MapDelete("/{id:guid}", async (Guid id, HttpContext context, ICommandHandler<DeletePortfolioCommand, bool> handler) =>
+        {
+            var tenantId = context.GetTenantId();
+            if (tenantId == null) return Results.BadRequest("Tenant ID is required");
+
+            try
+            {
+                await handler.HandleAsync(new DeletePortfolioCommand(id, tenantId.Value));
+                return Results.NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return Results.NotFound();
+            }
+        });
 
         portfolios.MapPut("/{id:guid}", async (Guid id, UpdatePortfolioDto dto, HttpContext context, ICommandHandler<UpdatePortfolioCommand, PortfolioDto> handler) =>
         {
@@ -315,10 +338,10 @@ public static class PortfolioEndpoints
         });
 
         // Public portfolio endpoint (no auth required)
-        group.MapGet("/portfolio/{slug}", async (string slug, IPortfolioRepository portfolioRepo) =>
+        group.MapGet("/portfolio/{slug}", async (string slug, IQueryHandler<GetPortfolioBySlugQuery, PortfolioDto?> handler) =>
         {
-            // TODO: Add query to get by slug - for now return NotFound
-            return Results.NotFound(new { message = "Public portfolio endpoint - implementation pending" });
+            var result = await handler.HandleAsync(new GetPortfolioBySlugQuery(slug));
+            return result != null ? Results.Ok(result) : Results.NotFound();
         })
         .WithName("GetPublicPortfolio")
         .WithDescription("Get public portfolio by slug (no authentication required)")

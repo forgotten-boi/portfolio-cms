@@ -1,3 +1,4 @@
+-- Fix AuthProvider for all local users (should be 'Email' not 'Local')
 UPDATE "Users" 
 SET "AuthProvider" = 'Email'
-WHERE "Email" = 'test@example.com';
+WHERE "AuthProvider" = 'Local';

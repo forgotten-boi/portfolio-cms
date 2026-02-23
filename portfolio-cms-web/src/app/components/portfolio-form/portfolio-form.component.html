@@ -1,6 +1,6 @@
 <div class="form-container">
   <div class="form-header">
-    <h1>{{ isEditMode ? 'Edit Portfolio' : 'Create New Portfolio' }}</h1>
+    <h1>{{ isEditMode ? ('portfolioForm.editTitle' | translate) : ('portfolioForm.createTitle' | translate) }}</h1>
     @if (!isEditMode) {
       <button type="button" class="btn-generate" (click)="openGenerateModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -8,13 +8,13 @@
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        Generate from PDF/LinkedIn
+        {{ 'portfolioForm.generateBtn' | translate }}
       </button>
     }
   </div>
 
   @if (loading) {
-    <div class="loading">Loading...</div>
+    <div class="loading">{{ 'portfolioForm.loading' | translate }}</div>
   }
   
   @if (error && !showGenerateModal) {
@@ -24,13 +24,13 @@
   @if (!loading) {
     <form [formGroup]="portfolioForm" (ngSubmit)="onSubmit()" class="portfolio-form">
       <div class="form-group">
-        <label for="title">Title <span class="required">*</span></label>
+        <label for="title">{{ 'portfolioForm.title' | translate }} <span class="required">*</span></label>
         <input 
           type="text" 
           id="title" 
           formControlName="title" 
           [class.invalid]="isFieldInvalid('title')"
-          placeholder="Enter portfolio title">
+          [placeholder]="'portfolioForm.titlePlaceholder' | translate">
         @if (isFieldInvalid('title')) {
           <div class="error-message">
             {{ getErrorMessage('title') }}
@@ -39,13 +39,13 @@
       </div>
 
       <div class="form-group">
-        <label for="subtitle">Subtitle <span class="required">*</span></label>
+        <label for="subtitle">{{ 'portfolioForm.subtitle' | translate }} <span class="required">*</span></label>
         <input 
           type="text" 
           id="subtitle" 
           formControlName="subtitle" 
           [class.invalid]="isFieldInvalid('subtitle')"
-          placeholder="Enter subtitle">
+          [placeholder]="'portfolioForm.subtitlePlaceholder' | translate">
         @if (isFieldInvalid('subtitle')) {
           <div class="error-message">
             {{ getErrorMessage('subtitle') }}
@@ -54,13 +54,13 @@
       </div>
 
       <div class="form-group">
-        <label for="bio">Bio <span class="required">*</span></label>
+        <label for="bio">{{ 'portfolioForm.bio' | translate }} <span class="required">*</span></label>
         <textarea 
           id="bio" 
           formControlName="bio" 
           rows="5"
           [class.invalid]="isFieldInvalid('bio')"
-          placeholder="Tell us about yourself..."></textarea>
+          [placeholder]="'portfolioForm.bioPlaceholder' | translate"></textarea>
         @if (isFieldInvalid('bio')) {
           <div class="error-message">
             {{ getErrorMessage('bio') }}
@@ -69,7 +69,7 @@
       </div>
 
       <div class="form-group">
-        <label for="template">Template <span class="required">*</span></label>
+        <label for="template">{{ 'portfolioForm.template' | translate }} <span class="required">*</span></label>
         <div class="template-selector">
           @for (template of templates; track template.id) {
             <label class="template-option" [class.selected]="portfolioForm.get('template')?.value === template.id">
@@ -93,26 +93,26 @@
 
       <div class="form-group checkbox-group">
         <label>
-          <input type="checkbox" formControlName="isPublic">
-          <span>Make portfolio public</span>
+          <input type="checkbox" formControlName="isPublished">
+          <span>{{ 'portfolioForm.isPublished' | translate }}</span>
         </label>
       </div>
 
       <div class="form-group checkbox-group">
         <label>
           <input type="checkbox" formControlName="featuredBlogsEnabled">
-          <span>Enable featured blogs</span>
+          <span>{{ 'portfolioForm.featuredBlogs' | translate }}</span>
         </label>
       </div>
 
       <div class="info-box">
-        <p><strong>Note:</strong> After creating the portfolio, you can add work experience, education, skills, projects, and certifications by editing it later.</p>
+        <p><strong>{{ 'common.note' | translate }}:</strong> {{ 'portfolioForm.note' | translate }}</p>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn-cancel" (click)="cancel()">{{ 'portfolioForm.cancel' | translate }}</button>
         <button type="submit" class="btn-submit" [disabled]="loading">
-          {{ isEditMode ? 'Update' : 'Create' }} Portfolio
+          {{ isEditMode ? ('portfolioForm.update' | translate) : ('portfolioForm.create' | translate) }}
         </button>
       </div>
     </form>
@@ -124,17 +124,17 @@
   <div class="modal-overlay" (click)="closeGenerateModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>Generate Portfolio</h2>
+        <h2>{{ 'portfolioForm.generateTitle' | translate }}</h2>
         <button type="button" class="close-btn" (click)="closeGenerateModal()">×</button>
       </div>
 
       <div class="modal-body">
-        <p>Upload your resume (PDF) or provide your LinkedIn profile URL to automatically generate your portfolio.</p>
+        <p>{{ 'portfolioForm.generateDesc' | translate }}</p>
 
         <div class="generate-options">
           <!-- PDF Upload -->
           <div class="generate-section">
-            <h3>Upload Resume (PDF)</h3>
+            <h3>{{ 'portfolioForm.uploadResume' | translate }}</h3>
             <div class="file-upload">
               <input 
                 type="file" 
@@ -153,19 +153,19 @@
                 @if (selectedFile) {
                   <span class="file-name">{{ selectedFile.name }}</span>
                 } @else {
-                  <span>Click to select PDF file</span>
+                  <span>{{ 'portfolioForm.clickSelectPdf' | translate }}</span>
                 }
               </label>
             </div>
           </div>
 
           <div class="divider">
-            <span>OR</span>
+            <span>{{ 'portfolioForm.or' | translate }}</span>
           </div>
 
           <!-- LinkedIn URL -->
           <div class="generate-section">
-            <h3>LinkedIn Profile URL</h3>
+            <h3>{{ 'portfolioForm.linkedInUrl' | translate }}</h3>
             <input 
               type="url" 
               [(ngModel)]="linkedInUrl"
@@ -181,14 +181,14 @@
 
       <div class="modal-footer">
         <button type="button" class="btn-cancel" (click)="closeGenerateModal()" [disabled]="generating">
-          Cancel
+          {{ 'portfolioForm.cancel' | translate }}
         </button>
         <button type="button" class="btn-primary" (click)="generatePortfolio()" [disabled]="generating || (!selectedFile && !linkedInUrl)">
           @if (generating) {
             <span class="spinner"></span>
-            Generating...
+            {{ 'portfolioForm.generating' | translate }}
           } @else {
-            Generate Portfolio
+            {{ 'portfolioForm.generate' | translate }}
           }
         </button>
       </div>

@@ -37,6 +37,7 @@ public class CreatePortfolioDto
     public string? ResumeUrl { get; set; }
     public string Template { get; set; } = "Modern";
     public bool FeaturedBlogsEnabled { get; set; }
+    public bool IsPublished { get; set; }
 }
 
 public class UpdatePortfolioDto
@@ -51,6 +52,7 @@ public class UpdatePortfolioDto
     public string? WebsiteUrl { get; set; }
     public string? Template { get; set; }
     public bool? FeaturedBlogsEnabled { get; set; }
+    public bool? IsPublished { get; set; }
     public int? MaxFeaturedBlogs { get; set; }
     public PortfolioData? Data { get; set; }
 }

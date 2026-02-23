@@ -31,7 +31,7 @@ export class PublicBlogComponent implements OnInit {
       return;
     }
 
-    this.blogService.getBySlug(slug).subscribe({
+    this.blogService.getPublicBySlug(slug).subscribe({
       next: (blog: any) => {
         if (!blog || !blog.isPublished) {
           this.error = 'Blog not found or not published';

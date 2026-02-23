@@ -1,0 +1,28 @@
+<aside class="sidebar" *ngIf="isAuthenticated" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <div class="brand" *ngIf="!collapsed">
+      <span class="brand-icon">💼</span>
+      <span class="brand-text">Portfolio CMS</span>
+    </div>
+    <button class="collapse-btn" (click)="toggleCollapse()" [title]="collapsed ? 'Expand' : 'Collapse'">
+      <span *ngIf="!collapsed">◀</span>
+      <span *ngIf="collapsed">▶</span>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a *ngFor="let item of navItems"
+       class="nav-item"
+       [routerLink]="item.route"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: item.exact}"
+       [title]="item.labelKey | translate">
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label" *ngIf="!collapsed">{{ item.labelKey | translate }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer" *ngIf="!collapsed">
+    <div class="version-info">v2.0</div>
+  </div>
+</aside>

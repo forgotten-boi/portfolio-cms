@@ -1,7 +1,7 @@
 -- Create default tenant
 INSERT INTO "Tenants" ("Id", "Name", "Subdomain", "IsActive", "CreatedAt", "UpdatedAt")
 VALUES (
-    '00000000-0000-0000-0000-000000000000'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
     'Default Tenant',
     'default',
     true,

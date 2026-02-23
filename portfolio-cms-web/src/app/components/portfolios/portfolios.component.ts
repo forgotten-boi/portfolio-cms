@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Portfolio } from '../../models';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-portfolios',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './portfolios.component.html',
   styleUrl: './portfolios.component.scss'
 })
@@ -17,7 +19,8 @@ export class PortfoliosComponent implements OnInit {
 
   constructor(
     private portfolioService: PortfolioService,
-    private router: Router
+    private router: Router,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -50,7 +53,7 @@ export class PortfoliosComponent implements OnInit {
   }
 
   deletePortfolio(id: string, title: string): void {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
+    if (confirm(this.translationService.t('portfolios.confirmDelete'))) {
       this.portfolioService.delete(id).subscribe({
         next: () => {
           this.portfolios = this.portfolios.filter(p => p.id !== id);
@@ -63,12 +66,12 @@ export class PortfoliosComponent implements OnInit {
     }
   }
 
-  getVisibilityClass(isPublic: boolean): string {
-    return isPublic ? 'visibility-public' : 'visibility-private';
+  getVisibilityClass(isPublished: boolean): string {
+    return isPublished ? 'visibility-public' : 'visibility-private';
   }
 
-  getVisibilityText(isPublic: boolean): string {
-    return isPublic ? 'Public' : 'Private';
+  getVisibilityText(isPublished: boolean): string {
+    return isPublished ? this.translationService.t('portfolios.public') : this.translationService.t('portfolios.private');
   }
 
   getTotalItems(portfolio: Portfolio): number {

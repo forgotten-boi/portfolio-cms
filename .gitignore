@@ -44,3 +44,12 @@ Thumbs.db
 # .NET build artifacts
 **/bin/
 **/obj/
+
+# Playwright MCP tool artifacts
+.playwright-mcp/
+
+# E2E test dependencies
+e2e/node_modules/
+
+# E2E test results
+e2e/test-results/

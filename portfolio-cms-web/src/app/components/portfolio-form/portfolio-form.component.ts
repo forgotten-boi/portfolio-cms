@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
+import { NotificationService } from '../../services/notification.service';
 import { CreatePortfolioDto, GeneratePortfolioDto } from '../../models';
 
 @Component({
@@ -34,7 +35,8 @@ export class PortfolioFormComponent implements OnInit {
     private fb: FormBuilder,
     private portfolioService: PortfolioService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.initForm();
   }
@@ -102,7 +104,10 @@ export class PortfolioFormComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
-        this.router.navigate(['/dashboard/portfolios']);
+        this.notificationService.success(
+          this.isEditMode ? 'Portfolio updated successfully' : 'Portfolio created successfully'
+        );
+        this.router.navigate(['/portfolios']);
       },
       error: (err) => {
         this.error = this.isEditMode ? 'Failed to update portfolio' : 'Failed to create portfolio';
@@ -175,7 +180,7 @@ export class PortfolioFormComponent implements OnInit {
           });
 
           // Show success message
-          alert('Portfolio generated successfully! Review and save your portfolio.');
+          this.notificationService.success('Portfolio generated successfully! Review and save your portfolio.');
         },
         error: (err) => {
           this.generating = false;
@@ -205,7 +210,7 @@ export class PortfolioFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/dashboard/portfolios']);
+    this.router.navigate(['/portfolios']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

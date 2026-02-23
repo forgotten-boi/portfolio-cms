@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
+import { NotificationService } from '../../services/notification.service';
 import { Blog, CreateBlogDto } from '../../models';
 import Quill from 'quill';
 
@@ -28,7 +29,8 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private blogService: BlogService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.initForm();
   }
@@ -172,7 +174,10 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
 
       request$.subscribe({
         next: () => {
-          this.router.navigate(['/dashboard/blogs']);
+          this.notificationService.success(
+            this.isEditMode ? 'Blog updated successfully' : 'Blog created successfully'
+          );
+          this.router.navigate(['/blogs']);
         },
         error: (err) => {
           this.error = this.isEditMode ? 'Failed to update blog' : 'Failed to create blog';
@@ -188,7 +193,7 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/dashboard/blogs']);
+    this.router.navigate(['/blogs']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

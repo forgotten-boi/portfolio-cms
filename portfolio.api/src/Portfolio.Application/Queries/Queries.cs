@@ -151,3 +151,13 @@ public class GetPortfoliosByTenantQuery : Query<IEnumerable<PortfolioDto>>
         TenantId = tenantId;
     }
 }
+
+public class GetPortfolioBySlugQuery : Query<PortfolioDto?>
+{
+    public string Slug { get; }
+
+    public GetPortfolioBySlugQuery(string slug)
+    {
+        Slug = slug;
+    }
+}

@@ -375,6 +375,13 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
         if (command.Data.Data != null)
             portfolio.Data = command.Data.Data;
 
+        if (command.Data.IsPublished.HasValue)
+        {
+            portfolio.IsPublished = command.Data.IsPublished.Value;
+            if (command.Data.IsPublished.Value && portfolio.PublishedAt == null)
+                portfolio.PublishedAt = DateTime.UtcNow;
+        }
+
         portfolio.UpdatedAt = DateTime.UtcNow;
 
         await _portfolioRepository.UpdateAsync(portfolio, cancellationToken);
@@ -386,6 +393,7 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
             TenantId = portfolio.TenantId,
             UserId = portfolio.UserId,
             Title = portfolio.Title,
+            Slug = portfolio.Slug,
             Subtitle = portfolio.Subtitle,
             Bio = portfolio.Bio,
             ProfileImageUrl = portfolio.ProfileImageUrl,
@@ -396,6 +404,8 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
             Template = portfolio.Template.ToString(),
             FeaturedBlogsEnabled = portfolio.FeaturedBlogsEnabled,
             MaxFeaturedBlogs = portfolio.MaxFeaturedBlogs,
+            IsPublished = portfolio.IsPublished,
+            PublishedAt = portfolio.PublishedAt,
             Data = portfolio.Data,
             CreatedAt = portfolio.CreatedAt,
             UpdatedAt = portfolio.UpdatedAt

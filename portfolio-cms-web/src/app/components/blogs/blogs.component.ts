@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
+import { NotificationService } from '../../services/notification.service';
 import { Blog } from '../../models';
 
 @Component({
@@ -14,10 +15,12 @@ export class BlogsComponent implements OnInit {
   blogs: Blog[] = [];
   loading = true;
   error: string | null = null;
+  confirmDeleteId: string | null = null;
 
   constructor(
     private blogService: BlogService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -57,26 +60,48 @@ export class BlogsComponent implements OnInit {
         if (index !== -1) {
           this.blogs[index] = updated;
         }
+        this.notificationService.success(
+          newState ? `"${blog.title}" published successfully` : `"${blog.title}" unpublished`
+        );
       },
       error: (err) => {
-        alert(`Failed to ${newState ? 'publish' : 'unpublish'} blog`);
+        this.notificationService.error(`Failed to ${newState ? 'publish' : 'unpublish'} blog`);
         console.error('Error toggling publish:', err);
       }
     });
   }
 
-  deleteBlog(id: string, title: string): void {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      this.blogService.delete(id).subscribe({
-        next: () => {
-          this.blogs = this.blogs.filter(b => b.id !== id);
-        },
-        error: (err) => {
-          alert('Failed to delete blog');
-          console.error('Error deleting blog:', err);
-        }
-      });
-    }
+  deleteBlog(id: string): void {
+    this.confirmDeleteId = id;
+  }
+
+  confirmDelete(): void {
+    if (!this.confirmDeleteId) return;
+    const id = this.confirmDeleteId;
+    this.confirmDeleteId = null;
+    this.blogService.delete(id).subscribe({
+      next: () => {
+        this.blogs = this.blogs.filter(b => b.id !== id);
+        this.notificationService.success('Blog deleted successfully');
+      },
+      error: (err) => {
+        this.notificationService.error('Failed to delete blog');
+        console.error('Error deleting blog:', err);
+      }
+    });
+  }
+
+  cancelDelete(): void {
+    this.confirmDeleteId = null;
+  }
+
+  copyPublicLink(blog: Blog): void {
+    const url = `${window.location.origin}/blog/${blog.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.notificationService.success('Blog link copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.info(`Public link: ${url}`);
+    });
   }
 
   shareOnLinkedIn(blog: Blog): void {
@@ -97,3 +122,4 @@ export class BlogsComponent implements OnInit {
     return isPublished ? 'Published' : 'Draft';
   }
 }
+

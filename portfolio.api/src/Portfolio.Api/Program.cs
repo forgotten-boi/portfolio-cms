@@ -91,6 +91,7 @@ builder.Services.AddScoped<IQueryHandler<GetBlogsByAuthorQuery, IEnumerable<Blog
 builder.Services.AddScoped<IQueryHandler<GetPortfolioByIdQuery, PortfolioDto?>, GetPortfolioByIdQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetPortfolioByUserIdQuery, PortfolioDto?>, GetPortfolioByUserIdQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetPortfoliosByTenantQuery, IEnumerable<PortfolioDto>>, GetPortfoliosByTenantQueryHandler>();
+builder.Services.AddScoped<IQueryHandler<GetPortfolioBySlugQuery, PortfolioDto?>, GetPortfolioBySlugQueryHandler>();
 
 // JWT Authentication
 var jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-min-32-chars-long-for-security";

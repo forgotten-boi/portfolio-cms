@@ -32,7 +32,7 @@ export class PortfolioService {
     return this.http.post<Portfolio>(this.baseUrl, portfolio);
   }
 
-  update(id: string, portfolio: CreatePortfolioDto): Observable<Portfolio> {
+  update(id: string, portfolio: Partial<CreatePortfolioDto> & { isPublished?: boolean }): Observable<Portfolio> {
     return this.http.put<Portfolio>(`${this.baseUrl}/${id}`, { id, ...portfolio });
   }
 

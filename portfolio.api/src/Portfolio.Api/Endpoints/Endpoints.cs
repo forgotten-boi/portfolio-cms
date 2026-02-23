@@ -315,10 +315,10 @@ public static class PortfolioEndpoints
         });
 
         // Public portfolio endpoint (no auth required)
-        group.MapGet("/portfolio/{slug}", async (string slug, IPortfolioRepository portfolioRepo) =>
+        group.MapGet("/portfolio/{slug}", async (string slug, IQueryHandler<GetPortfolioBySlugQuery, PortfolioDto?> handler) =>
         {
-            // TODO: Add query to get by slug - for now return NotFound
-            return Results.NotFound(new { message = "Public portfolio endpoint - implementation pending" });
+            var result = await handler.HandleAsync(new GetPortfolioBySlugQuery(slug));
+            return result != null ? Results.Ok(result) : Results.NotFound();
         })
         .WithName("GetPublicPortfolio")
         .WithDescription("Get public portfolio by slug (no authentication required)")

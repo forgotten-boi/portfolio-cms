@@ -416,3 +416,43 @@ public class GetPortfoliosByTenantQueryHandler : IQueryHandler<GetPortfoliosByTe
         });
     }
 }
+
+public class GetPortfolioBySlugQueryHandler : IQueryHandler<GetPortfolioBySlugQuery, PortfolioDto?>
+{
+    private readonly IPortfolioRepository _portfolioRepository;
+
+    public GetPortfolioBySlugQueryHandler(IPortfolioRepository portfolioRepository)
+    {
+        _portfolioRepository = portfolioRepository;
+    }
+
+    public async Task<PortfolioDto?> HandleAsync(GetPortfolioBySlugQuery query, CancellationToken cancellationToken = default)
+    {
+        var portfolio = await _portfolioRepository.GetBySlugAsync(query.Slug, cancellationToken);
+        if (portfolio == null) return null;
+
+        return new PortfolioDto
+        {
+            Id = portfolio.Id,
+            TenantId = portfolio.TenantId,
+            UserId = portfolio.UserId,
+            Title = portfolio.Title,
+            Slug = portfolio.Slug,
+            Subtitle = portfolio.Subtitle,
+            Bio = portfolio.Bio,
+            ProfileImageUrl = portfolio.ProfileImageUrl,
+            ResumeUrl = portfolio.ResumeUrl,
+            LinkedInUrl = portfolio.LinkedInUrl,
+            GitHubUrl = portfolio.GitHubUrl,
+            WebsiteUrl = portfolio.WebsiteUrl,
+            Template = portfolio.Template.ToString(),
+            FeaturedBlogsEnabled = portfolio.FeaturedBlogsEnabled,
+            MaxFeaturedBlogs = portfolio.MaxFeaturedBlogs,
+            IsPublished = portfolio.IsPublished,
+            PublishedAt = portfolio.PublishedAt,
+            Data = portfolio.Data,
+            CreatedAt = portfolio.CreatedAt,
+            UpdatedAt = portfolio.UpdatedAt
+        };
+    }
+}

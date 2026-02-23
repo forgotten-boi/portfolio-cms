@@ -143,7 +143,7 @@ export interface CreatePortfolioDto {
 export interface GeneratePortfolioDto {
   pdfBase64?: string;
   linkedInProfileUrl?: string;
-  templateId?: number;
+  templateId?: string | number;
 }
 
 export interface LoginRequest {

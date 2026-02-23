@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 import { Portfolio, Skill, WorkExperience, Education, Project, Certification } from '../../models';
 
 interface CvSection {
@@ -52,7 +53,10 @@ export class CvManagerComponent implements OnInit {
   newCertification: Partial<Certification> = { name: '', issuingOrganization: '' };
   newTechInput = '';
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private translationService: TranslationService
+  ) {}
 
   ngOnInit(): void {
     this.loadPortfolio();
@@ -233,7 +237,13 @@ export class CvManagerComponent implements OnInit {
   }
 
   getSkillLevelLabel(level: number): string {
-    const labels = ['Beginner', 'Elementary', 'Intermediate', 'Advanced', 'Expert'];
-    return labels[Math.min(level - 1, 4)] || 'Intermediate';
+    const keys = [
+      'cv.skillLevel.beginner',
+      'cv.skillLevel.elementary',
+      'cv.skillLevel.intermediate',
+      'cv.skillLevel.advanced',
+      'cv.skillLevel.expert'
+    ];
+    return this.translationService.t(keys[Math.min(level - 1, 4)] || 'cv.skillLevel.intermediate');
   }
 }

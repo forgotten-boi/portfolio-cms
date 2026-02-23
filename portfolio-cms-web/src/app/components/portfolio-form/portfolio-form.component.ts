@@ -147,7 +147,7 @@ export class PortfolioFormComponent implements OnInit {
 
     try {
       const generateData: GeneratePortfolioDto = {
-        templateId: this.portfolioForm.get('template')?.value || 1
+        templateId: this.portfolioForm.get('template')?.value || 'Modern'
       };
 
       if (this.selectedFile) {
@@ -170,7 +170,7 @@ export class PortfolioFormComponent implements OnInit {
             title: portfolio.title,
             subtitle: portfolio.subtitle,
             bio: portfolio.bio,
-            template: portfolio.template || 1,
+            template: portfolio.template || 'Modern',
             isPublished: portfolio.isPublished || false,
             featuredBlogsEnabled: portfolio.featuredBlogsEnabled || false
           });

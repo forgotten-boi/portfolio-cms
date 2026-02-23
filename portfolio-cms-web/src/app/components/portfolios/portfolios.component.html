@@ -1,16 +1,16 @@
 <div class="portfolios-container">
   <div class="header">
-    <h1>Portfolios</h1>
-    <button class="btn-primary" (click)="createPortfolio()">Create New Portfolio</button>
+    <h1>{{ 'portfolios.title' | translate }}</h1>
+    <button class="btn-primary" (click)="createPortfolio()">{{ 'portfolios.createNew' | translate }}</button>
   </div>
 
-  <div *ngIf="loading" class="loading">Loading portfolios...</div>
+  <div *ngIf="loading" class="loading">{{ 'portfolios.loading' | translate }}</div>
   
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="!loading && !error" class="portfolios-grid">
     <div *ngIf="portfolios.length === 0" class="no-data">
-      No portfolios found. Create your first portfolio!
+      {{ 'portfolios.empty' | translate }}
     </div>
 
     <div *ngFor="let portfolio of portfolios" class="portfolio-card">
@@ -28,39 +28,39 @@
 
       <div class="portfolio-meta">
         <div class="template">
-          <strong>Template:</strong> {{ portfolio.template }}
+          <strong>{{ 'portfolios.template' | translate }}:</strong> {{ portfolio.template }}
         </div>
         <div class="items-count">
-          <strong>{{ getTotalItems(portfolio) }}</strong> items
+          <strong>{{ getTotalItems(portfolio) }}</strong> {{ 'portfolios.items' | translate }}
         </div>
       </div>
 
       <div class="portfolio-stats">
         <div class="stat" *ngIf="portfolio.data.workExperiences?.length">
           <span class="count">{{ portfolio.data.workExperiences.length }}</span>
-          <span class="label">Work</span>
+          <span class="label">{{ 'portfolios.work' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.education?.length">
           <span class="count">{{ portfolio.data.education.length }}</span>
-          <span class="label">Education</span>
+          <span class="label">{{ 'portfolios.education' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.skills?.length">
           <span class="count">{{ portfolio.data.skills.length }}</span>
-          <span class="label">Skills</span>
+          <span class="label">{{ 'portfolios.skills' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.projects?.length">
           <span class="count">{{ portfolio.data.projects.length }}</span>
-          <span class="label">Projects</span>
+          <span class="label">{{ 'portfolios.projects' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.certifications?.length">
           <span class="count">{{ portfolio.data.certifications.length }}</span>
-          <span class="label">Certs</span>
+          <span class="label">{{ 'portfolios.certs' | translate }}</span>
         </div>
       </div>
 
       <div class="portfolio-actions">
-        <button class="btn-edit" (click)="editPortfolio(portfolio.id)">Edit</button>
-        <button class="btn-delete" (click)="deletePortfolio(portfolio.id, portfolio.title)">Delete</button>
+        <button class="btn-edit" (click)="editPortfolio(portfolio.id)">{{ 'portfolios.edit' | translate }}</button>
+        <button class="btn-delete" (click)="deletePortfolio(portfolio.id, portfolio.title)">{{ 'portfolios.delete' | translate }}</button>
       </div>
     </div>
   </div>

@@ -1,14 +1,14 @@
 <div class="registration-container">
   <div class="registration-card">
     <div class="registration-header">
-      <h1>Create Account</h1>
-      <p>Join Portfolio CMS to showcase your professional portfolio</p>
+      <h1>{{ 'register.title' | translate }}</h1>
+      <p>{{ 'register.subtitle' | translate }}</p>
     </div>
 
     <form (ngSubmit)="register()" #registerForm="ngForm">
       <!-- Profile Image Upload -->
       <div class="form-group image-upload-section">
-        <label>Profile Photo (Optional)</label>
+        <label>{{ 'register.profilePhoto' | translate }}</label>
         <div class="image-upload-container">
           @if (previewUrl) {
             <div class="image-preview">
@@ -31,7 +31,7 @@
                   <polyline points="17 8 12 3 7 8"></polyline>
                   <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                <span>Click to upload profile photo</span>
+                <span>{{ 'register.uploadPhoto' | translate }}</span>
               </label>
             </div>
           }
@@ -41,7 +41,7 @@
       <!-- Name Fields -->
       <div class="form-row">
         <div class="form-group">
-          <label for="firstName">First Name <span class="required">*</span></label>
+          <label for="firstName">{{ 'register.firstName' | translate }} <span class="required">*</span></label>
           <input 
             type="text" 
             id="firstName" 
@@ -52,7 +52,7 @@
         </div>
 
         <div class="form-group">
-          <label for="lastName">Last Name <span class="required">*</span></label>
+          <label for="lastName">{{ 'register.lastName' | translate }} <span class="required">*</span></label>
           <input 
             type="text" 
             id="lastName" 
@@ -65,7 +65,7 @@
 
       <!-- Email -->
       <div class="form-group">
-        <label for="email">Email Address <span class="required">*</span></label>
+        <label for="email">{{ 'register.email' | translate }} <span class="required">*</span></label>
         <input 
           type="email" 
           id="email" 
@@ -77,19 +77,19 @@
 
       <!-- Tenant ID (Optional) -->
       <div class="form-group">
-        <label for="tenantId">Organization ID (Optional)</label>
+        <label for="tenantId">{{ 'register.orgId' | translate }}</label>
         <input 
           type="text" 
           id="tenantId" 
           name="tenantId"
           [(ngModel)]="formData.tenantId"
-          placeholder="Leave empty for personal account">
-        <small class="form-hint">If you're joining an organization, enter the organization ID</small>
+          [placeholder]="'register.orgIdPlaceholder' | translate">
+        <small class="form-hint">{{ 'register.orgIdHint' | translate }}</small>
       </div>
 
       <!-- Password -->
       <div class="form-group">
-        <label for="password">Password <span class="required">*</span></label>
+        <label for="password">{{ 'register.password' | translate }} <span class="required">*</span></label>
         <div class="password-input-wrapper">
           <input 
             [type]="showPassword ? 'text' : 'password'" 
@@ -97,7 +97,7 @@
             name="password"
             [(ngModel)]="formData.password"
             required
-            placeholder="At least 6 characters">
+            [placeholder]="'register.passwordPlaceholder' | translate">
           <button 
             type="button" 
             class="toggle-password" 
@@ -120,7 +120,7 @@
 
       <!-- Confirm Password -->
       <div class="form-group">
-        <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+        <label for="confirmPassword">{{ 'register.confirmPassword' | translate }} <span class="required">*</span></label>
         <div class="password-input-wrapper">
           <input 
             [type]="showConfirmPassword ? 'text' : 'password'" 
@@ -128,7 +128,7 @@
             name="confirmPassword"
             [(ngModel)]="confirmPassword"
             required
-            placeholder="Re-enter your password">
+            [placeholder]="'register.confirmPlaceholder' | translate">
           <button 
             type="button" 
             class="toggle-password" 
@@ -179,16 +179,16 @@
         [disabled]="loading || !registerForm.valid">
         @if (loading) {
           <span class="spinner"></span>
-          Creating Account...
+          {{ 'register.submitting' | translate }}
         } @else {
-          Create Account
+          {{ 'register.submit' | translate }}
         }
       </button>
 
       <!-- Login Link -->
       <div class="form-footer">
-        Already have an account? 
-        <a routerLink="/login" class="link">Sign in here</a>
+        {{ 'register.hasAccount' | translate }} 
+        <a routerLink="/login" class="link">{{ 'register.signIn' | translate }}</a>
       </div>
     </form>
   </div>

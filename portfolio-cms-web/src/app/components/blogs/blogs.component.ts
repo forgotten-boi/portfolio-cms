@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
 import { Blog } from '../../models';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-blogs',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './blogs.component.html',
   styleUrl: './blogs.component.scss'
 })
@@ -17,7 +19,8 @@ export class BlogsComponent implements OnInit {
 
   constructor(
     private blogService: BlogService,
-    private router: Router
+    private router: Router,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -50,7 +53,7 @@ export class BlogsComponent implements OnInit {
   }
 
   deleteBlog(id: string, title: string): void {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
+    if (confirm(this.translationService.t('blogs.confirmDelete'))) {
       this.blogService.delete(id).subscribe({
         next: () => {
           this.blogs = this.blogs.filter(b => b.id !== id);
@@ -68,6 +71,6 @@ export class BlogsComponent implements OnInit {
   }
 
   getStatusText(isPublished: boolean): string {
-    return isPublished ? 'Published' : 'Draft';
+    return isPublished ? this.translationService.t('blogs.published') : this.translationService.t('blogs.draft');
   }
 }

@@ -5,10 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
 import { Blog, CreateBlogDto } from '../../models';
 import Quill from 'quill';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-blog-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './blog-form.component.html',
   styleUrl: './blog-form.component.scss'
 })

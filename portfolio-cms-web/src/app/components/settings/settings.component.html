@@ -1,14 +1,15 @@
 <div class="settings-container">
-  <h1>Settings</h1>
-  <p class="settings-description">Configure application behavior and display options.</p>
+  <h1>{{ 'settings.title' | translate }}</h1>
+  <p class="settings-description">{{ 'settings.description' | translate }}</p>
 
+  <!-- Login Settings -->
   <div class="settings-card">
-    <h2>Login Settings</h2>
+    <h2>{{ 'settings.loginSettings' | translate }}</h2>
 
     <div class="setting-item">
       <div class="setting-info">
-        <label for="showTenantId" class="setting-label">Show Tenant ID on Login</label>
-        <p class="setting-help">When enabled, the Tenant ID field will be visible on the login page. When disabled, the default tenant will be used automatically.</p>
+        <label for="showTenantId" class="setting-label">{{ 'settings.showTenantId' | translate }}</label>
+        <p class="setting-help">{{ 'settings.showTenantIdHelp' | translate }}</p>
       </div>
       <div class="setting-control">
         <label class="toggle-switch">
@@ -24,8 +25,8 @@
 
     <div class="setting-item" *ngIf="!settings.showTenantId">
       <div class="setting-info">
-        <label for="defaultTenantId" class="setting-label">Default Tenant ID</label>
-        <p class="setting-help">The tenant ID used when the Tenant ID field is hidden.</p>
+        <label for="defaultTenantId" class="setting-label">{{ 'settings.defaultTenantId' | translate }}</label>
+        <p class="setting-help">{{ 'settings.defaultTenantIdHelp' | translate }}</p>
       </div>
       <div class="setting-control setting-control-wide">
         <input
@@ -39,8 +40,76 @@
     </div>
   </div>
 
+  <!-- Appearance Settings -->
+  <div class="settings-card">
+    <h2>{{ 'settings.appearance' | translate }}</h2>
+
+    <!-- Color Theme -->
+    <div class="setting-item">
+      <div class="setting-info">
+        <label class="setting-label">{{ 'settings.theme' | translate }}</label>
+        <p class="setting-help">{{ 'settings.themeHelp' | translate }}</p>
+      </div>
+      <div class="setting-control">
+        <div class="color-picker">
+          <button 
+            *ngFor="let c of themeService.getAvailableColors()" 
+            class="color-btn"
+            [class.active]="currentColor === c.id"
+            [style.background]="c.preview"
+            [title]="c.name"
+            (click)="setColor(c.id)">
+            <span *ngIf="currentColor === c.id" class="check">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark Mode -->
+    <div class="setting-item">
+      <div class="setting-info">
+        <label for="darkMode" class="setting-label">{{ 'settings.darkMode' | translate }}</label>
+        <p class="setting-help">{{ 'settings.darkModeHelp' | translate }}</p>
+      </div>
+      <div class="setting-control">
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            id="darkMode"
+            [ngModel]="isDark"
+            (ngModelChange)="toggleDarkMode()"
+            name="darkMode">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Settings -->
+  <div class="settings-card">
+    <h2>{{ 'settings.languageSection' | translate }}</h2>
+
+    <div class="setting-item">
+      <div class="setting-info">
+        <label class="setting-label">{{ 'settings.language' | translate }}</label>
+        <p class="setting-help">{{ 'settings.languageHelp' | translate }}</p>
+      </div>
+      <div class="setting-control">
+        <div class="language-picker">
+          <button 
+            *ngFor="let lang of translationService.getAvailableLanguages()" 
+            class="lang-btn"
+            [class.active]="currentLang === lang.code"
+            (click)="setLanguage(lang.code)">
+            {{ lang.nativeName }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="actions">
-    <button class="btn btn-primary" (click)="onSave()">Save Settings</button>
-    <span class="save-success" *ngIf="saved">✓ Settings saved successfully</span>
+    <button class="btn btn-primary" (click)="onSave()">{{ 'settings.save' | translate }}</button>
+    <span class="save-success" *ngIf="saved">✓ {{ 'settings.saved' | translate }}</span>
   </div>
 </div>

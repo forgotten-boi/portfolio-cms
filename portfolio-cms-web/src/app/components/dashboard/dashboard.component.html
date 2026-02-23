@@ -1,40 +1,150 @@
 <div class="dashboard-container">
-  <h1>Dashboard</h1>
+  <h1 class="page-title">{{ 'dashboard.title' | translate }}</h1>
 
   <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <span>{{ 'dashboard.loading' | translate }}</span>
+  </div>
 
-  <div *ngIf="loading" class="loading">Loading dashboard...</div>
-
-  <div class="stats-grid" *ngIf="!loading">
-    <div class="stat-card">
-      <h3>Total Blogs</h3>
-      <p class="stat-number">{{ stats.totalBlogs }}</p>
-      <a routerLink="/blogs" class="stat-link">View all →</a>
+  <!-- Snapshot Cards Row -->
+  <div class="snapshot-cards" *ngIf="!loading">
+    <div class="snap-card">
+      <div class="snap-card-header">
+        <h3>{{ 'dashboard.activeCv' | translate }}</h3>
+        <span class="snap-icon">📄</span>
+      </div>
+      <div class="snap-card-body">
+        <p class="snap-label">{{ 'dashboard.current' | translate }}: <strong>{{ cvName || 'My Portfolio CV' }}</strong></p>
+        <p class="snap-meta">{{ 'dashboard.lastUpdated' | translate }}: {{ lastCvUpdate }}</p>
+        <p class="snap-highlight">{{ skillCount }} {{ 'dashboard.skillsListed' | translate }}</p>
+      </div>
+      <div class="snap-card-footer">
+        <button class="btn-snap" routerLink="/dashboard/cv-manager">{{ 'dashboard.editCv' | translate }}</button>
+      </div>
     </div>
 
-    <div class="stat-card">
-      <h3>Published Blogs</h3>
-      <p class="stat-number">{{ stats.publishedBlogs }}</p>
+    <div class="snap-card">
+      <div class="snap-card-header">
+        <h3>{{ 'dashboard.blogPipeline' | translate }}</h3>
+        <span class="snap-icon">✍️</span>
+      </div>
+      <div class="snap-card-body">
+        <p class="snap-stat">› {{ 'dashboard.drafts' | translate }}: <strong>{{ stats.totalBlogs - stats.publishedBlogs }}</strong></p>
+        <p class="snap-stat">› {{ 'dashboard.published' | translate }}: <strong>{{ stats.publishedBlogs }}</strong></p>
+        <p class="snap-stat">› {{ 'dashboard.scheduled' | translate }}: <strong>0</strong></p>
+      </div>
+      <div class="snap-card-footer">
+        <button class="btn-snap" routerLink="/dashboard/blogs/new">{{ 'dashboard.continueDraft' | translate }}</button>
+      </div>
     </div>
 
-    <div class="stat-card">
-      <h3>Portfolios</h3>
-      <p class="stat-number">{{ stats.totalPortfolios }}</p>
-      <a routerLink="/portfolios" class="stat-link">View all →</a>
+    <div class="snap-card">
+      <div class="snap-card-header">
+        <h3>{{ 'dashboard.jobMatchStatus' | translate }}</h3>
+        <span class="snap-icon">🎯</span>
+      </div>
+      <div class="snap-card-body">
+        <p class="snap-label">{{ 'dashboard.lastAnalyzed' | translate }}: <strong>{{ lastJobTitle }}</strong></p>
+        <p class="snap-match">{{ 'dashboard.matchScore' | translate }}: <span class="match-score">{{ matchScore }}%</span></p>
+      </div>
+      <div class="snap-card-footer">
+        <button class="btn-snap btn-accent" routerLink="/dashboard/job-matcher">{{ 'dashboard.improveMatch' | translate }}</button>
+      </div>
     </div>
 
-    <div class="stat-card">
-      <h3>Users</h3>
-      <p class="stat-number">{{ stats.totalUsers }}</p>
-      <a routerLink="/users" class="stat-link">Manage →</a>
+    <div class="snap-card">
+      <div class="snap-card-header">
+        <h3>{{ 'dashboard.resumeVariants' | translate }}</h3>
+        <span class="snap-icon">📑</span>
+      </div>
+      <div class="snap-card-body">
+        <p class="snap-stat">{{ 'dashboard.totalGenerated' | translate }}: <strong>{{ resumeCount }}</strong></p>
+        <p class="snap-meta">{{ 'dashboard.lastGenerated' | translate }}: {{ lastResumeDate }}</p>
+      </div>
+      <div class="snap-card-footer">
+        <button class="btn-snap btn-gradient" routerLink="/dashboard/resume-generator">{{ 'dashboard.generateNew' | translate }} ›</button>
+      </div>
     </div>
   </div>
 
-  <div class="quick-actions" *ngIf="!loading">
-    <h2>Quick Actions</h2>
-    <div class="actions-grid">
-      <button routerLink="/blogs/new" class="btn btn-primary">Create New Blog</button>
-      <button routerLink="/portfolios/new" class="btn btn-primary">Create New Portfolio</button>
+  <!-- Bottom Section: 3-column layout -->
+  <div class="dashboard-grid" *ngIf="!loading">
+    <!-- Blog Post Workflow (Kanban) -->
+    <div class="dash-panel kanban-panel">
+      <h2 class="panel-title">{{ 'dashboard.blogWorkflow' | translate }}</h2>
+      <div class="kanban-columns">
+        <div class="kanban-col" *ngFor="let col of kanbanColumns">
+          <div class="kanban-col-header" [class]="'kanban-' + col.id">{{ col.name }}</div>
+          <div class="kanban-card" *ngFor="let card of col.items">
+            <div class="kanban-card-title">{{ card.title }}</div>
+            <div class="kanban-card-tags">
+              <span class="kanban-tag" *ngFor="let tag of card.tags">{{ tag }}</span>
+              <span class="kanban-seo" *ngIf="card.seoScore">SEO: {{ card.seoScore }}</span>
+            </div>
+          </div>
+          <div class="kanban-empty" *ngIf="col.items.length === 0">
+            {{ 'dashboard.noItems' | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CV Editor Preview -->
+    <div class="dash-panel cv-panel">
+      <div class="panel-header-row">
+        <h2 class="panel-title">{{ 'dashboard.cvEditor' | translate }}</h2>
+      </div>
+      <div class="cv-preview-layout">
+        <div class="cv-sections-list">
+          <div class="cv-section-item" *ngFor="let section of cvSections" [class.active]="section.active">
+            <span class="section-icon">{{ section.icon }}</span>
+            <span>{{ section.name }}</span>
+          </div>
+        </div>
+        <div class="cv-content-preview">
+          <div class="cv-preview-line title-line"></div>
+          <div class="cv-preview-block">
+            <div class="cv-preview-line subtitle-line"></div>
+            <div class="cv-preview-line text-line"></div>
+          </div>
+          <div class="cv-preview-block">
+            <div class="cv-preview-line" *ngFor="let i of [1,2,3,4]" [style.width.%]="80 - i * 10"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-panel-action" routerLink="/dashboard/cv-manager">{{ 'dashboard.customizeCv' | translate }} ›</button>
+    </div>
+
+    <!-- Job Match Analysis -->
+    <div class="dash-panel match-panel">
+      <h2 class="panel-title">{{ 'dashboard.jobMatchAnalysis' | translate }}</h2>
+      <div class="match-gauge-container">
+        <div class="match-gauge">
+          <svg viewBox="0 0 120 120" class="gauge-svg">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="10"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" stroke-width="10"
+                    [attr.stroke-dasharray]="matchDashArray"
+                    stroke-dashoffset="0"
+                    stroke-linecap="round"
+                    transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="gauge-center">
+            <span class="gauge-value">{{ matchScore }}%</span>
+            <span class="gauge-label">{{ matchScore >= 80 ? ('dashboard.goodMatch' | translate) : ('dashboard.needsWork' | translate) }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="match-details">
+        <div class="match-item success">
+          <span class="match-dot">✅</span> {{ 'dashboard.keySkillsMatched' | translate }}
+        </div>
+        <div class="match-item danger">
+          <span class="match-dot">❌</span> {{ gapCount }} {{ 'dashboard.gapsToAddress' | translate }}
+        </div>
+      </div>
+      <button class="btn-panel-action btn-accent" routerLink="/dashboard/job-matcher">{{ 'dashboard.optimizeResume' | translate }} ›</button>
     </div>
   </div>
 </div>
+

@@ -4,10 +4,11 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { CreatePortfolioDto, GeneratePortfolioDto } from '../../models';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-portfolio-form',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslatePipe],
   templateUrl: './portfolio-form.component.html',
   styleUrl: './portfolio-form.component.scss'
 })

@@ -197,7 +197,7 @@ export class BlogFormComponent implements OnInit {
           this.notificationService.success(
             this.isEditMode ? 'Blog updated successfully' : 'Blog created successfully'
           );
-          this.router.navigate(['/blogs']);
+          this.router.navigate(['/dashboard/blogs']);
         },
         error: (err) => {
           this.error = this.isEditMode ? 'Failed to update blog' : 'Failed to create blog';
@@ -213,7 +213,7 @@ export class BlogFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/blogs']);
+    this.router.navigate(['/dashboard/blogs']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

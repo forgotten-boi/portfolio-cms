@@ -37,8 +37,8 @@ export class AuthService {
       );
   }
 
-  register(request: RegisterRequest): Observable<AuthResult> {
-    return this.http.post<AuthResult>(`${environment.apiUrl}/auth/register`, request);
+  register(request: RegisterRequest): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/auth/register`, request);
   }
 
   createAdmin(adminData: { email: string; password: string; firstName: string; lastName: string }): Observable<any> {

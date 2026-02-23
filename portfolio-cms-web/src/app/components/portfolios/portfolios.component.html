@@ -49,23 +49,23 @@
 
       <div class="portfolio-stats">
         <div class="stat" *ngIf="portfolio.data.workExperiences?.length">
-          <span class="count">{{ portfolio.data.workExperiences.length }}</span>
+          <span class="count">{{ portfolio.data.workExperiences?.length }}</span>
           <span class="label">{{ 'portfolios.work' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.education?.length">
-          <span class="count">{{ portfolio.data.education.length }}</span>
+          <span class="count">{{ portfolio.data.education?.length }}</span>
           <span class="label">{{ 'portfolios.education' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.skills?.length">
-          <span class="count">{{ portfolio.data.skills.length }}</span>
+          <span class="count">{{ portfolio.data.skills?.length }}</span>
           <span class="label">{{ 'portfolios.skills' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.projects?.length">
-          <span class="count">{{ portfolio.data.projects.length }}</span>
+          <span class="count">{{ portfolio.data.projects?.length }}</span>
           <span class="label">{{ 'portfolios.projects' | translate }}</span>
         </div>
         <div class="stat" *ngIf="portfolio.data.certifications?.length">
-          <span class="count">{{ portfolio.data.certifications.length }}</span>
+          <span class="count">{{ portfolio.data.certifications?.length }}</span>
           <span class="label">{{ 'portfolios.certs' | translate }}</span>
         </div>
       </div>

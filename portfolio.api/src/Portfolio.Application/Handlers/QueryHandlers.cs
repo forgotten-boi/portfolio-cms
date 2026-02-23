@@ -454,7 +454,6 @@ public class GetPortfolioBySlugQueryHandler : IQueryHandler<GetPortfolioBySlugQu
             Data = portfolio.Data,
             CreatedAt = portfolio.CreatedAt,
             UpdatedAt = portfolio.UpdatedAt,
-            Slug = portfolio.Slug,
             IsPublished = portfolio.IsPublished
         };
     }

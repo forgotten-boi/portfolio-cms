@@ -109,7 +109,7 @@ export class PortfolioFormComponent implements OnInit {
         this.notificationService.success(
           this.isEditMode ? 'Portfolio updated successfully' : 'Portfolio created successfully'
         );
-        this.router.navigate(['/portfolios']);
+        this.router.navigate(['/dashboard/portfolios']);
       },
       error: (err) => {
         this.error = this.isEditMode ? 'Failed to update portfolio' : 'Failed to create portfolio';
@@ -153,7 +153,7 @@ export class PortfolioFormComponent implements OnInit {
 
     try {
       const generateData: GeneratePortfolioDto = {
-        templateId: this.portfolioForm.get('template')?.value || 'Modern'
+        templateName: this.portfolioForm.get('template')?.value || 'Modern'
       };
 
       if (this.selectedFile) {
@@ -212,7 +212,7 @@ export class PortfolioFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/portfolios']);
+    this.router.navigate(['/dashboard/portfolios']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

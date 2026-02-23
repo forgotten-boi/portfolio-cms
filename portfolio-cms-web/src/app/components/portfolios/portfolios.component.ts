@@ -48,11 +48,11 @@ export class PortfoliosComponent implements OnInit {
   }
 
   createPortfolio(): void {
-    this.router.navigate(['/portfolios/new']);
+    this.router.navigate(['/dashboard/portfolios/new']);
   }
 
   editPortfolio(id: string): void {
-    this.router.navigate(['/portfolios/edit', id]);
+    this.router.navigate(['/dashboard/portfolios/edit', id]);
   }
 
   deletePortfolio(id: string): void {

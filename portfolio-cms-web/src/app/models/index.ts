@@ -87,11 +87,11 @@ export interface Portfolio {
 }
 
 export interface PortfolioData {
-  workExperiences: WorkExperience[];
-  education: Education[];
-  skills: Skill[];
-  projects: Project[];
-  certifications: Certification[];
+  workExperiences?: WorkExperience[];
+  education?: Education[];
+  skills?: Skill[];
+  projects?: Project[];
+  certifications?: Certification[];
 }
 
 export interface WorkExperience {
@@ -143,7 +143,7 @@ export interface CreatePortfolioDto {
 export interface GeneratePortfolioDto {
   pdfBase64?: string;
   linkedInProfileUrl?: string;
-  templateId?: string | number;
+  templateName?: string;
 }
 
 export interface LoginRequest {

@@ -71,7 +71,13 @@ public class ImportResumeDto
 public class GeneratePortfolioDto
 {
     public string? PdfUrl { get; set; }
+    /// <summary>Base64-encoded PDF resume (alternative to PdfUrl)</summary>
+    public string? PdfBase64 { get; set; }
     public string? LinkedInUrl { get; set; }
+    /// <summary>LinkedIn profile URL alias used by the frontend</summary>
+    public string? LinkedInProfileUrl { get; set; }
     public string? ResumeText { get; set; }
     public int TemplateId { get; set; } = 1;
+    /// <summary>Template name alias (e.g. "Modern", "Classic") — mapped to TemplateId if TemplateId is 0</summary>
+    public string? TemplateName { get; set; }
 }

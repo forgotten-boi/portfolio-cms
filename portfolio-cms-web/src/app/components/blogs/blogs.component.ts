@@ -48,11 +48,11 @@ export class BlogsComponent implements OnInit {
   }
 
   createBlog(): void {
-    this.router.navigate(['/blogs/new']);
+    this.router.navigate(['/dashboard/blogs/new']);
   }
 
   editBlog(id: string): void {
-    this.router.navigate(['/blogs/edit', id]);
+    this.router.navigate(['/dashboard/blogs/edit', id]);
   }
 
   togglePublish(blog: Blog): void {
@@ -74,20 +74,6 @@ export class BlogsComponent implements OnInit {
     });
   }
 
-<<<<<<< HEAD
-  deleteBlog(id: string, title: string): void {
-    if (confirm(this.translationService.t('blogs.confirmDelete'))) {
-      this.blogService.delete(id).subscribe({
-        next: () => {
-          this.blogs = this.blogs.filter(b => b.id !== id);
-        },
-        error: (err) => {
-          alert('Failed to delete blog');
-          console.error('Error deleting blog:', err);
-        }
-      });
-    }
-=======
   deleteBlog(id: string): void {
     this.confirmDeleteId = id;
   }
@@ -119,7 +105,6 @@ export class BlogsComponent implements OnInit {
     }).catch(() => {
       this.notificationService.info(`Public link: ${url}`);
     });
->>>>>>> copilot/fix-api-errors-login-registration
   }
 
   shareOnLinkedIn(blog: Blog): void {
@@ -143,7 +128,9 @@ export class BlogsComponent implements OnInit {
   copyBlogLink(slug: string): void {
     const url = `${window.location.origin}/blog/${slug}`;
     navigator.clipboard.writeText(url).then(() => {
-      alert('Blog link copied to clipboard!');
+      this.notificationService.success('Blog link copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.info(`Blog link: ${url}`);
     });
   }
 }

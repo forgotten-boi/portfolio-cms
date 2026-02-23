@@ -1,41 +1,41 @@
 <div class="form-container">
   <div class="form-header">
-    <h1>{{ isEditMode ? 'Edit Blog' : 'Create New Blog' }}</h1>
+    <h1>{{ isEditMode ? ('blogForm.editTitle' | translate) : ('blogForm.createTitle' | translate) }}</h1>
   </div>
 
-  <div *ngIf="loading" class="loading">Loading...</div>
+  <div *ngIf="loading" class="loading">{{ 'blogForm.loading' | translate }}</div>
   
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <form *ngIf="!loading" [formGroup]="blogForm" (ngSubmit)="onSubmit()" class="blog-form">
     <div class="form-group">
-      <label for="title">Title *</label>
+      <label for="title">{{ 'blogForm.title' | translate }} *</label>
       <input 
         type="text" 
         id="title" 
         formControlName="title" 
         [class.invalid]="isFieldInvalid('title')"
-        placeholder="Enter blog title">
+        [placeholder]="'blogForm.titlePlaceholder' | translate">
       <div *ngIf="isFieldInvalid('title')" class="error-message">
         {{ getErrorMessage('title') }}
       </div>
     </div>
 
     <div class="form-group">
-      <label for="summary">Summary *</label>
+      <label for="summary">{{ 'blogForm.summary' | translate }} *</label>
       <textarea 
         id="summary" 
         formControlName="summary" 
         rows="3"
         [class.invalid]="isFieldInvalid('summary')"
-        placeholder="Brief summary of the blog"></textarea>
+        [placeholder]="'blogForm.summaryPlaceholder' | translate"></textarea>
       <div *ngIf="isFieldInvalid('summary')" class="error-message">
         {{ getErrorMessage('summary') }}
       </div>
     </div>
 
     <div class="form-group">
-      <label>Header Image</label>
+      <label>{{ 'blogForm.headerImage' | translate }}</label>
       <div class="header-image-upload">
         <div *ngIf="!headerImagePreview" class="upload-placeholder">
           <input 
@@ -46,7 +46,7 @@
             #fileInput>
           <label for="headerImage" class="upload-label">
             <span class="upload-icon">📷</span>
-            <span>Choose header image</span>
+            <span>{{ 'blogForm.chooseImage' | translate }}</span>
           </label>
         </div>
         <div *ngIf="headerImagePreview" class="image-preview">
@@ -59,7 +59,7 @@
     </div>
 
     <div class="form-group">
-      <label for="content">Content *</label>
+      <label for="content">{{ 'blogForm.content' | translate }} *</label>
       <div 
         #editor 
         class="quill-editor"
@@ -70,26 +70,26 @@
     </div>
 
     <div class="form-group">
-      <label for="tags">Tags</label>
+      <label for="tags">{{ 'blogForm.tags' | translate }}</label>
       <input 
         type="text" 
         id="tags" 
         formControlName="tags" 
-        placeholder="Enter tags separated by commas (e.g., javascript, angular, web)">
-      <small class="hint">Separate tags with commas</small>
+        [placeholder]="'blogForm.tagsPlaceholder' | translate">
+      <small class="hint">{{ 'blogForm.tagsHint' | translate }}</small>
     </div>
 
     <div class="form-group checkbox-group">
       <label>
         <input type="checkbox" formControlName="isPublished">
-        <span>Publish immediately</span>
+        <span>{{ 'blogForm.publishNow' | translate }}</span>
       </label>
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+      <button type="button" class="btn-cancel" (click)="cancel()">{{ 'blogForm.cancel' | translate }}</button>
       <button type="submit" class="btn-submit" [disabled]="loading">
-        {{ isEditMode ? 'Update' : 'Create' }} Blog
+        {{ isEditMode ? ('blogForm.update' | translate) : ('blogForm.create' | translate) }}
       </button>
     </div>
   </form>

@@ -1,0 +1,171 @@
+<div class="resume-gen-container">
+  <div class="page-header">
+    <h1 class="page-title">📑 {{ 'nav.resumeGen' | translate }}</h1>
+    <div class="header-actions">
+      <button class="btn-generate" (click)="generateResume()" [disabled]="generating">
+        <span *ngIf="!generating">🚀 Generate Resume</span>
+        <span *ngIf="generating">⏳ Generating...</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="gen-layout">
+    <!-- Left: Configuration -->
+    <div class="config-panel">
+      <!-- Target Info -->
+      <div class="panel-card">
+        <h3 class="panel-title">🎯 Target Position</h3>
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input class="form-input" [(ngModel)]="targetCompany" placeholder="e.g. Google, Microsoft" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role / Job Title</label>
+          <input class="form-input" [(ngModel)]="targetRole" placeholder="e.g. Senior Frontend Dev" />
+        </div>
+      </div>
+
+      <!-- Template Selection -->
+      <div class="panel-card">
+        <h3 class="panel-title">📄 Template</h3>
+        <div class="template-grid">
+          <button *ngFor="let t of templates"
+            class="template-option"
+            [class.active]="selectedTemplate === t.id"
+            (click)="selectTemplate(t.id)">
+            <span class="template-icon">{{ t.icon }}</span>
+            <span class="template-name">{{ t.name }}</span>
+            <span class="template-desc">{{ t.description }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tone -->
+      <div class="panel-card">
+        <h3 class="panel-title">🎭 Tone</h3>
+        <div class="pill-row">
+          <button *ngFor="let t of tones"
+            class="pill-btn" [class.active]="tone === t.id"
+            (click)="tone = $any(t.id)">{{ t.icon }} {{ t.label }}</button>
+        </div>
+      </div>
+
+      <!-- Length -->
+      <div class="panel-card">
+        <h3 class="panel-title">📏 Length</h3>
+        <div class="pill-row">
+          <button *ngFor="let l of lengths"
+            class="pill-btn" [class.active]="length === l.id"
+            (click)="length = $any(l.id)">{{ l.label }}</button>
+        </div>
+      </div>
+
+      <!-- Sections -->
+      <div class="panel-card">
+        <h3 class="panel-title">📋 Include Sections</h3>
+        <div class="toggle-list">
+          <label class="toggle-item">
+            <input type="checkbox" [(ngModel)]="includeSummary" />
+            <span>📝 Summary</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" [(ngModel)]="includeSkills" />
+            <span>⚡ Skills</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" [(ngModel)]="includeExperience" />
+            <span>💼 Work Experience</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" [(ngModel)]="includeProjects" />
+            <span>🔧 Projects</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" [(ngModel)]="includeEducation" />
+            <span>🎓 Education</span>
+          </label>
+          <label class="toggle-item">
+            <input type="checkbox" [(ngModel)]="includeCertifications" />
+            <span>🏅 Certifications</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Preview -->
+    <div class="preview-panel">
+      <!-- Preview -->
+      <div class="panel-card preview-card" *ngIf="previewReady">
+        <div class="preview-toolbar">
+          <h3 class="panel-title">Preview</h3>
+          <div class="export-btns">
+            <button class="btn-export" (click)="exportAs('PDF')">📄 PDF</button>
+            <button class="btn-export" (click)="exportAs('DOCX')">📝 DOCX</button>
+            <button class="btn-export" (click)="exportAs('MD')">📋 Markdown</button>
+          </div>
+        </div>
+        <div class="resume-preview">
+          <div class="preview-page">
+            <div class="preview-header-block">
+              <div class="preview-name">John Doe</div>
+              <div class="preview-tagline">{{ targetRole || 'Software Developer' }}</div>
+              <div class="preview-contact">john.doe&#64;email.com • +1 234 567 890 • linkedin.com/in/johndoe</div>
+            </div>
+            <div class="preview-section" *ngFor="let section of activeSections">
+              <div class="preview-section-title">{{ section }}</div>
+              <div class="preview-skeleton">
+                <div class="skeleton-line" [style.width.%]="90"></div>
+                <div class="skeleton-line" [style.width.%]="75"></div>
+                <div class="skeleton-line" [style.width.%]="82"></div>
+                <div class="skeleton-line short" [style.width.%]="45"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="panel-card generating-card" *ngIf="generating">
+        <div class="gen-progress">
+          <div class="gen-spinner"></div>
+          <h3>Generating Your Resume</h3>
+          <p>Tailoring content for {{ targetCompany || 'your target company' }}...</p>
+          <div class="gen-steps">
+            <div class="gen-step done">✅ Analyzing your CV data</div>
+            <div class="gen-step active">🔄 Optimizing for job match</div>
+            <div class="gen-step">⏳ Formatting document</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="panel-card empty-card" *ngIf="!previewReady && !generating">
+        <div class="empty-inner">
+          <span class="empty-icon">📑</span>
+          <h3>Configure & Generate</h3>
+          <p>Set your target position and preferences, then click Generate to create a tailored resume.</p>
+        </div>
+      </div>
+
+      <!-- Saved Variants -->
+      <div class="panel-card">
+        <h3 class="panel-title">💾 Saved Variants</h3>
+        <div class="variants-list" *ngIf="savedVariants.length; else noVariants">
+          <div class="variant-item" *ngFor="let v of savedVariants">
+            <div class="variant-info">
+              <span class="variant-name">{{ v.name }}</span>
+              <span class="variant-meta">{{ v.template }} • {{ v.tone }} • {{ v.format }}</span>
+            </div>
+            <div class="variant-actions">
+              <button class="btn-sm-icon" title="Download">📥</button>
+              <button class="btn-sm-icon danger" (click)="deleteVariant(v.id)" title="Delete">🗑️</button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noVariants>
+          <p class="empty-text">No saved variants yet.</p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

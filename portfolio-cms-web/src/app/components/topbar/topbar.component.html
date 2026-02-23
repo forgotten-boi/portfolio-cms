@@ -1,0 +1,84 @@
+<header class="topbar" *ngIf="isAuthenticated">
+  <!-- Quick Actions -->
+  <div class="topbar-left">
+    <button class="btn-quick-action btn-primary-action" routerLink="/dashboard/blogs/new">
+      <span class="action-icon">+</span> {{ 'topbar.newBlog' | translate }}
+    </button>
+    <button class="btn-quick-action" routerLink="/dashboard/resume-generator">
+      <span class="action-icon">+</span> {{ 'topbar.newResume' | translate }}
+    </button>
+  </div>
+
+  <!-- Right Actions -->
+  <div class="topbar-right">
+    <!-- Notifications -->
+    <button class="btn-icon notification-btn" title="Notifications">
+      <span class="notif-icon">🔔</span>
+      <span class="notif-badge">3</span>
+    </button>
+
+    <!-- Color Theme Picker -->
+    <div class="dropdown" (click)="toggleColorMenu()">
+      <button class="btn-icon" title="Theme Color">
+        <span class="color-dot" [style.background]="getCurrentColorPreview()"></span>
+      </button>
+      <div class="dropdown-menu" *ngIf="showColorMenu" (click)="$event.stopPropagation()">
+        <button 
+          *ngFor="let c of themeService.getAvailableColors()" 
+          class="dropdown-item color-item"
+          [class.active]="themeService.color === c.id"
+          (click)="setColor(c.id)">
+          <span class="color-swatch" [style.background]="c.preview"></span>
+          {{ c.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Dark Mode -->
+    <button class="btn-icon" (click)="toggleDarkMode()" [title]="isDark ? 'Light Mode' : 'Dark Mode'">
+      <span *ngIf="!isDark">🌙</span>
+      <span *ngIf="isDark">☀️</span>
+    </button>
+
+    <!-- Language -->
+    <div class="dropdown" (click)="toggleLangMenu()">
+      <button class="btn-icon btn-lang">
+        🌐 <span class="lang-label">{{ getCurrentLanguageName() }}</span>
+      </button>
+      <div class="dropdown-menu" *ngIf="showLangMenu" (click)="$event.stopPropagation()">
+        <button 
+          *ngFor="let lang of translationService.getAvailableLanguages()" 
+          class="dropdown-item"
+          [class.active]="translationService.currentLang === lang.code"
+          (click)="setLanguage(lang.code)">
+          {{ lang.nativeName }} ({{ lang.name }})
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Avatar -->
+    <div class="dropdown profile-dropdown" (click)="toggleProfileMenu()">
+      <button class="avatar-btn">
+        <div class="avatar">
+          <span>A</span>
+        </div>
+      </button>
+      <div class="dropdown-menu profile-menu" *ngIf="showProfileMenu" (click)="$event.stopPropagation()">
+        <div class="profile-header">
+          <div class="avatar avatar-lg"><span>A</span></div>
+          <div class="profile-info">
+            <span class="profile-name">Admin User</span>
+            <span class="profile-email">admin&#64;portfolio.local</span>
+          </div>
+        </div>
+        <div class="menu-divider"></div>
+        <button class="dropdown-item" routerLink="/dashboard/settings">
+          ⚙️ {{ 'nav.settings' | translate }}
+        </button>
+        <button class="dropdown-item logout-item" (click)="logout()">
+          🚪 {{ 'nav.logout' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

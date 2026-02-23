@@ -1,0 +1,97 @@
+<div class="analytics-container">
+  <div class="page-header">
+    <h1 class="page-title">📊 {{ 'nav.analytics' | translate }}</h1>
+    <div class="period-pills">
+      <button class="pill" [class.active]="period === '7d'" (click)="setPeriod('7d')">7 Days</button>
+      <button class="pill" [class.active]="period === '30d'" (click)="setPeriod('30d')">30 Days</button>
+      <button class="pill" [class.active]="period === '90d'" (click)="setPeriod('90d')">90 Days</button>
+      <button class="pill" [class.active]="period === 'all'" (click)="setPeriod('all')">All Time</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading analytics...</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Stat Cards -->
+    <div class="stat-cards">
+      <div class="stat-card" *ngFor="let stat of stats">
+        <div class="stat-icon">{{ stat.icon }}</div>
+        <div class="stat-body">
+          <span class="stat-value">{{ stat.value }}</span>
+          <span class="stat-label">{{ stat.label }}</span>
+        </div>
+        <span class="stat-change" [class.positive]="stat.positive" [class.negative]="!stat.positive">
+          {{ stat.change }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts-grid">
+      <!-- Match Score Trend -->
+      <div class="chart-card">
+        <h3 class="chart-title">🎯 Match Score Trend</h3>
+        <div class="trend-chart">
+          <div class="trend-bar" *ngFor="let m of matchTrend"
+            [title]="m.month + ': ' + m.score + '%'">
+            <div class="trend-fill" [style.height.%]="getTrendHeight(m.score)"></div>
+            <span class="trend-label">{{ m.month }}</span>
+            <span class="trend-value">{{ m.score }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Skills -->
+      <div class="chart-card">
+        <h3 class="chart-title">⚡ Most Requested Skills</h3>
+        <div class="bar-chart">
+          <div class="bar-row" *ngFor="let skill of topSkills">
+            <span class="bar-label">{{ skill.label }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="getBarWidth(skill.value, skill.max)"
+                [class.high]="skill.value >= 80"
+                [class.medium]="skill.value >= 50 && skill.value < 80"
+                [class.low]="skill.value < 50"></div>
+            </div>
+            <span class="bar-value">{{ skill.value }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Views -->
+      <div class="chart-card">
+        <h3 class="chart-title">📝 Blog Views</h3>
+        <div class="bar-chart" *ngIf="blogViews.length; else noBlogViews">
+          <div class="bar-row" *ngFor="let blog of blogViews">
+            <span class="bar-label">{{ blog.label }}</span>
+            <div class="bar-track">
+              <div class="bar-fill high" [style.width.%]="getBarWidth(blog.value, blog.max)"></div>
+            </div>
+            <span class="bar-value">{{ blog.value }}</span>
+          </div>
+        </div>
+        <ng-template #noBlogViews>
+          <p class="empty-text">No blog data available.</p>
+        </ng-template>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="chart-card">
+        <h3 class="chart-title">🕐 Recent Activity</h3>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let item of recentActivity">
+            <span class="activity-icon">{{ item.icon }}</span>
+            <div class="activity-body">
+              <span class="activity-text">{{ item.text }}</span>
+              <span class="activity-time">{{ item.time }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

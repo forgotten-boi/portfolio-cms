@@ -4,10 +4,11 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { CreatePortfolioDto, GeneratePortfolioDto } from '../../models';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-portfolio-form',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslatePipe],
   templateUrl: './portfolio-form.component.html',
   styleUrl: './portfolio-form.component.scss'
 })
@@ -55,6 +56,7 @@ export class PortfolioFormComponent implements OnInit {
       bio: ['', [Validators.required, Validators.maxLength(1000)]],
       template: ['Modern', [Validators.required]],
       isPublic: [false],
+      isPublished: [false],
       featuredBlogsEnabled: [false]
     });
   }
@@ -68,7 +70,7 @@ export class PortfolioFormComponent implements OnInit {
           subtitle: portfolio.subtitle,
           bio: portfolio.bio,
           template: portfolio.template,
-          isPublic: portfolio.isPublic,
+          isPublished: portfolio.isPublished,
           featuredBlogsEnabled: portfolio.featuredBlogsEnabled
         });
         this.loading = false;
@@ -146,7 +148,7 @@ export class PortfolioFormComponent implements OnInit {
 
     try {
       const generateData: GeneratePortfolioDto = {
-        templateId: this.portfolioForm.get('template')?.value || 1
+        templateId: this.portfolioForm.get('template')?.value || 'Modern'
       };
 
       if (this.selectedFile) {
@@ -169,8 +171,8 @@ export class PortfolioFormComponent implements OnInit {
             title: portfolio.title,
             subtitle: portfolio.subtitle,
             bio: portfolio.bio,
-            template: portfolio.template || 1,
-            isPublic: portfolio.isPublic || false,
+            template: portfolio.template || 'Modern',
+            isPublished: portfolio.isPublished || false,
             featuredBlogsEnabled: portfolio.featuredBlogsEnabled || false
           });
 

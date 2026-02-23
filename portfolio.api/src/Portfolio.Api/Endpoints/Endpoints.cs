@@ -109,6 +109,19 @@ public static class BlogEndpoints
             return Results.Ok(result);
         });
 
+        blogs.MapGet("/my", async (HttpContext context, IQueryHandler<GetBlogsByAuthorQuery, IEnumerable<BlogDto>> handler) =>
+        {
+            var tenantId = context.GetTenantId();
+            if (tenantId == null) return Results.BadRequest("Tenant ID is required");
+
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || !Guid.TryParse(userId, out var authorId))
+                return Results.Unauthorized();
+
+            var result = await handler.HandleAsync(new GetBlogsByAuthorQuery(authorId, tenantId.Value));
+            return Results.Ok(result);
+        }).RequireAuthorization();
+
         blogs.MapGet("/{id:guid}", async (Guid id, HttpContext context, IQueryHandler<GetBlogByIdQuery, BlogDto?> handler) =>
         {
             var tenantId = context.GetTenantId();

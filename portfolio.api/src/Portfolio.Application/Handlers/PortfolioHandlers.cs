@@ -48,6 +48,7 @@ public class CreatePortfolioCommandHandler : ICommandHandler<CreatePortfolioComm
             LinkedInUrl = command.Data.LinkedInUrl,
             ResumeUrl = command.Data.ResumeUrl,
             Template = template,
+            IsPublished = command.Data.IsPublished,
             FeaturedBlogsEnabled = command.Data.FeaturedBlogsEnabled,
             CreatedAt = DateTime.UtcNow,
             LastGeneratedAt = DateTime.UtcNow
@@ -397,6 +398,9 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
 
         if (command.Data.FeaturedBlogsEnabled.HasValue)
             portfolio.FeaturedBlogsEnabled = command.Data.FeaturedBlogsEnabled.Value;
+
+        if (command.Data.IsPublished.HasValue)
+            portfolio.IsPublished = command.Data.IsPublished.Value;
 
         if (command.Data.MaxFeaturedBlogs.HasValue)
             portfolio.MaxFeaturedBlogs = command.Data.MaxFeaturedBlogs.Value;

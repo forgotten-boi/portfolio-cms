@@ -1,16 +1,16 @@
 <div class="blogs-container">
   <div class="header">
-    <h1>Blogs</h1>
-    <button class="btn-primary" (click)="createBlog()">Create New Blog</button>
+    <h1>{{ 'blogs.title' | translate }}</h1>
+    <button class="btn-primary" (click)="createBlog()">{{ 'blogs.createNew' | translate }}</button>
   </div>
 
-  <div *ngIf="loading" class="loading">Loading blogs...</div>
+  <div *ngIf="loading" class="loading">{{ 'blogs.loading' | translate }}</div>
   
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div *ngIf="!loading && !error" class="blogs-grid">
     <div *ngIf="blogs.length === 0" class="no-data">
-      No blogs found. Create your first blog!
+      {{ 'blogs.empty' | translate }}
     </div>
 
     <div *ngFor="let blog of blogs" class="blog-card">
@@ -22,7 +22,7 @@
       </div>
 
       <div class="blog-meta">
-        <span class="views">{{ blog.views }} views</span>
+        <span class="views">{{ blog.views || 0 }} {{ 'blogs.views' | translate }}</span>
         <span class="date">{{ blog.createdAt | date:'mediumDate' }}</span>
       </div>
 
@@ -33,8 +33,26 @@
       </div>
 
       <div class="blog-actions">
-        <button class="btn-edit" (click)="editBlog(blog.id)">Edit</button>
-        <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">Delete</button>
+        <a *ngIf="blog.isPublished && blog.slug" class="btn-view" [href]="'/blog/' + blog.slug" target="_blank">🔗 {{ 'blogs.view' | translate }}</a>
+        <button *ngIf="blog.isPublished && blog.slug" class="btn-copy" (click)="copyBlogLink(blog.slug)">📋 {{ 'blogs.copyLink' | translate }}</button>
+        <button class="btn-edit" (click)="editBlog(blog.id)">{{ 'blogs.edit' | translate }}</button>
+        <button
+          class="btn-publish"
+          [class.btn-unpublish]="blog.isPublished"
+          (click)="togglePublish(blog)">
+          {{ blog.isPublished ? ('blogs.unpublish' | translate) : ('blogs.publish' | translate) }}
+        </button>
+        <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">{{ 'blogs.delete' | translate }}</button>
+      </div>
+
+      <div class="share-actions" *ngIf="blog.isPublished">
+        <span class="share-label">Share:</span>
+        <button class="btn-share btn-linkedin" (click)="shareOnLinkedIn(blog)" title="Share on LinkedIn">
+          <span class="share-icon">in</span> LinkedIn
+        </button>
+        <button class="btn-share btn-facebook" (click)="shareOnFacebook(blog)" title="Share on Facebook">
+          <span class="share-icon">f</span> Facebook
+        </button>
       </div>
     </div>
   </div>

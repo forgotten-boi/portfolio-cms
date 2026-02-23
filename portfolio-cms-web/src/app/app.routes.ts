@@ -49,6 +49,26 @@ export const routes: Routes = [
       {
         path: 'portfolios/edit/:id',
         loadComponent: () => import('./components/portfolio-form/portfolio-form.component').then(m => m.PortfolioFormComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'cv-manager',
+        loadComponent: () => import('./components/cv-manager/cv-manager.component').then(m => m.CvManagerComponent)
+      },
+      {
+        path: 'job-matcher',
+        loadComponent: () => import('./components/job-matcher/job-matcher.component').then(m => m.JobMatcherComponent)
+      },
+      {
+        path: 'resume-generator',
+        loadComponent: () => import('./components/resume-generator/resume-generator.component').then(m => m.ResumeGeneratorComponent)
+      },
+      {
+        path: 'analytics',
+        loadComponent: () => import('./components/analytics/analytics.component').then(m => m.AnalyticsComponent)
       }
     ]
   },

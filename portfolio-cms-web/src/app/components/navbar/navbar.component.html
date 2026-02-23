@@ -1,15 +1,55 @@
 <nav class="navbar" *ngIf="isAuthenticated">
   <div class="nav-brand">
-    <h2>Portfolio CMS</h2>
+    <h2>{{ 'nav.brand' | translate }}</h2>
   </div>
   <ul class="nav-links">
-    <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
-    <li><a routerLink="/blogs" routerLinkActive="active">Blogs</a></li>
-    <li><a routerLink="/portfolios" routerLinkActive="active">Portfolios</a></li>
-    <li><a routerLink="/users" routerLinkActive="active">Users</a></li>
-    <li><a routerLink="/tenants" routerLinkActive="active">Tenants</a></li>
+    <li><a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{ 'nav.dashboard' | translate }}</a></li>
+    <li><a routerLink="/dashboard/blogs" routerLinkActive="active">{{ 'nav.blogs' | translate }}</a></li>
+    <li><a routerLink="/dashboard/portfolios" routerLinkActive="active">{{ 'nav.portfolios' | translate }}</a></li>
+    <li><a routerLink="/dashboard/users" routerLinkActive="active">{{ 'nav.users' | translate }}</a></li>
+    <li><a routerLink="/dashboard/tenants" routerLinkActive="active">{{ 'nav.tenants' | translate }}</a></li>
+    <li><a routerLink="/dashboard/settings" routerLinkActive="active">{{ 'nav.settings' | translate }}</a></li>
   </ul>
   <div class="nav-actions">
-    <button class="btn btn-outline" (click)="logout()">Logout</button>
+    <!-- Color Theme Picker -->
+    <div class="dropdown" (click)="toggleColorMenu()">
+      <button class="btn-icon" title="Theme Color">
+        <span class="color-dot" [style.background]="getCurrentColorPreview()"></span>
+      </button>
+      <div class="dropdown-menu" *ngIf="showColorMenu" (click)="$event.stopPropagation()">
+        <button 
+          *ngFor="let c of themeService.getAvailableColors()" 
+          class="dropdown-item color-item"
+          [class.active]="themeService.color === c.id"
+          (click)="setColor(c.id)">
+          <span class="color-swatch" [style.background]="c.preview"></span>
+          {{ c.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button class="btn-icon" (click)="toggleDarkMode()" [title]="isDark ? 'Light Mode' : 'Dark Mode'">
+      <span *ngIf="!isDark">🌙</span>
+      <span *ngIf="isDark">☀️</span>
+    </button>
+
+    <!-- Language Picker -->
+    <div class="dropdown" (click)="toggleLangMenu()">
+      <button class="btn-icon btn-lang">
+        🌐 <span class="lang-label">{{ getCurrentLanguageName() }}</span>
+      </button>
+      <div class="dropdown-menu" *ngIf="showLangMenu" (click)="$event.stopPropagation()">
+        <button 
+          *ngFor="let lang of translationService.getAvailableLanguages()" 
+          class="dropdown-item"
+          [class.active]="translationService.currentLang === lang.code"
+          (click)="setLanguage(lang.code)">
+          {{ lang.nativeName }} ({{ lang.name }})
+        </button>
+      </div>
+    </div>
+
+    <button class="btn btn-outline" (click)="logout()">{{ 'nav.logout' | translate }}</button>
   </div>
 </nav>

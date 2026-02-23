@@ -3,27 +3,27 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient);
 }
 
 .login-card {
-  background: white;
+  background: var(--card-bg);
   padding: 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px var(--shadow);
   width: 100%;
   max-width: 420px;
 
   h1 {
     text-align: center;
-    color: #667eea;
+    color: var(--primary);
     margin-bottom: 0.5rem;
     font-size: 1.8rem;
   }
 
   h2 {
     text-align: center;
-    color: #333;
+    color: var(--text-heading);
     margin-bottom: 2rem;
     font-size: 1.3rem;
     font-weight: 400;
@@ -36,7 +36,7 @@
   label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #555;
+    color: var(--text-secondary);
     font-weight: 500;
   }
 }
@@ -44,7 +44,7 @@
 .form-control {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid #e1e8ed;
+  border: 2px solid var(--input-border);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -52,12 +52,12 @@
 
   &:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
   }
 
   &::placeholder {
-    color: #adb5bd;
+    color: var(--text-muted);
   }
 }
 
@@ -68,9 +68,9 @@
 }
 
 .alert-error {
-  background-color: #fee;
-  color: #c33;
-  border: 1px solid #fcc;
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid var(--danger-bg);
 }
 
 .btn {
@@ -90,12 +90,12 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient);
   color: white;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 20px rgba(var(--primary-rgb), 0.4);
   }
 }
 
@@ -104,7 +104,7 @@
   margin-top: 1.5rem;
 
   p {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 0.9rem;
   }
 }

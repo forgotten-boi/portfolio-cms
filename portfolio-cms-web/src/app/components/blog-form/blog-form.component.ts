@@ -1,19 +1,27 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
 import { Blog, CreateBlogDto } from '../../models';
 import Quill from 'quill';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-blog-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './blog-form.component.html',
   styleUrl: './blog-form.component.scss'
 })
-export class BlogFormComponent implements OnInit, AfterViewInit {
-  @ViewChild('editor') editorElement!: ElementRef;
+export class BlogFormComponent implements OnInit {
+  private _editorElement!: ElementRef;
+  
+  @ViewChild('editor') set editorElement(el: ElementRef) {
+    if (el && !this.quillEditor) {
+      this._editorElement = el;
+      this.initQuill();
+    }
+  }
   
   blogForm!: FormGroup;
   isEditMode = false;
@@ -33,6 +41,8 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
     this.initForm();
   }
 
+  private pendingContent: string | null = null;
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -42,9 +52,9 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    if (this.editorElement) {
-      this.quillEditor = new Quill(this.editorElement.nativeElement, {
+  private initQuill(): void {
+    if (this._editorElement) {
+      this.quillEditor = new Quill(this._editorElement.nativeElement, {
         theme: 'snow',
         modules: {
           toolbar: [
@@ -64,6 +74,12 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
         const content = this.quillEditor?.root.innerHTML || '';
         this.blogForm.patchValue({ content }, { emitEvent: false });
       });
+
+      // If content was loaded before Quill initialized, apply it now
+      if (this.pendingContent) {
+        this.quillEditor.root.innerHTML = this.pendingContent;
+        this.pendingContent = null;
+      }
     }
   }
 
@@ -89,9 +105,13 @@ export class BlogFormComponent implements OnInit, AfterViewInit {
           tags: blog.tags ? blog.tags.join(', ') : ''
         });
         
-        // Set Quill content
-        if (this.quillEditor && blog.content) {
-          this.quillEditor.root.innerHTML = blog.content;
+        // Set Quill content - handle race condition with ngAfterViewInit
+        if (blog.content) {
+          if (this.quillEditor) {
+            this.quillEditor.root.innerHTML = blog.content;
+          } else {
+            this.pendingContent = blog.content;
+          }
         }
         
         this.loading = false;

@@ -21,6 +21,10 @@ export class BlogService {
     return this.http.get<Blog[]>(this.baseUrl, { params });
   }
 
+  getMyBlogs(): Observable<Blog[]> {
+    return this.http.get<Blog[]>(`${this.baseUrl}/my`);
+  }
+
   getById(id: string): Observable<Blog> {
     return this.http.get<Blog>(`${this.baseUrl}/${id}`);
   }
@@ -29,12 +33,20 @@ export class BlogService {
     return this.http.get<Blog>(`${this.baseUrl}/slug/${slug}`);
   }
 
+  getPublicBySlug(slug: string): Observable<Blog> {
+    return this.http.get<Blog>(`${this.baseUrl}/${slug}`);
+  }
+
   create(blog: CreateBlogDto): Observable<Blog> {
     return this.http.post<Blog>(this.baseUrl, blog);
   }
 
   update(id: string, blog: CreateBlogDto): Observable<Blog> {
     return this.http.put<Blog>(`${this.baseUrl}/${id}`, { id, ...blog });
+  }
+
+  togglePublish(id: string, isPublished: boolean): Observable<Blog> {
+    return this.http.put<Blog>(`${this.baseUrl}/${id}`, { isPublished });
   }
 
   delete(id: string): Observable<void> {

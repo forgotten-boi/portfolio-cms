@@ -101,5 +101,6 @@
         "eval": true,
         "Invoke-Expression": true,
         "iex": true
-    }
+    },
+    "chat.edits2.enabled": false
 }

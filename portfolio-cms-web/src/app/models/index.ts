@@ -135,7 +135,7 @@ export interface CreatePortfolioDto {
   subtitle: string;
   bio: string;
   template: string;
-  isPublic: boolean;
+  isPublished: boolean;
   featuredBlogsEnabled: boolean;
   data?: PortfolioData;
 }
@@ -143,7 +143,7 @@ export interface CreatePortfolioDto {
 export interface GeneratePortfolioDto {
   pdfBase64?: string;
   linkedInProfileUrl?: string;
-  templateId?: number;
+  templateId?: string | number;
 }
 
 export interface LoginRequest {

@@ -1,6 +1,7 @@
 {
-  "Portfolio.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\MyProjects\\IonicApp\\portfolio\\portfolio.api\\src\\Portfolio.Api",
-  "Portfolio.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\MyProjects\\IonicApp\\portfolio\\portfolio.api\\src\\Portfolio.Application",
-  "Portfolio.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\MyProjects\\IonicApp\\portfolio\\portfolio.api\\src\\Portfolio.Domain",
-  "Portfolio.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\MyProjects\\IonicApp\\portfolio\\portfolio.api\\src\\Portfolio.Infrastructure"
+  "Portfolio.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/runner\/work\/portfolio-cms\/portfolio-cms\/portfolio.api\/src\/Portfolio.Api",
+  "Portfolio.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/runner\/work\/portfolio-cms\/portfolio-cms\/portfolio.api\/src\/Portfolio.Application",
+  "Portfolio.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/runner\/work\/portfolio-cms\/portfolio-cms\/portfolio.api\/src\/Portfolio.Domain",
+  "Portfolio.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/runner\/work\/portfolio-cms\/portfolio-cms\/portfolio.api\/src\/Portfolio.Infrastructure",
+  "Portfolio.ServiceDefaults, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/runner\/work\/portfolio-cms\/portfolio-cms\/portfolio.api\/src\/Portfolio.ServiceDefaults"
 }

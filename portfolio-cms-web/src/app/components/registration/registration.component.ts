@@ -108,16 +108,12 @@ export class RegistrationComponent {
 
       // Register user
       this.authService.register(this.formData).subscribe({
-        next: (result) => {
+        next: () => {
           this.loading = false;
-          if (result.success) {
-            this.success = 'Registration successful! Redirecting to login...';
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
-          } else {
-            this.error = result.error || 'Registration failed';
-          }
+          this.success = 'Registration successful! Redirecting to login...';
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
         },
         error: (err) => {
           this.loading = false;

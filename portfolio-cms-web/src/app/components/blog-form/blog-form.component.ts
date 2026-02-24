@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
+import { NotificationService } from '../../services/notification.service';
 import { Blog, CreateBlogDto } from '../../models';
 import Quill from 'quill';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -36,7 +37,8 @@ export class BlogFormComponent implements OnInit {
     private fb: FormBuilder,
     private blogService: BlogService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.initForm();
   }
@@ -192,6 +194,9 @@ export class BlogFormComponent implements OnInit {
 
       request$.subscribe({
         next: () => {
+          this.notificationService.success(
+            this.isEditMode ? 'Blog updated successfully' : 'Blog created successfully'
+          );
           this.router.navigate(['/dashboard/blogs']);
         },
         error: (err) => {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
+import { NotificationService } from '../../services/notification.service';
 import { Portfolio, PortfolioData, WorkExperience, Education, Skill, Project, Certification } from '../../models';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
@@ -33,6 +34,8 @@ export class PortfolioManagerComponent implements OnInit {
   activeSection = 'about';
   editingSection: string | null = null;
   linkCopied = false;
+
+  confirmDeleteId: string | null = null;
 
   // Portfolio basic info
   title = '';
@@ -78,7 +81,8 @@ export class PortfolioManagerComponent implements OnInit {
   constructor(
     private portfolioService: PortfolioService,
     private router: Router,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -121,6 +125,28 @@ export class PortfolioManagerComponent implements OnInit {
       });
     }
   }
+  requestDelete(id: string): void {
+    this.confirmDeleteId = id;
+  }
+
+  confirmDelete(): void {
+    if (!this.confirmDeleteId) return;
+    const id = this.confirmDeleteId;
+    this.confirmDeleteId = null;
+    this.portfolioService.delete(id).subscribe({
+      next: () => {
+        this.portfolios = this.portfolios.filter(p => p.id !== id);
+        this.notificationService.success('Portfolio deleted!');
+      },
+      error: () => {
+        this.notificationService.error('Failed to delete portfolio');
+      }
+    });
+  }
+
+  cancelDelete(): void {
+    this.confirmDeleteId = null;
+  }
 
   backToList(): void {
     this.viewMode = 'list';
@@ -141,7 +167,7 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   getStatusClass(isPublished: boolean): string {
-    return isPublished ? 'status-published' : 'status-draft';
+    return isPublished ? 'published' : 'draft';
   }
 
   getStatusText(isPublished: boolean): string {
@@ -165,8 +191,16 @@ export class PortfolioManagerComponent implements OnInit {
   copyPortfolioLink(slug: string): void {
     const url = `${window.location.origin}/portfolio/${slug}`;
     navigator.clipboard.writeText(url).then(() => {
-      this.showSuccess('Link copied to clipboard!');
+      // this.showSuccess('Link copied to clipboard!');
+  
+      this.notificationService.success('Link copied to clipboard!');
     });
+  }
+
+  viewPublicPortfolio(p: Portfolio): void {
+    if (p.slug) {
+      window.open(`/portfolio/${p.slug}`, '_blank');
+    }
   }
 
   private resetForm(): void {
@@ -219,6 +253,7 @@ export class PortfolioManagerComponent implements OnInit {
       navigator.clipboard.writeText(this.publicUrl).then(() => {
         this.linkCopied = true;
         this.showSuccess('Link copied!');
+        this.notificationService.success('Link copied!');
         setTimeout(() => this.linkCopied = false, 2000);
       });
     }
@@ -275,10 +310,10 @@ export class PortfolioManagerComponent implements OnInit {
           this.portfolios.push(result);
         }
         this.saving = false;
-        this.showSuccess('Portfolio saved!');
+        this.notificationService.success('Portfolio saved!');
       },
       error: (err: any) => {
-        this.showError('Failed to save portfolio');
+        this.notificationService.error('Failed to save portfolio');
         this.saving = false;
         console.error(err);
       }
@@ -296,9 +331,11 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   // ── Experience ──
+
+  // ── Experience ──
   addExperience(): void {
     if (!this.newExperience.company || !this.newExperience.position) return;
-    this.data.workExperiences.push({
+    (this.data.workExperiences ??= []).push({
       company: this.newExperience.company!,
       position: this.newExperience.position!,
       startDate: this.newExperience.startDate || new Date(),
@@ -309,13 +346,13 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   removeExperience(i: number): void {
-    this.data.workExperiences.splice(i, 1);
+    this.data.workExperiences?.splice(i, 1);
   }
 
   // ── Education ──
   addEducation(): void {
     if (!this.newEducation.institution || !this.newEducation.degree) return;
-    this.data.education.push({
+    (this.data.education ??= []).push({
       institution: this.newEducation.institution!,
       degree: this.newEducation.degree!,
       fieldOfStudy: this.newEducation.fieldOfStudy || '',
@@ -325,13 +362,13 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   removeEducation(i: number): void {
-    this.data.education.splice(i, 1);
+    this.data.education?.splice(i, 1);
   }
 
   // ── Skills ──
   addSkill(): void {
     if (!this.newSkill.name) return;
-    this.data.skills.push({
+    (this.data.skills ??= []).push({
       name: this.newSkill.name!,
       level: this.newSkill.level || 70,
       category: this.newSkill.category || 'General'
@@ -340,13 +377,13 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   removeSkill(i: number): void {
-    this.data.skills.splice(i, 1);
+    this.data.skills?.splice(i, 1);
   }
 
   // ── Projects ──
   addProject(): void {
     if (!this.newProject.name) return;
-    this.data.projects.push({
+    (this.data.projects ??= []).push({
       name: this.newProject.name!,
       description: this.newProject.description || '',
       url: this.newProject.url,
@@ -368,13 +405,13 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   removeProject(i: number): void {
-    this.data.projects.splice(i, 1);
+    this.data.projects?.splice(i, 1);
   }
 
   // ── Certifications ──
   addCertification(): void {
     if (!this.newCertification.name) return;
-    this.data.certifications.push({
+    (this.data.certifications ??= []).push({
       name: this.newCertification.name!,
       issuingOrganization: this.newCertification.issuingOrganization || '',
       issueDate: this.newCertification.issueDate || new Date(),
@@ -384,6 +421,6 @@ export class PortfolioManagerComponent implements OnInit {
   }
 
   removeCertification(i: number): void {
-    this.data.certifications.splice(i, 1);
+    this.data.certifications?.splice(i, 1);
   }
 }

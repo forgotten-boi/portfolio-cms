@@ -6,10 +6,11 @@ import { TopbarComponent } from './components/topbar/topbar.component';
 import { ThemeService } from './services/theme.service';
 import { TranslationService } from './services/translation.service';
 import { AuthService } from './services/auth.service';
+import { NotificationsComponent } from './components/notifications/notifications.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
+  imports: [RouterOutlet, CommonModule, SidebarComponent, TopbarComponent, NotificationsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

@@ -145,6 +145,15 @@ public class GeneratePortfolioCommandHandler : ICommandHandler<GeneratePortfolio
 
     public async Task<PortfolioDto> HandleAsync(GeneratePortfolioCommand command, CancellationToken cancellationToken = default)
     {
+        // Normalize aliased fields from frontend
+        var data = command.Data;
+        if (string.IsNullOrEmpty(data.LinkedInUrl) && !string.IsNullOrEmpty(data.LinkedInProfileUrl))
+            data.LinkedInUrl = data.LinkedInProfileUrl;
+        if (string.IsNullOrEmpty(data.PdfUrl) && !string.IsNullOrEmpty(data.PdfBase64))
+            data.ResumeText = $"[PDF_BASE64]{data.PdfBase64}"; // store as marker for future processing
+        if (data.TemplateId == 0 && !string.IsNullOrEmpty(data.TemplateName))
+            data.TemplateId = data.TemplateName switch { "Classic" => 2, "Minimal" => 3, "Creative" => 4, "Vibrant" => 5, _ => 1 };
+
         // Get user for default data
         var user = await _userRepository.GetByIdAsync(command.UserId, cancellationToken);
         if (user == null)
@@ -408,6 +417,13 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
         if (command.Data.Data != null)
             portfolio.Data = command.Data.Data;
 
+        if (command.Data.IsPublished.HasValue)
+        {
+            portfolio.IsPublished = command.Data.IsPublished.Value;
+            if (command.Data.IsPublished.Value && portfolio.PublishedAt == null)
+                portfolio.PublishedAt = DateTime.UtcNow;
+        }
+
         portfolio.UpdatedAt = DateTime.UtcNow;
 
         await _portfolioRepository.UpdateAsync(portfolio, cancellationToken);
@@ -419,6 +435,7 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
             TenantId = portfolio.TenantId,
             UserId = portfolio.UserId,
             Title = portfolio.Title,
+            Slug = portfolio.Slug,
             Subtitle = portfolio.Subtitle,
             Bio = portfolio.Bio,
             ProfileImageUrl = portfolio.ProfileImageUrl,
@@ -429,6 +446,8 @@ public class UpdatePortfolioCommandHandler : ICommandHandler<UpdatePortfolioComm
             Template = portfolio.Template.ToString(),
             FeaturedBlogsEnabled = portfolio.FeaturedBlogsEnabled,
             MaxFeaturedBlogs = portfolio.MaxFeaturedBlogs,
+            IsPublished = portfolio.IsPublished,
+            PublishedAt = portfolio.PublishedAt,
             Data = portfolio.Data,
             CreatedAt = portfolio.CreatedAt,
             UpdatedAt = portfolio.UpdatedAt

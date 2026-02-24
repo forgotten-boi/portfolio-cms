@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
+import { NotificationService } from '../../services/notification.service';
 import { CreatePortfolioDto, GeneratePortfolioDto } from '../../models';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -35,7 +36,8 @@ export class PortfolioFormComponent implements OnInit {
     private fb: FormBuilder,
     private portfolioService: PortfolioService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.initForm();
   }
@@ -103,6 +105,9 @@ export class PortfolioFormComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
+        this.notificationService.success(
+          this.isEditMode ? 'Portfolio updated successfully' : 'Portfolio created successfully'
+        );
         this.router.navigate(['/dashboard/portfolios']);
       },
       error: (err) => {
@@ -147,7 +152,7 @@ export class PortfolioFormComponent implements OnInit {
 
     try {
       const generateData: GeneratePortfolioDto = {
-        templateId: this.portfolioForm.get('template')?.value || 1
+        templateName: this.portfolioForm.get('template')?.value || 'Modern'
       };
 
       if (this.selectedFile) {
@@ -170,13 +175,13 @@ export class PortfolioFormComponent implements OnInit {
             title: portfolio.title,
             subtitle: portfolio.subtitle,
             bio: portfolio.bio,
-            template: portfolio.template || 1,
+            template: portfolio.template || 'Modern',
             isPublished: portfolio.isPublished || false,
             featuredBlogsEnabled: portfolio.featuredBlogsEnabled || false
           });
 
           // Show success message
-          alert('Portfolio generated successfully! Review and save your portfolio.');
+          this.notificationService.success('Portfolio generated successfully! Review and save your portfolio.');
         },
         error: (err) => {
           this.generating = false;

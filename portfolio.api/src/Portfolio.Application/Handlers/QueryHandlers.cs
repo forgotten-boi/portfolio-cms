@@ -440,6 +440,7 @@ public class GetPortfolioBySlugQueryHandler : IQueryHandler<GetPortfolioBySlugQu
             TenantId = portfolio.TenantId,
             UserId = portfolio.UserId,
             Title = portfolio.Title,
+            Slug = portfolio.Slug,
             Subtitle = portfolio.Subtitle,
             Bio = portfolio.Bio,
             ProfileImageUrl = portfolio.ProfileImageUrl,
@@ -453,7 +454,6 @@ public class GetPortfolioBySlugQueryHandler : IQueryHandler<GetPortfolioBySlugQu
             Data = portfolio.Data,
             CreatedAt = portfolio.CreatedAt,
             UpdatedAt = portfolio.UpdatedAt,
-            Slug = portfolio.Slug,
             IsPublished = portfolio.IsPublished
         };
     }

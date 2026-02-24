@@ -5,22 +5,101 @@
     <p>{{ 'pm.loading' | translate }}</p>
   </div>
 
-  <!-- No Portfolio Yet -->
-  <div class="empty-state" *ngIf="!loading && !portfolio">
-    <div class="empty-icon">📁</div>
-    <h2>{{ 'pm.noPortfolio' | translate }}</h2>
-    <p>{{ 'pm.noPortfolioDesc' | translate }}</p>
-    <button class="btn-create" (click)="createPortfolio()">
-      <span>🚀</span> {{ 'pm.createPortfolio' | translate }}
-    </button>
+  <!-- Delete confirmation modal -->
+  <div *ngIf="confirmDeleteId" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <h3>{{ 'pm.confirmDeleteTitle' | translate }}</h3>
+      <p>{{ 'pm.confirmDeleteMsg' | translate }}</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">{{ 'pm.cancel' | translate }}</button>
+        <button class="btn-confirm-delete" (click)="confirmDelete()">{{ 'pm.delete' | translate }}</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Portfolio Editor -->
-  <div class="editor-layout" *ngIf="!loading && portfolio">
+  <!-- ═══ LIST VIEW ═══ -->
+  <div class="list-view" *ngIf="!loading && viewMode === 'list'">
+    <div class="list-header">
+      <h1>{{ 'pm.title' | translate }}</h1>
+      <button class="btn-create" (click)="createNewPortfolio()">
+        <span>🚀</span> {{ 'pm.createPortfolio' | translate }}
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="portfolios.length === 0">
+      <div class="empty-icon">📁</div>
+      <h2>{{ 'pm.noPortfolio' | translate }}</h2>
+      <p>{{ 'pm.noPortfolioDesc' | translate }}</p>
+      <button class="btn-create" (click)="createNewPortfolio()">
+        <span>🚀</span> {{ 'pm.createPortfolio' | translate }}
+      </button>
+    </div>
+
+    <!-- Portfolio Cards Grid -->
+    <div class="portfolios-grid" *ngIf="portfolios.length > 0">
+      <div class="portfolio-card" *ngFor="let p of portfolios">
+        <div class="card-header">
+          <div class="card-title-section">
+            <h3>{{ p.title }}</h3>
+            <p class="card-subtitle">{{ p.subtitle }}</p>
+          </div>
+          <span class="status-badge" [ngClass]="getStatusClass(p.isPublished)">
+            {{ getStatusText(p.isPublished) }}
+          </span>
+        </div>
+
+        <p class="card-bio">{{ p.bio }}</p>
+
+        <div class="card-meta">
+          <div class="meta-template">
+            <strong>{{ 'portfolios.template' | translate }}:</strong> {{ p.template }}
+          </div>
+          <div class="meta-items">
+            <strong>{{ getPortfolioItemCount(p) }}</strong> {{ 'portfolios.items' | translate }}
+          </div>
+        </div>
+
+        <div class="card-stats">
+          <div class="stat" *ngIf="p.data?.workExperiences?.length">
+            <span class="count">{{ p.data!.workExperiences!.length }}</span>
+            <span class="label">{{ 'portfolios.work' | translate }}</span>
+          </div>
+          <div class="stat" *ngIf="p.data?.education?.length">
+            <span class="count">{{ p.data!.education!.length }}</span>
+            <span class="label">{{ 'portfolios.education' | translate }}</span>
+          </div>
+          <div class="stat" *ngIf="p.data?.skills?.length">
+            <span class="count">{{ p.data!.skills!.length }}</span>
+            <span class="label">{{ 'portfolios.skills' | translate }}</span>
+          </div>
+          <div class="stat" *ngIf="p.data?.projects?.length">
+            <span class="count">{{ p.data!.projects!.length }}</span>
+            <span class="label">{{ 'portfolios.projects' | translate }}</span>
+          </div>
+          <div class="stat" *ngIf="p.data?.certifications?.length">
+            <span class="count">{{ p.data!.certifications!.length }}</span>
+            <span class="label">{{ 'portfolios.certs' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-action btn-edit" (click)="editPortfolio(p)">✏️ {{ 'blogs.edit' | translate }}</button>
+          <button *ngIf="p.isPublished && p.slug" class="btn-action btn-view" (click)="viewPublicPortfolio(p)">🔗 {{ 'blogs.view' | translate }}</button>
+          <button *ngIf="p.isPublished && p.slug" class="btn-action btn-copy" (click)="copyPortfolioLink(p.slug)">📋 {{ 'blogs.copyLink' | translate }}</button>
+          <button class="btn-action btn-delete" (click)="requestDelete(p.id)">{{ 'pm.delete' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EDITOR VIEW ═══ -->
+  <div class="editor-layout" *ngIf="!loading && viewMode === 'edit'">
     <!-- Header Bar -->
     <div class="editor-header">
       <div class="header-left">
-        <h1>{{ 'pm.title' | translate }}</h1>
+        <button class="btn-back" (click)="backToList()" title="Back to list">← {{ 'pm.backToList' | translate }}</button>
+        <h1>{{ portfolio ? title : ('pm.createPortfolio' | translate) }}</h1>
         <span class="status-badge" [class.published]="isPublished" [class.draft]="!isPublished">
           {{ isPublished ? ('pm.published' | translate) : ('pm.draft' | translate) }}
         </span>
@@ -151,7 +230,6 @@
         <!-- Education Section -->
         <div class="section-panel" *ngIf="activeSection === 'education'">
           <h2><span>🎓</span> {{ 'pm.educationSection' | translate }}</h2>
-
           <div class="item-list">
             <div class="item-card" *ngFor="let edu of data.education; let i = index">
               <div class="item-header">
@@ -164,7 +242,6 @@
               </div>
             </div>
           </div>
-
           <div class="add-form">
             <h4>{{ 'pm.addEducation' | translate }}</h4>
             <div class="form-row">
@@ -194,7 +271,6 @@
         <!-- Skills Section -->
         <div class="section-panel" *ngIf="activeSection === 'skills'">
           <h2><span>⚡</span> {{ 'pm.skillsSection' | translate }}</h2>
-
           <div class="skills-grid">
             <div class="skill-chip" *ngFor="let skill of data.skills; let i = index">
               <span class="skill-name">{{ skill.name }}</span>
@@ -229,7 +305,6 @@
         <!-- Projects Section -->
         <div class="section-panel" *ngIf="activeSection === 'projects'">
           <h2><span>🔧</span> {{ 'pm.projectsSection' | translate }}</h2>
-
           <div class="item-list">
             <div class="item-card" *ngFor="let project of data.projects; let i = index">
               <div class="item-header">
@@ -245,7 +320,6 @@
               </div>
             </div>
           </div>
-
           <div class="add-form">
             <h4>{{ 'pm.addProject' | translate }}</h4>
             <div class="form-row">
@@ -270,7 +344,7 @@
               </div>
               <div class="tech-chips" *ngIf="newProject.technologies?.length">
                 <span class="tech-chip" *ngFor="let t of newProject.technologies; let j = index">
-                  {{ t }} <button class="chip-remove" (click)="removeTech(j)">✕</button>
+                  {{ t }} <button class="chip-remove" (click)="removeTech(j)">✖</button>
                 </span>
               </div>
             </div>
@@ -281,7 +355,6 @@
         <!-- Certifications Section -->
         <div class="section-panel" *ngIf="activeSection === 'certifications'">
           <h2><span>🏅</span> {{ 'pm.certsSection' | translate }}</h2>
-
           <div class="item-list">
             <div class="item-card" *ngFor="let cert of data.certifications; let i = index">
               <div class="item-header">
@@ -293,7 +366,6 @@
               </div>
             </div>
           </div>
-
           <div class="add-form">
             <h4>{{ 'pm.addCert' | translate }}</h4>
             <div class="form-row">

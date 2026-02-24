@@ -8,6 +8,18 @@
   
   <div *ngIf="error" class="error">{{ error }}</div>
 
+  <!-- Delete confirmation modal -->
+  <div *ngIf="confirmDeleteId" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-blog-dialog-title">
+    <div class="modal-dialog">
+      <h3 id="delete-blog-dialog-title">Delete Blog</h3>
+      <p>Are you sure you want to delete this blog? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="!loading && !error" class="blogs-grid">
     <div *ngIf="blogs.length === 0" class="no-data">
       {{ 'blogs.empty' | translate }}
@@ -36,8 +48,33 @@
         <a *ngIf="blog.isPublished && blog.slug" class="btn-view" [href]="'/blog/' + blog.slug" target="_blank">🔗 {{ 'blogs.view' | translate }}</a>
         <button *ngIf="blog.isPublished && blog.slug" class="btn-copy" (click)="copyBlogLink(blog.slug)">📋 {{ 'blogs.copyLink' | translate }}</button>
         <button class="btn-edit" (click)="editBlog(blog.id)">{{ 'blogs.edit' | translate }}</button>
-        <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">{{ 'blogs.delete' | translate }}</button>
+        <!-- <button class="btn-delete" (click)="deleteBlog(blog.id, blog.title)">{{ 'blogs.delete' | translate }}</button> -->
+        <button
+          class="btn-publish"
+          [class.btn-unpublish]="blog.isPublished"
+          (click)="togglePublish(blog)">
+          {{ blog.isPublished ? ('blogs.unpublish' | translate) : ('blogs.publish' | translate) }}
+        </button>
+        <button
+          *ngIf="blog.isPublished && blog.slug"
+          class="btn-copy-link"
+          (click)="copyPublicLink(blog)"
+          title="Copy public link">
+          Copy Link
+        </button>
+        <button class="btn-delete" (click)="deleteBlog(blog.id)">Delete</button>
+      </div>
+
+      <div class="share-actions" *ngIf="blog.isPublished">
+        <span class="share-label">Share:</span>
+        <button class="btn-share btn-linkedin" (click)="shareOnLinkedIn(blog)" title="Share on LinkedIn">
+          <span class="share-icon">in</span> LinkedIn
+        </button>
+        <button class="btn-share btn-facebook" (click)="shareOnFacebook(blog)" title="Share on Facebook">
+          <span class="share-icon">f</span> Facebook
+        </button>
       </div>
     </div>
   </div>
 </div>
+

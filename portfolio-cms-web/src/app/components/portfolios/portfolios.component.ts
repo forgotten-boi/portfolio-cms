@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
+import { NotificationService } from '../../services/notification.service';
 import { Portfolio } from '../../models';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
@@ -16,11 +17,13 @@ export class PortfoliosComponent implements OnInit {
   portfolios: Portfolio[] = [];
   loading = true;
   error: string | null = null;
+  confirmDeleteId: string | null = null;
 
   constructor(
     private portfolioService: PortfolioService,
     private router: Router,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -52,17 +55,81 @@ export class PortfoliosComponent implements OnInit {
     this.router.navigate(['/dashboard/portfolios/edit', id]);
   }
 
-  deletePortfolio(id: string, title: string): void {
-    if (confirm(this.translationService.t('portfolios.confirmDelete'))) {
-      this.portfolioService.delete(id).subscribe({
-        next: () => {
-          this.portfolios = this.portfolios.filter(p => p.id !== id);
-        },
-        error: (err) => {
-          alert('Failed to delete portfolio');
-          console.error('Error deleting portfolio:', err);
+  // deletePortfolio(id: string, title: string): void {
+  //   if (confirm(this.translationService.t('portfolios.confirmDelete'))) {
+  //     this.portfolioService.delete(id).subscribe({
+  //       next: () => {
+  //         this.portfolios = this.portfolios.filter(p => p.id !== id);
+  //       },
+  //       error: (err) => {
+  //         alert('Failed to delete portfolio');
+  //         console.error('Error deleting portfolio:', err);
+  //       }
+  //     });
+  //   }
+  // }
+
+  deletePortfolio(id: string): void {
+    this.confirmDeleteId = id;
+  }
+
+  confirmDelete(): void {
+    if (!this.confirmDeleteId) return;
+    const id = this.confirmDeleteId;
+    this.confirmDeleteId = null;
+    this.portfolioService.delete(id).subscribe({
+      next: () => {
+        this.portfolios = this.portfolios.filter(p => p.id !== id);
+        this.notificationService.success('Portfolio deleted successfully');
+      },
+      error: (err) => {
+        this.notificationService.error('Failed to delete portfolio');
+        console.error('Error deleting portfolio:', err);
+      }
+    });
+  }
+
+  cancelDelete(): void {
+    this.confirmDeleteId = null;
+  }
+
+  toggleVisibility(portfolio: Portfolio): void {
+    const updatedData: { isPublished: boolean } = {
+      isPublished: !portfolio.isPublished
+    };
+    this.portfolioService.update(portfolio.id, updatedData).subscribe({
+      next: (updated) => {
+        const index = this.portfolios.findIndex(p => p.id === portfolio.id);
+        if (index !== -1) {
+          this.portfolios[index] = updated;
         }
-      });
+        this.notificationService.success(
+          updated.isPublished ? 'Portfolio is now public' : 'Portfolio is now private'
+        );
+      },
+      error: (err) => {
+        this.notificationService.error('Failed to update portfolio visibility');
+        console.error('Error toggling visibility:', err);
+      }
+    });
+  }
+
+  copyPublicLink(portfolio: Portfolio): void {
+    if (!portfolio.slug) {
+      this.notificationService.warning('No public link available for this portfolio');
+      return;
+    }
+    const url = `${window.location.origin}/portfolio/${portfolio.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.notificationService.success('Public link copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.info(`Public link: ${url}`);
+    });
+  }
+
+  viewPublicPortfolio(portfolio: Portfolio): void {
+    if (portfolio.slug) {
+      window.open(`/portfolio/${portfolio.slug}`, '_blank');
     }
   }
 
@@ -83,3 +150,4 @@ export class PortfoliosComponent implements OnInit {
            (data.certifications?.length || 0);
   }
 }
+

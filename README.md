@@ -4,11 +4,7 @@
 
 ## 🎯 Project Overview
 
-Portfolio CMS is a comprehensive solution for managing personal portfolios and blogs. It features a modern Angular frontend with a rich text editor, a robust .NET backend with clean architecture, and containerized deployment with Docker.
-
-**Status:** ✅ Production Ready | 100% Complete
-
-**Last Updated:** Session 2 Complete - All 9 features implemented and tested
+Portfolio CMS is a comprehensive solution for managing personal portfolios and blogs. It features a modern Angular frontend with a sidebar navigation, dark/light theme support, multi-language support, rich text editing, and a robust .NET backend with Clean Architecture, containerized deployment with Docker.
 
 ---
 
@@ -18,8 +14,8 @@ Portfolio CMS is a comprehensive solution for managing personal portfolios and b
 |----------|---------|
 | [📚 Complete Documentation](./COMPLETE_DOCUMENTATION.md) | Full project reference with architecture, API docs, troubleshooting |
 | [🚀 Quick Start Guide](./QUICK_START.md) | 5-minute setup using Docker |
+| [🐳 Docker Orchestration Guide](./DOCKER_ORCHESTRATION_GUIDE.md) | Advanced Docker/Aspire orchestration |
 | [📝 Implementation Details](./README_IMPLEMENTATION.md) | Component-by-component implementation summary |
-| [📊 Session 2 Report](./SESSION_2_COMPLETE_REPORT.md) | Final session completion report |
 
 ---
 
@@ -62,112 +58,6 @@ docker-compose down
 
 ---
 
-## 🛠️ Build & Deploy
-
-### Full Build and Deploy
-
-```powershell
-# Complete build from source with Docker images
-.\build-and-deploy.ps1
-
-# With verbose output
-.\build-and-deploy.ps1 -Verbose
-
-# Skip code compilation, just redeploy with existing images
-.\build-and-deploy.ps1 -SkipBuild
-
-# Only check status without deploying
-.\build-and-deploy.ps1 -StatusOnly
-
-# Clean and remove all containers (without rebuilding)
-.\build-and-deploy.ps1 -CleanOnly
-```
-
-### Enhanced Deployment Script
-
-An enhanced version with improved logging and features is available:
-
-```powershell
-# Use enhanced deployment script
-.\build-and-deploy-enhanced.ps1 -Verbose
-
-# Features:
-# - Comprehensive logging to build-deploy-{timestamp}.log
-# - Detailed progress indicators
-# - Multi-attempt retry logic
-# - Enhanced health checks
-# - Service status reporting
-```
-
-### Manual Build (Without Docker)
-
-```powershell
-# Frontend build
-cd portfolio-cms-web
-npm install
-npm run build
-
-# Backend build
-cd portfolio.api
-dotnet build -c Release
-```
-
----
-
-## 🧠 .NET Aspire Orchestration
-
-Use the custom orchestration host when you want a single command that boots the API plus every dependent service (PostgreSQL, Kafka, Redis, pgAdmin, and the Angular frontend) with consistent configuration and health probes.
-
-### Prerequisites
-- .NET SDK 10.0
-- Docker Desktop running
-
-### Run the orchestration host
-
-```powershell
-cd portfolio.api
-dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
-```
-
-**What happens:**
-1. Automatically builds the frontend Docker image if it doesn't exist
-2. Starts PostgreSQL + pgAdmin
-3. Conditionally starts Kafka/Zookeeper (skipped if `USE_MOCKS=true`)
-4. Starts the .NET API with proper configuration
-5. Starts the Angular frontend container
-
-**Environment variables:**
-- `USE_MOCKS=true` - Skips Kafka/Zookeeper/Redis, uses in-memory message bus
-- `REBUILD_FRONTEND=true` - Forces frontend image rebuild even if it exists
-
-**Toggle mock mode (PowerShell):**
-
-```powershell
-$env:USE_MOCKS='true'
-dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
-```
-
-**Force frontend rebuild:**
-
-```powershell
-$env:REBUILD_FRONTEND='true'
-dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
-```
-
-The orchestration host spins up the following resources:
-
-| Resource | Description | Access |
-|----------|-------------|--------|
-| `portfolio-api` | .NET Minimal API with ServiceDefaults health checks (`/health`, `/healthz`) | http://localhost:8085
-| `portfolio-frontend` | Angular frontend (auto-built Docker image). Maps container port 80 to host 4200. | http://localhost:4200
-| `postgres` | PostgreSQL 17 database seeded with the default creds | localhost:5432
-| `pgadmin` | Browser UI for PostgreSQL management | http://localhost:5050
-| `kafka` + `zookeeper` | Messaging backbone for async flows (skipped in mock mode) | Broker exposed at `kafka:9092`
-
-Stop all services at any time with **Ctrl+C**. The orchestrator automatically cleans up containers.
-
----
-
 ## 🏗️ Architecture
 
 ```
@@ -190,12 +80,12 @@ Backend API     PostgreSQL         Kafka
 ```
 
 **Docker Services:**
-1. **portfolio-backend-api** - .NET 10 API service
-2. **portfolio-frontend** - Angular 19 web app
+1. **portfolio-backend-api** - .NET 10 API service (Clean Architecture)
+2. **portfolio-frontend** - Angular 19 web app (Nginx served)
 3. **postgres** - PostgreSQL 17 database
-4. **kafka** - Message streaming (for future analytics)
+4. **kafka** - Message streaming (for analytics events)
 5. **zookeeper** - Kafka coordination
-6. **nginx** - Reverse proxy (optional)
+6. **redis** - Caching layer (optional)
 
 ---
 
@@ -206,71 +96,193 @@ Backend API     PostgreSQL         Kafka
 | **Frontend** | Angular | 19.0+ |
 | | TypeScript | 5.6+ |
 | | Quill | 2.0 (Rich Text Editor) |
-| | Bootstrap | 5.3+ |
+| | SCSS | Modern variables/themes |
 | **Backend** | .NET | 10.0 |
 | | Entity Framework Core | 10.0 |
 | | Clean Architecture | Applied |
+| | MediatR | CQRS Pattern |
 | **Database** | PostgreSQL | 17 |
 | **Container** | Docker | Latest |
 | | Docker Compose | Latest |
+| | .NET Aspire | Orchestration |
 | **Message Queue** | Kafka | 3.x |
 
 ---
 
-## ✨ Features Implemented
+## ✨ Features & Functionality
 
-### Session 1 - Core Features ✅
-- [x] **User Authentication** - Login/Registration with JWT
-- [x] **Portfolio Management** - CRUD operations for portfolios
-- [x] **Portfolio Generator** - AI-powered portfolio generation
-- [x] **Database Schema** - Complete PostgreSQL schema
-- [x] **Docker Setup** - Multi-container orchestration
-- [x] **E2E Testing** - Comprehensive test suite
-- [x] **API Documentation** - RESTful API endpoints
+### 🔐 Authentication & Authorization
 
-### Session 2 - Advanced Features ✅
-- [x] **Blog System** - Full blog management
-- [x] **Rich Text Editor** - Quill 2.0 integration for content editing
-- [x] **Public Pages** - Public portfolio and blog viewing
-- [x] **Admin Dashboard** - Enhanced admin UI with role-based access
-- [x] **UI Enhancements** - Modern design improvements
-- [x] **Component Library** - Reusable Angular components
-- [x] **Error Handling** - Global error management
-- [x] **Responsive Design** - Mobile-friendly interface
-- [x] **Search & Filter** - Portfolio and blog search
+| Feature | Description |
+|---------|-------------|
+| **User Registration** | Sign up with email, name, password. Creates user + portfolio in one step |
+| **User Login** | JWT-based login with access + refresh tokens |
+| **Token Refresh** | Automatic token refresh for seamless session management |
+| **Auth Guard** | Route protection — unauthenticated users are redirected to `/login` |
+| **Role-Based Access** | `admin`, `user` roles with different capabilities |
+| **Multi-Tenant** | Tenant isolation — each user belongs to a tenant |
+
+**Login Flow:**
+1. Navigate to `/login`
+2. Enter email and password
+3. JWT token stored in `localStorage`
+4. Redirected to `/dashboard`
+
+**Registration Flow:**
+1. Navigate to `/register`
+2. Fill in: Full Name, Email, Password, Confirm Password
+3. Optionally enter Tenant ID (or new tenant is created)
+4. On success → redirected to `/login`
 
 ---
 
-## 📚 Documentation
+### 🏠 Dashboard
 
-### Core Documentation Files
+The main dashboard (`/dashboard`) provides:
+- Summary statistics: total portfolios, blogs, views
+- Quick action cards for navigating to common tasks
+- Recent activity overview
 
-1. **[COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md)** (Comprehensive)
-   - Project overview and architecture
-   - Tech stack details
-   - Setup and installation guide
-   - Build and deployment procedures
-   - Complete API documentation with examples
-   - Frontend component documentation
-   - Database schema with SQL
-   - Troubleshooting guide
+---
 
-2. **[QUICK_START.md](./QUICK_START.md)** (Quick Reference)
-   - 5-minute setup
-   - Docker commands
-   - Service verification
-   - Access URLs
+### ✍️ Blog Management
 
-3. **[README_IMPLEMENTATION.md](./README_IMPLEMENTATION.md)** (Implementation Details)
-   - Component-by-component implementation
-   - 9 frontend components documented
-   - Status and completion tracking
+| Feature | Description |
+|---------|-------------|
+| **List My Blogs** | Shows all blogs belonging to the authenticated user |
+| **Create Blog** | Rich-text editor (Quill 2.0) with title, summary, tags, slug |
+| **Edit Blog** | Update existing blog content, metadata |
+| **Delete Blog** | Confirmation dialog before deletion |
+| **Publish/Unpublish** | Toggle blog visibility with a single click |
+| **View Public Blog** | Direct link to public blog page (`/blog/:slug`) |
+| **Copy Link** | One-click copy of the public blog URL |
+| **Share on LinkedIn** | Share published blog to LinkedIn |
+| **Share on Facebook** | Share published blog to Facebook |
+| **Blog Status** | Visual badge: Published (green) / Draft (red) |
 
-4. **[SESSION_2_COMPLETE_REPORT.md](./SESSION_2_COMPLETE_REPORT.md)** (Final Report)
-   - Session summary
-   - All changes documented
-   - Test results
-   - Deployment verification
+**Blog Create/Edit Flow:**
+1. Navigate to `/dashboard/blogs`
+2. Click "Create New Blog"
+3. Fill in title, content (rich text), summary, tags
+4. Optionally set a custom slug (auto-generated from title)
+5. Save as draft or publish immediately
+
+---
+
+### 🗂️ Portfolio Management
+
+| Feature | Description |
+|---------|-------------|
+| **List Portfolios** | View all portfolios with status indicators |
+| **Create Portfolio** | Add name, description, skills, experience, links |
+| **Edit Portfolio** | Update portfolio fields and metadata |
+| **Delete Portfolio** | Remove portfolio with confirmation |
+| **Public Portfolio** | Shareable portfolio page (`/portfolio/:slug`) |
+| **Portfolio Form** | Multi-field form: bio, skills, projects, experience, education |
+
+**Portfolio Create Flow:**
+1. Navigate to `/dashboard/portfolios`
+2. Click "Add Portfolio"
+3. Fill: Title, Description, Tech Stack, GitHub URL, Live URL
+4. Save → portfolio is visible at `/portfolio/:slug`
+
+---
+
+### 📄 CV Manager
+
+The CV Manager (`/dashboard/cv-manager`) provides:
+- Upload and manage CV/Resume files
+- Generate CV from portfolio data
+- Preview CV in the browser
+- Download CV as PDF
+
+---
+
+### 📑 Resume Generator
+
+The Resume Generator (`/dashboard/resume-generator`) provides:
+- Generate a professional resume from your profile and portfolio data
+- Multiple resume templates
+- Download as HTML/PDF
+- Customizable sections: Summary, Skills, Experience, Education, Projects
+
+---
+
+### 🎯 Job Matcher
+
+The Job Matcher (`/dashboard/job-matcher`) provides:
+- Paste a job description
+- AI-powered matching against your skills and portfolio
+- Match score percentage
+- Gap analysis: Missing skills vs. your skills
+- Suggestions for improvement
+
+---
+
+### 📊 Analytics
+
+The Analytics page (`/dashboard/analytics`) provides:
+- Blog post view counts over time
+- Portfolio view tracking
+- Top performing content
+- Traffic sources
+
+---
+
+### ⚙️ Settings
+
+The Settings page (`/dashboard/settings`) provides:
+- **Theme**: Toggle between Light and Dark mode
+- **Language**: Switch between English (EN), Spanish (ES), German (DE), Hindi (HI)
+- **Profile**: Update display name, email, and bio
+- **Password**: Change account password
+- **Notifications**: Configure email notification preferences
+
+---
+
+### 👥 User Management (Admin)
+
+| Feature | Description |
+|---------|-------------|
+| **List Users** | View all users in the system (admin only) |
+| **Edit User** | Update user role and status |
+| **Delete User** | Remove user account |
+| **Role Assignment** | Assign `admin` or `user` role |
+
+---
+
+### 🏢 Tenant Management (Admin)
+
+| Feature | Description |
+|---------|-------------|
+| **List Tenants** | View all registered tenants |
+| **Create Tenant** | Add a new tenant |
+| **Update Tenant** | Modify tenant name |
+
+---
+
+### 🌐 Public Pages
+
+| Page | URL | Description |
+|------|-----|-------------|
+| **Public Portfolio** | `/portfolio/:slug` | View a user's public portfolio |
+| **Public Blog** | `/blog/:slug` | Read a published blog post |
+
+---
+
+### 🎨 UI/UX Features
+
+| Feature | Description |
+|---------|-------------|
+| **Sidebar Navigation** | Collapsible sidebar with icons and labels |
+| **Topbar** | Shows current page, notifications, user menu |
+| **Dark/Light Theme** | CSS variables-based theming, persisted in localStorage |
+| **Multi-language** | EN/ES/DE/HI translations throughout the UI |
+| **Responsive Design** | Works on mobile, tablet, and desktop |
+| **CSS Variables** | Consistent theming with SCSS design tokens |
+| **Loading States** | Spinners and skeleton loaders |
+| **Error Handling** | User-friendly error messages |
+| **Confirmation Dialogs** | Before destructive actions |
 
 ---
 
@@ -278,74 +290,90 @@ Backend API     PostgreSQL         Kafka
 
 ### Authentication
 ```
-POST   /api/auth/register          Register new user
-POST   /api/auth/login             Login user
-POST   /api/auth/refresh-token     Refresh JWT token
-POST   /api/auth/logout            Logout user
+POST   /api/auth/register           Register new user
+POST   /api/auth/login              Login user
+POST   /api/auth/refresh-token      Refresh JWT token
+POST   /api/auth/logout             Logout user
 ```
 
 ### Portfolio Management
 ```
-GET    /api/portfolio              List all portfolios
-GET    /api/portfolio/{id}         Get portfolio by ID
-GET    /api/portfolio/slug/{slug}  Get portfolio by slug (public)
-POST   /api/portfolio              Create new portfolio
-PUT    /api/portfolio/{id}         Update portfolio
-DELETE /api/portfolio/{id}         Delete portfolio
+GET    /api/portfolios              List all portfolios
+GET    /api/portfolios/{id}         Get portfolio by ID
+GET    /api/portfolios/slug/{slug}  Get portfolio by slug (public)
+GET    /api/portfolios/user/{id}    Get portfolios by user
+POST   /api/portfolios              Create new portfolio
+PUT    /api/portfolios/{id}         Update portfolio
+DELETE /api/portfolios/{id}         Delete portfolio
 ```
 
 ### Blog Management
 ```
-GET    /api/blog                   List all blog posts
-GET    /api/blog/{id}              Get blog post by ID
-GET    /api/blog/slug/{slug}       Get blog by slug (public)
-POST   /api/blog                   Create new blog post
-PUT    /api/blog/{id}              Update blog post
-DELETE /api/blog/{id}              Delete blog post
+GET    /api/blogs                   List all blog posts
+GET    /api/blogs/my                Get current user's blogs
+GET    /api/blogs/{id}              Get blog post by ID
+GET    /api/blogs/slug/{slug}       Get blog by slug (public)
+POST   /api/blogs                   Create new blog post
+PUT    /api/blogs/{id}              Update blog post (publish/unpublish)
+DELETE /api/blogs/{id}              Delete blog post
 ```
 
-### Admin Management
+### User Management
 ```
-GET    /api/users                  List all users (admin only)
-GET    /api/users/{id}             Get user by ID
-PUT    /api/users/{id}             Update user
-DELETE /api/users/{id}             Delete user
-GET    /api/tenants                List all tenants (admin)
-POST   /api/tenants                Create new tenant
+GET    /api/users                   List all users (admin only)
+GET    /api/users/{id}              Get user by ID
+PUT    /api/users/{id}              Update user
+DELETE /api/users/{id}              Delete user
+```
+
+### Tenant Management
+```
+GET    /api/tenants                 List all tenants (admin)
+POST   /api/tenants                 Create new tenant
+PUT    /api/tenants/{id}            Update tenant
+DELETE /api/tenants/{id}            Delete tenant
 ```
 
 For complete API documentation with request/response examples, see [COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md).
 
 ---
 
-## 🎨 Frontend Pages
+## 🎨 Frontend Routes
 
-| Page | Route | Purpose |
-|------|-------|---------|
-| Dashboard | `/dashboard` | Main admin dashboard |
-| Portfolios | `/portfolios` | Manage portfolios |
-| Portfolio Form | `/portfolio/new`, `/portfolio/edit/:id` | Create/edit portfolio |
-| Public Portfolio | `/portfolio/:slug` | Public portfolio view |
-| Blogs | `/blogs` | Manage blog posts |
-| Blog Form | `/blog/new`, `/blog/edit/:id` | Create/edit blog (with rich editor) |
-| Public Blog | `/blog/:slug` | Public blog post view |
-| Users | `/users` | Manage users (admin) |
-| Tenants | `/tenants` | Manage tenants (admin) |
-| Login | `/login` | User authentication |
+| Route | Component | Auth Required | Purpose |
+|-------|-----------|--------------|---------|
+| `/login` | LoginComponent | No | User login |
+| `/register` | RegistrationComponent | No | User registration |
+| `/dashboard` | DashboardComponent | Yes | Main dashboard |
+| `/dashboard/blogs` | BlogsComponent | Yes | List & manage blogs |
+| `/dashboard/blogs/new` | BlogFormComponent | Yes | Create new blog |
+| `/dashboard/blogs/edit/:id` | BlogFormComponent | Yes | Edit existing blog |
+| `/dashboard/portfolios` | PortfoliosComponent | Yes | List & manage portfolios |
+| `/dashboard/portfolios/new` | PortfolioFormComponent | Yes | Create new portfolio |
+| `/dashboard/portfolios/edit/:id` | PortfolioFormComponent | Yes | Edit existing portfolio |
+| `/dashboard/cv-manager` | CvManagerComponent | Yes | CV management |
+| `/dashboard/resume-generator` | ResumeGeneratorComponent | Yes | Resume generation |
+| `/dashboard/job-matcher` | JobMatcherComponent | Yes | Job description matching |
+| `/dashboard/analytics` | AnalyticsComponent | Yes | View analytics |
+| `/dashboard/settings` | SettingsComponent | Yes | App settings & preferences |
+| `/dashboard/users` | UsersComponent | Yes (admin) | Manage users |
+| `/dashboard/tenants` | TenantsComponent | Yes (admin) | Manage tenants |
+| `/portfolio/:slug` | PublicPortfolioComponent | No | Public portfolio view |
+| `/blog/:slug` | PublicBlogComponent | No | Public blog view |
 
 ---
 
 ## 🗄️ Database Schema
 
 **Core Tables:**
-- `users` - User accounts and authentication
-- `portfolios` - Portfolio entries
-- `blogs` - Blog posts
-- `portfolio_items` - Portfolio item details
-- `blog_categories` - Blog post categorization
-- `tenants` - Multi-tenant support
+- `users` - User accounts, hashed passwords, roles, tenant reference
+- `tenants` - Multi-tenant organization records
+- `portfolios` - Portfolio entries (title, bio, skills, links)
+- `portfolio_items` - Individual portfolio projects/experience entries
+- `blogs` - Blog posts (title, content, slug, isPublished, views)
+- `blog_categories` - Blog post categorization tags
 
-Full schema with SQL CREATE statements: See [COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md)
+Full schema with SQL: See [COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md)
 
 ---
 
@@ -353,8 +381,8 @@ Full schema with SQL CREATE statements: See [COMPLETE_DOCUMENTATION.md](./COMPLE
 
 ### Run Tests
 
-```powershell
-# Frontend tests
+```bash
+# Frontend unit tests
 cd portfolio-cms-web
 npm test
 
@@ -364,93 +392,18 @@ dotnet test
 
 # E2E Tests
 cd e2e
-npm run test:e2e
+npm install
+npx playwright test
 ```
 
-### Test Results
-- ✅ Unit Tests: All passing
-- ✅ Integration Tests: All passing
-- ✅ E2E Tests: 9/9 verification tests passing
-- ✅ Build Verification: Frontend & Backend successful
+### E2E Test Specs
+- `e2e/basic-verification.spec.ts` - Login, registration, navigation checks
+- `e2e/complete-flow.spec.ts` - Full user flow: register → login → create portfolio → create blog
+- `e2e/portfolio-creation.spec.ts` - Portfolio CRUD flow
 
 ---
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Port Already in Use**
-```powershell
-# Check what's using the port
-Get-NetTCPConnection -LocalPort 4200
-
-# Kill the process
-Stop-Process -Id <PID> -Force
-```
-
-**Docker Image Build Failures**
-```powershell
-# Clear Docker cache
-docker system prune -a
-
-# Rebuild images
-.\build-and-deploy.ps1 -SkipBuild
-```
-
-**Services Not Starting**
-```powershell
-# Check service logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
-
-# Restart services
-docker-compose restart
-```
-
-**Database Connection Issues**
-```powershell
-# Verify PostgreSQL is running
-docker-compose ps postgres
-
-# Check connection string in appsettings.json
-# Default: Server=postgres;Port=5432;Database=portfolio;Username=postgres;Password=postgres
-```
-
-For more troubleshooting steps, see [COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md#troubleshooting).
-
----
-
-## 📋 Project Structure
-
-```
-portfolio/
-├── portfolio-cms-web/           # Angular Frontend
-│   ├── src/
-│   │   ├── app/                 # Angular components
-│   │   ├── assets/              # Static files
-│   │   └── styles/              # Global styles
-│   ├── Dockerfile               # Frontend container config
-│   └── package.json
-│
-├── portfolio.api/               # .NET Backend
-│   ├── Controllers/             # API endpoints
-│   ├── Services/                # Business logic
-│   ├── Data/                    # Database layer
-│   ├── Models/                  # Data models
-│   ├── Dockerfile               # Backend container config
-│   └── appsettings.json
-│
-├── e2e/                         # End-to-end tests
-├── tests/                       # Test utilities
-├── docker-compose.yml           # Service orchestration
-├── build-and-deploy.ps1         # Deployment script
-├── build-and-deploy-enhanced.ps1 # Enhanced deployment script
-└── README.md                    # This file
-```
-
----
-
-## 🚀 Deployment
+## 🛠️ Build & Deploy
 
 ### Docker Deployment (Recommended)
 
@@ -460,114 +413,196 @@ portfolio/
 
 # With verbose output for debugging
 .\build-and-deploy.ps1 -Verbose
+
+# Skip compilation, redeploy with existing images
+.\build-and-deploy.ps1 -SkipBuild
+
+# Status check only (no deploy)
+.\build-and-deploy.ps1 -StatusOnly
+
+# Clean containers
+.\build-and-deploy.ps1 -CleanOnly
 ```
 
-### Manual Deployment
+### Manual Development Build
+
+```bash
+# Frontend
+cd portfolio-cms-web
+npm install
+npm start           # Dev server on http://localhost:4200
+npm run build       # Production build
+
+# Backend
+cd portfolio.api
+dotnet restore
+dotnet run --project src/Portfolio.Api/Portfolio.Api.csproj  # API on http://localhost:8085
+```
+
+---
+
+## 🧠 .NET Aspire Orchestration
+
+Use the Aspire orchestration host to start all services with a single command:
 
 ```powershell
-# Terminal 1: Backend
 cd portfolio.api
-dotnet run
+dotnet run --project .\src\Portfolio.AppHost\Portfolio.AppHost.csproj
+```
 
-# Terminal 2: Frontend
-cd portfolio-cms-web
-npm start
+**What starts:**
+| Resource | Access |
+|----------|--------|
+| Portfolio API | http://localhost:8085 |
+| Angular Frontend | http://localhost:4200 |
+| PostgreSQL | localhost:5432 |
+| pgAdmin | http://localhost:5050 |
+| Kafka + Zookeeper | kafka:9092 (optional) |
 
-# Terminal 3: PostgreSQL (if not using Docker)
-# Configure connection string in appsettings.json
+**Environment variables:**
+- `USE_MOCKS=true` — Skip Kafka/Zookeeper, use in-memory bus
+- `REBUILD_FRONTEND=true` — Force frontend Docker image rebuild
+
+For more details, see [DOCKER_ORCHESTRATION_GUIDE.md](./DOCKER_ORCHESTRATION_GUIDE.md).
+
+---
+
+## 📋 Project Structure
+
+```
+portfolio/
+├── portfolio-cms-web/           # Angular 19 Frontend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── components/      # All Angular components
+│   │   │   │   ├── analytics/   # Analytics dashboard
+│   │   │   │   ├── blog-form/   # Blog create/edit (Quill)
+│   │   │   │   ├── blogs/       # Blog list management
+│   │   │   │   ├── cv-manager/  # CV/Resume management
+│   │   │   │   ├── dashboard/   # Main dashboard
+│   │   │   │   ├── job-matcher/ # Job description matcher
+│   │   │   │   ├── login/       # Login page
+│   │   │   │   ├── navbar/      # Top navigation bar
+│   │   │   │   ├── portfolio-form/ # Portfolio create/edit
+│   │   │   │   ├── portfolios/  # Portfolio list
+│   │   │   │   ├── public-blog/ # Public blog view
+│   │   │   │   ├── public-portfolio/ # Public portfolio view
+│   │   │   │   ├── registration/ # Registration page
+│   │   │   │   ├── resume-generator/ # Resume generator
+│   │   │   │   ├── settings/    # App settings
+│   │   │   │   ├── sidebar/     # Collapsible sidebar nav
+│   │   │   │   ├── tenants/     # Tenant management
+│   │   │   │   ├── topbar/      # Top bar with user menu
+│   │   │   │   └── users/       # User management
+│   │   │   ├── guards/          # Auth guard
+│   │   │   ├── models/          # TypeScript interfaces
+│   │   │   ├── pipes/           # translate pipe
+│   │   │   ├── services/        # HTTP services
+│   │   │   │   ├── auth.service.ts
+│   │   │   │   ├── blog.service.ts
+│   │   │   │   ├── portfolio.service.ts
+│   │   │   │   ├── settings.service.ts
+│   │   │   │   ├── theme.service.ts
+│   │   │   │   └── translation.service.ts
+│   │   │   ├── app.component.*  # Root component
+│   │   │   ├── app.config.*     # App config (SSR/CSR)
+│   │   │   └── app.routes.ts    # Route definitions
+│   │   ├── environments/        # Dev/Prod configs
+│   │   └── styles.scss          # Global styles + CSS variables
+│   ├── Dockerfile
+│   └── package.json
+│
+├── portfolio.api/               # .NET 10 Backend (Clean Architecture)
+│   └── src/
+│       ├── Portfolio.Api/       # Entry point, endpoints, middleware
+│       ├── Portfolio.Application/ # CQRS commands, queries, handlers, DTOs
+│       ├── Portfolio.Domain/    # Entities, value objects
+│       ├── Portfolio.Infrastructure/ # EF Core, repositories, DB
+│       ├── Portfolio.AppHost/   # .NET Aspire orchestration host
+│       └── Portfolio.ServiceDefaults/ # Shared Aspire defaults
+│
+├── Portfolio.Api.Tests/         # Unit & integration tests
+├── e2e/                         # Playwright E2E tests
+├── init-scripts/                # DB initialization SQL
+├── docker-compose.yml           # Production orchestration
+├── docker-compose.dev.yml       # Development orchestration
+├── build-and-deploy.ps1         # Standard deployment script
+├── build-and-deploy-enhanced.ps1 # Enhanced deployment script
+├── orchestrate.ps1              # Manual orchestration helper
+└── README.md                    # This file
 ```
 
 ---
 
 ## 👥 User Roles
 
-1. **Admin** - Full system access
-   - Manage all portfolios and blogs
-   - User management
-   - Tenant management
-   - System configuration
-
-2. **User** - Content creator
-   - Create and edit own portfolios
-   - Create and edit own blog posts
-   - View analytics
-
-3. **Viewer** - Public access
-   - View public portfolios
-   - Read public blog posts
-   - No editing capabilities
+| Role | Permissions |
+|------|------------|
+| **Admin** | Full system access: manage all users, tenants, portfolios, blogs |
+| **User** | Own content: create/edit own portfolios and blogs, view analytics |
+| **Viewer** | Public only: view public portfolios and blog posts |
 
 ---
 
-## 📞 Support & Issues
+## 🐛 Known Issues & Flags
 
-For issues, questions, or feature requests:
+1. **`blogs.component.ts` uses `getMyBlogs()`** — calls `GET /api/blogs/my` which requires the user's author information to be properly set in the blog record. Verify that blog creation sets `authorId` from the JWT token.
 
-1. Check [COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md#troubleshooting) first
-2. Review [SESSION_2_COMPLETE_REPORT.md](./SESSION_2_COMPLETE_REPORT.md) for recent changes
-3. Check Docker service status: `docker-compose ps`
-4. Review logs: `docker-compose logs -f`
+2. **Kafka is optional** — The app runs without Kafka using in-memory message bus (`USE_MOCKS=true`). Analytics events may not persist if Kafka is not running.
+
+3. **CV Manager** — The CV file upload feature requires proper server-side storage configuration. Verify the upload path in `appsettings.json`.
+
+4. **Job Matcher & Resume Generator** — These features use AI/LLM integration which may require an API key configured in the backend. Check `appsettings.json` for `AiSettings:ApiKey`.
+
+---
+
+## 🔒 Security
+
+- Passwords hashed with BCrypt
+- JWT tokens with expiry and refresh
+- CORS configured for frontend origin only
+- Input validation on all API endpoints
+- SQL injection prevention via EF Core parameterized queries
+- Auth guard on all authenticated routes
+
+---
+
+## 🐛 Troubleshooting
+
+**Port Already in Use**
+```powershell
+Get-NetTCPConnection -LocalPort 4200
+Stop-Process -Id <PID> -Force
+```
+
+**Docker Build Failures**
+```powershell
+docker system prune -a
+.\build-and-deploy.ps1
+```
+
+**Services Not Starting**
+```powershell
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose restart
+```
+
+**Database Connection Issues**
+```powershell
+docker-compose ps postgres
+# Default connection: Server=postgres;Port=5432;Database=portfolio;Username=postgres;Password=postgres
+```
+
+**Login / Registration Issues**
+- Ensure the backend API is running on port 8085
+- Check the browser console for CORS errors
+- Verify `environment.ts` has correct `apiUrl`
+
+For more troubleshooting, see [COMPLETE_DOCUMENTATION.md](./COMPLETE_DOCUMENTATION.md).
 
 ---
 
 ## 📝 License
 
 This project is proprietary and confidential.
-
----
-
-## 🎓 Development Notes
-
-### Code Quality
-- ✅ Clean Architecture principles applied
-- ✅ SOLID principles followed
-- ✅ Comprehensive error handling
-- ✅ Responsive design implemented
-- ✅ Security best practices applied
-
-### Performance
-- ✅ Angular lazy loading enabled
-- ✅ .NET caching strategies
-- ✅ Database indexing optimized
-- ✅ Docker resource limits configured
-
-### Scalability
-- ✅ Multi-tenant architecture
-- ✅ Microservices ready (Kafka integration)
-- ✅ Horizontal scaling capable
-- ✅ Load balancer ready (Nginx proxy)
-
----
-
-## 📊 Statistics
-
-- **Frontend**: 10+ Angular components, 50+ pages/views
-- **Backend**: 8+ API controllers, 20+ endpoints
-- **Database**: 8+ core tables, optimized schema
-- **Tests**: 30+ test cases, 100% critical path coverage
-- **Documentation**: 2000+ lines across 4 files
-- **Code**: ~15,000 lines (frontend + backend combined)
-
----
-
-## ✅ Completion Status
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Frontend Build | ✅ | Angular 19, production optimized |
-| Backend Build | ✅ | .NET 10, clean architecture |
-| Database | ✅ | PostgreSQL 17, fully migrated |
-| Docker Setup | ✅ | 5-service orchestration |
-| Authentication | ✅ | JWT-based with refresh tokens |
-| API Documentation | ✅ | Complete with examples |
-| UI/UX | ✅ | Modern responsive design |
-| Testing | ✅ | Unit, Integration, E2E all passing |
-| Deployment | ✅ | Single-command PowerShell script |
-| Documentation | ✅ | Comprehensive guides created |
-
----
-
-**Last Updated:** 2024 - Session 2 Complete
-**Build Status:** ✅ All Systems Operational
-**Test Results:** ✅ 100% Passing
-**Deployment:** ✅ Ready for Production

@@ -1,43 +1,39 @@
 import { test, expect, Page } from '@playwright/test';
 
-/**
- * Helper: bypass auth.
- */
-async function ensureAuthenticated(page: Page) {
-  await page.goto('/');
-  const url = page.url();
-  if (url.includes('/login')) {
-    await page.evaluate(() => {
-      localStorage.setItem(
-        'auth_token',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXIiLCJleHAiOjk5OTk5OTk5OTl9.mock'
-      );
-      localStorage.setItem('tenant_id', 'test-tenant');
-    });
-    await page.goto('/dashboard');
-  }
+async function setupAuth(page: Page) {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'portfolio_jwt_token',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXIiLCJleHAiOjk5OTk5OTk5OTl9.mock'
+    );
+    localStorage.setItem('portfolio_tenant_id', 'test-tenant');
+    localStorage.setItem('portfolio_user_id', 'test-user');
+  });
+}
+
+async function gotoAndWait(page: Page, url: string, waitSelector: string) {
+  await page.goto(url);
+  await page.waitForSelector(waitSelector, { timeout: 20000 });
 }
 
 test.describe('Event Analytics Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    await ensureAuthenticated(page);
+    await setupAuth(page);
   });
 
   test('should display event analytics page', async ({ page }) => {
-    await page.goto('/dashboard/event-analytics');
-    await expect(page.locator('h1')).toContainText('Event Analytics');
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
+    await expect(page.locator('h1.page-title')).toContainText('Event Analytics');
   });
 
-  test('should show stats row when BFF is available', async ({ page }) => {
-    await page.goto('/dashboard/event-analytics');
-    // Stats row may show after loading
+  test('should show stats row or loading state', async ({ page }) => {
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
+    // Stats row shows after data loads, loading-state shows while loading
     const statsRow = page.locator('.stats-row');
     const loading = page.locator('.loading-state');
-    // Wait for either stats or loading to resolve
     await page.waitForTimeout(3000);
-    const statsCount = await statsRow.count();
-    const loadingCount = await loading.count();
-    expect(statsCount > 0 || loadingCount > 0).toBeTruthy();
+    const count = (await statsRow.count()) + (await loading.count());
+    expect(count).toBeGreaterThan(0);
   });
 
   test('should display payment metrics card', async ({ page }) => {
@@ -46,11 +42,9 @@ test.describe('Event Analytics Dashboard', () => {
       'Skipping: BFF server not available. Set BFF_RUNNING=1 to enable.'
     );
 
-    await page.goto('/dashboard/event-analytics');
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
     await page.waitForTimeout(2000);
-
-    const paymentCard = page.locator('h3:has-text("Payment Metrics")');
-    await expect(paymentCard).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'Payment Metrics' })).toBeVisible();
   });
 
   test('should display portfolio metrics card', async ({ page }) => {
@@ -59,29 +53,26 @@ test.describe('Event Analytics Dashboard', () => {
       'Skipping: BFF server not available. Set BFF_RUNNING=1 to enable.'
     );
 
-    await page.goto('/dashboard/event-analytics');
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
     await page.waitForTimeout(2000);
-
-    const portfolioCard = page.locator('h3:has-text("Portfolio Metrics")');
-    await expect(portfolioCard).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'Portfolio Metrics' })).toBeVisible();
   });
 
   test('should have refresh and reset buttons', async ({ page }) => {
-    await page.goto('/dashboard/event-analytics');
-    await expect(page.locator('button:has-text("Refresh")')).toBeVisible();
-    await expect(page.locator('button:has-text("Reset")')).toBeVisible();
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
+    await expect(page.locator('button', { hasText: 'Refresh' })).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Reset' })).toBeVisible();
   });
 
   test('should show live event feed section', async ({ page }) => {
-    await page.goto('/dashboard/event-analytics');
-    const feedCard = page.locator('.feed-card, h3:has-text("Live Event Feed")');
-    await expect(feedCard.first()).toBeVisible();
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
+    await expect(page.locator('.feed-card')).toBeVisible();
   });
 });
 
 test.describe('Real-time Event Updates', () => {
   test.beforeEach(async ({ page }) => {
-    await ensureAuthenticated(page);
+    await setupAuth(page);
   });
 
   test('should establish SSE connection', async ({ page }) => {
@@ -90,13 +81,9 @@ test.describe('Real-time Event Updates', () => {
       'Skipping: BFF server not available. Set BFF_RUNNING=1 to enable.'
     );
 
-    // Navigate to event analytics which uses SSE
-    await page.goto('/dashboard/event-analytics');
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
 
-    // Check that the EventSource was created by evaluating in browser
-    const hasEventSource = await page.evaluate(() => {
-      return typeof EventSource !== 'undefined';
-    });
+    const hasEventSource = await page.evaluate(() => typeof EventSource !== 'undefined');
     expect(hasEventSource).toBeTruthy();
   });
 
@@ -106,7 +93,7 @@ test.describe('Real-time Event Updates', () => {
       'Skipping: payment services not available.'
     );
 
-    await page.goto('/dashboard/event-analytics');
+    await gotoAndWait(page, '/dashboard/event-analytics', '.analytics-dash');
     await page.waitForTimeout(2000);
 
     // Publish a test event via the BFF
@@ -122,10 +109,8 @@ test.describe('Real-time Event Updates', () => {
       });
     });
 
-    // Wait for the event to appear in the live feed
     await page.waitForTimeout(3000);
     const liveItems = page.locator('.feed-item.live');
-    const count = await liveItems.count();
-    expect(count).toBeGreaterThan(0);
+    expect(await liveItems.count()).toBeGreaterThan(0);
   });
 });

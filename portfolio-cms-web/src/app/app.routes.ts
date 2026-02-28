@@ -73,6 +73,35 @@ export const routes: Routes = [
       {
         path: 'portfolio-manager',
         loadComponent: () => import('./components/portfolio-manager/portfolio-manager.component').then(m => m.PortfolioManagerComponent)
+      },
+      // ── Payment & Event-Driven Architecture ──
+      {
+        path: 'payments',
+        loadComponent: () => import('./components/payment-dashboard/payment-dashboard.component').then(m => m.PaymentDashboardComponent)
+      },
+      {
+        path: 'payments/orders',
+        loadComponent: () => import('./components/payment-orders/payment-orders.component').then(m => m.PaymentOrdersComponent)
+      },
+      {
+        path: 'payments/orders/new',
+        loadComponent: () => import('./components/create-payment-order/create-payment-order.component').then(m => m.CreatePaymentOrderComponent)
+      },
+      {
+        path: 'payments/orders/:id',
+        loadComponent: () => import('./components/payment-order-detail/payment-order-detail.component').then(m => m.PaymentOrderDetailComponent)
+      },
+      {
+        path: 'payments/accounting',
+        loadComponent: () => import('./components/payment-accounting/payment-accounting.component').then(m => m.PaymentAccountingComponent)
+      },
+      {
+        path: 'payments/lifecycle',
+        loadComponent: () => import('./components/payment-lifecycle/payment-lifecycle.component').then(m => m.PaymentLifecycleComponent)
+      },
+      {
+        path: 'event-analytics',
+        loadComponent: () => import('./components/event-analytics-dashboard/event-analytics-dashboard.component').then(m => m.EventAnalyticsDashboardComponent)
       }
     ]
   },

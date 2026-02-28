@@ -1,0 +1,103 @@
+<div class="lifecycle">
+  <div class="page-header">
+    <h1 class="page-title">🔁 Payment Lifecycle Demo</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="runLifecycle()" [disabled]="running">
+        {{ running ? '⏳ Running...' : '▶ Run Full Lifecycle' }}
+      </button>
+      <a class="btn btn-secondary" routerLink="/dashboard/payments">← Dashboard</a>
+    </div>
+  </div>
+
+  <p class="subtitle">
+    Automated end-to-end payment flow: Create Order → Payment Authorization → Confirm → Capture → Ledger Verification.
+    Watch domain events propagate across microservices in real time.
+  </p>
+
+  <!-- Steps Pipeline -->
+  <div class="pipeline" *ngIf="steps.length > 0">
+    <div *ngFor="let step of steps; let i = index; let last = last" class="pipeline-item">
+      <div class="step-node" [ngClass]="getStepClass(step)">
+        <span class="step-icon">{{ step.icon }}</span>
+        <div class="step-info">
+          <span class="step-label">{{ step.label }}</span>
+          <span class="step-detail" *ngIf="step.detail">{{ step.detail }}</span>
+          <span class="step-duration" *ngIf="step.duration">{{ formatDuration(step.duration) }}</span>
+        </div>
+        <span class="step-status-icon" *ngIf="step.status === 'success'">✓</span>
+        <span class="step-status-icon error" *ngIf="step.status === 'error'">✗</span>
+        <div class="step-spinner" *ngIf="step.status === 'running'"></div>
+      </div>
+      <div class="pipeline-connector" *ngIf="!last">
+        <div class="connector-line" [class.active]="step.status === 'success'"></div>
+        <span class="connector-arrow" [class.active]="step.status === 'success'">→</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="steps.length === 0" class="empty-state">
+    <div class="empty-icon">🚀</div>
+    <p>Click <strong>Run Full Lifecycle</strong> to start the automated demo.</p>
+    <p class="hint">Ensure the .NET microservices and BFF server are running.</p>
+  </div>
+
+  <!-- Completed Summary -->
+  <div *ngIf="completed" class="summary-section">
+    <h2>✅ Lifecycle Complete</h2>
+
+    <div class="summary-grid">
+      <!-- Order -->
+      <div class="summary-card" *ngIf="order">
+        <h4>Order</h4>
+        <div class="kv"><span>ID</span><span class="mono">{{ orderId }}</span></div>
+        <div class="kv"><span>Status</span><span>{{ order.status }}</span></div>
+        <div class="kv"><span>Amount</span><span>$42.00</span></div>
+      </div>
+
+      <!-- Payment -->
+      <div class="summary-card" *ngIf="payment">
+        <h4>Payment</h4>
+        <div class="kv"><span>ID</span><span class="mono">{{ payment.id }}</span></div>
+        <div class="kv"><span>Status</span><span>{{ payment.status }}</span></div>
+        <div class="kv"><span>Amount</span><span>{{ payment.amount | currency }}</span></div>
+      </div>
+
+      <!-- Ledger -->
+      <div class="summary-card wide" *ngIf="ledgerEntries.length > 0">
+        <h4>Ledger Entries</h4>
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Type</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of ledgerEntries">
+              <td>{{ entry.accountName }}</td>
+              <td>
+                <span class="badge" [class.badge-debit]="entry.debitAmount > 0" [class.badge-credit]="entry.creditAmount > 0">
+                  {{ entry.debitAmount > 0 ? 'Debit' : 'Credit' }}
+                </span>
+              </td>
+              <td class="num">{{ (entry.debitAmount > 0 ? entry.debitAmount : entry.creditAmount) | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Events -->
+  <div class="events-section" *ngIf="events.length > 0">
+    <h3>📡 Events Observed ({{ events.length }})</h3>
+    <div class="events-list">
+      <div *ngFor="let ev of events" class="event-item">
+        <span class="event-type">{{ ev.eventType }}</span>
+        <span class="event-time">{{ ev.timestamp | date:'HH:mm:ss.SSS' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+<div class="payment-dashboard">
+  <div class="page-header">
+    <h1 class="page-title">💳 Payment Dashboard</h1>
+    <div class="header-actions">
+      <span class="connection-status" [class.connected]="connected">
+        {{ connected ? '● Live' : '○ Offline' }}
+      </span>
+      <button class="btn btn-secondary" (click)="loadMetrics()">↻ Refresh</button>
+      <a class="btn btn-primary" routerLink="/dashboard/payments/orders/new">➕ New Order</a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading payment metrics...</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card stat-blue">
+        <span class="stat-icon">📦</span>
+        <div class="stat-value">{{ metrics.totalOrders }}</div>
+        <div class="stat-label">Total Orders</div>
+      </div>
+      <div class="stat-card stat-amber">
+        <span class="stat-icon">🔒</span>
+        <div class="stat-value">{{ metrics.authorizedCount }}</div>
+        <div class="stat-label">Authorized</div>
+      </div>
+      <div class="stat-card stat-green">
+        <span class="stat-icon">✅</span>
+        <div class="stat-value">{{ metrics.capturedCount }}</div>
+        <div class="stat-label">Captured</div>
+      </div>
+      <div class="stat-card stat-red">
+        <span class="stat-icon">❌</span>
+        <div class="stat-value">{{ metrics.failedCount }}</div>
+        <div class="stat-label">Failed</div>
+      </div>
+      <div class="stat-card stat-purple">
+        <span class="stat-icon">💰</span>
+        <div class="stat-value">{{ formatCurrency(metrics.capturedVolume, metrics.currency) }}</div>
+        <div class="stat-label">Captured Volume</div>
+      </div>
+    </div>
+
+    <!-- Payment Lifecycle Flow -->
+    <div class="card lifecycle-card">
+      <h3 class="card-title">Payment Lifecycle Flow</h3>
+      <div class="lifecycle-flow">
+        <div class="lifecycle-step">
+          <span class="step-badge step-blue">Order</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="lifecycle-step">
+          <span class="step-badge step-amber">Authorize</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="lifecycle-step">
+          <span class="step-badge step-green">Capture</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="lifecycle-step">
+          <span class="step-badge step-purple">Settle</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="lifecycle-step">
+          <span class="step-badge step-teal">Ledger</span>
+        </div>
+      </div>
+      <p class="lifecycle-desc">
+        Orders → (Event Hub / Kafka) → Payments → (Event Hub / Kafka) → Accounting.
+        All services communicate via asynchronous event streaming.
+      </p>
+    </div>
+
+    <!-- Quick Links + Recent Events -->
+    <div class="dashboard-grid">
+      <div class="card">
+        <h3 class="card-title">Quick Actions</h3>
+        <div class="quick-links">
+          <a routerLink="/dashboard/payments/orders" class="quick-link">
+            <span>📦</span> View All Orders
+          </a>
+          <a routerLink="/dashboard/payments/orders/new" class="quick-link">
+            <span>➕</span> Create Order
+          </a>
+          <a routerLink="/dashboard/payments/accounting" class="quick-link">
+            <span>📒</span> Accounting & Ledger
+          </a>
+          <a routerLink="/dashboard/payments/lifecycle" class="quick-link">
+            <span>🔄</span> Full Lifecycle Demo
+          </a>
+          <a routerLink="/dashboard/event-analytics" class="quick-link">
+            <span>📊</span> Event Analytics
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Recent Events <span class="badge badge-live" *ngIf="connected">Live</span></h3>
+        <div class="event-feed" *ngIf="recentEvents.length; else noEvents">
+          <div class="event-item" *ngFor="let event of recentEvents">
+            <span class="event-badge" [class]="getStatusClass(event.eventType)">
+              {{ getEventLabel(event.eventType) }}
+            </span>
+            <span class="event-time">{{ event.timestamp | date:'HH:mm:ss' }}</span>
+          </div>
+        </div>
+        <ng-template #noEvents>
+          <p class="empty-text">No payment events yet. Create an order to get started!</p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

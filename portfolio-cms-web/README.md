@@ -80,6 +80,21 @@ ng serve
 - **BFF Health**: http://localhost:3100/api/health
 - **Kafka UI**: http://localhost:8085
 
+### 7. Run E2E tests
+
+```bash
+# Install Playwright browser (first time only)
+npx playwright install --with-deps chromium
+
+# Run all tests (Angular dev server must be running)
+npx playwright test
+
+# Run with full backend stack (includes .NET service tests)
+PAYMENT_SERVICES_RUNNING=1 BFF_RUNNING=1 npx playwright test
+```
+
+Expected: **26 passed, 6 skipped** (skipped tests require `.NET` services).
+
 ---
 
 ## Project Structure
@@ -201,7 +216,16 @@ npx playwright test --ui
 npx playwright show-report
 ```
 
-Tests run against the **Playwright MCP server at port 9000**.
+Tests run against the **Angular dev server at `http://localhost:4200`**. The config is in [playwright.config.ts](playwright.config.ts) and auto-starts the dev server when using `webServer`.
+
+### Test results
+
+| Suite | Tests | Notes |
+|-------|-------|-------|
+| `payment-dashboard.spec.ts` | 13 | Payment stats, create, orders, accounting |
+| `payment-lifecycle.spec.ts` | 4 / 2 skipped | Lifecycle demo; skipped tests need .NET |
+| `event-analytics.spec.ts` | 4 / 4 skipped | Analytics; skipped tests need .NET + BFF |
+| `navigation-smoke.spec.ts` | 5 | Sidebar navigation smoke tests |
 
 ---
 
@@ -232,6 +256,32 @@ docker-compose up -d    # Start Kafka + UI
 docker-compose down     # Stop all
 docker-compose logs -f  # Follow logs
 ```
+
+---
+
+## AI Agents (Claude)
+
+This project ships a **Claude sub-agent** for automated test generation, located in [`.claude/agents/`](.claude/agents/).
+
+| Agent | File | Purpose |
+|-------|------|---------|
+| `playwright-test-generator` | `.claude/agents/playwright-test-generator.md` | Generates Playwright E2E tests from natural language descriptions, validates them iteratively, and suggests additional test cases |
+
+### Using the Playwright test generator
+
+Open GitHub Copilot Chat (or any Claude-compatible client) and describe what you want to test:
+
+```
+@playwright-test-generator Generate tests for the payment order creation flow
+@playwright-test-generator Write smoke tests for the sidebar navigation
+@playwright-test-generator Add tests for the event analytics dashboard filter buttons
+```
+
+The agent will:
+1. Generate tests following Playwright best practices (web-first assertions, auto-waiting, accessibility selectors)
+2. Apply the `addInitScript` auth bypass pattern required for SSR
+3. Use `gotoAndWait()` helpers to handle Angular's client-side re-routing after SSR
+4. Iteratively fix any failures until tests pass
 
 ---
 

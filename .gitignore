@@ -53,3 +53,5 @@ e2e/node_modules/
 
 # E2E test results
 e2e/test-results/
+
+tmpclaude-**-cwd

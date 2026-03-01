@@ -1,0 +1,127 @@
+<div class="analytics-dash">
+  <div class="page-header">
+    <h1 class="page-title">📊 Event Analytics</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="loadData()">↻ Refresh</button>
+      <button class="btn btn-danger-outline" (click)="resetCounters()">🗑 Reset</button>
+    </div>
+  </div>
+
+  <p class="subtitle">Unified analytics dashboard — real-time metrics from payment and portfolio event streams.</p>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading analytics...</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Top-level stats -->
+    <div class="stats-row" *ngIf="summary">
+      <div class="stat-card stat-indigo">
+        <div class="stat-value">{{ summary.payment.totalOrders + summary.portfolio.blogViewCount }}</div>
+        <div class="stat-label">Total Events</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-value">{{ summary.payment.totalOrders }}</div>
+        <div class="stat-label">Payment Events</div>
+      </div>
+      <div class="stat-card stat-blue">
+        <div class="stat-value">{{ summary.portfolio.blogViewCount }}</div>
+        <div class="stat-label">Portfolio Events</div>
+      </div>
+      <div class="stat-card stat-amber">
+        <div class="stat-value">{{ liveEvents.length }}</div>
+        <div class="stat-label">Live Stream</div>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="two-col">
+      <!-- Payment Metrics -->
+      <div class="card" *ngIf="paymentMetrics">
+        <h3>💳 Payment Metrics</h3>
+        <div class="metric-list">
+          <div class="metric-row">
+            <span>Total Orders</span>
+            <span class="metric-val">{{ paymentMetrics.totalOrders }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Captured</span>
+            <span class="metric-val success">{{ paymentMetrics.capturedCount }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Failed</span>
+            <span class="metric-val danger">{{ paymentMetrics.failedCount }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Captured Volume</span>
+            <span class="metric-val">{{ paymentMetrics.capturedVolume | currency }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Cancelled</span>
+            <span class="metric-val">{{ paymentMetrics.cancelledCount }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Metrics -->
+      <div class="card" *ngIf="portfolioMetrics">
+        <h3>🎨 Portfolio Metrics</h3>
+        <div class="metric-list">
+          <div class="metric-row">
+            <span>Blog Views</span>
+            <span class="metric-val">{{ portfolioMetrics.blogViewCount }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Blogs Published</span>
+            <span class="metric-val">{{ portfolioMetrics.blogPublishedCount }}</span>
+          </div>
+          <div class="metric-row">
+            <span>CVs Updated</span>
+            <span class="metric-val">{{ portfolioMetrics.cvUpdateCount }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Resumes Generated</span>
+            <span class="metric-val">{{ portfolioMetrics.resumeGeneratedCount }}</span>
+          </div>
+          <div class="metric-row">
+            <span>Job Matches</span>
+            <span class="metric-val">{{ portfolioMetrics.jobMatchCount }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Event Feed -->
+    <div class="card feed-card">
+      <div class="card-header">
+        <h3>📡 Live Event Feed</h3>
+        <span class="live-badge" *ngIf="liveEvents.length > 0">● LIVE</span>
+      </div>
+
+      <div *ngIf="liveEvents.length === 0 && recentEvents.length === 0" class="empty-feed">
+        No events yet. Run a payment lifecycle or perform portfolio actions to generate events.
+      </div>
+
+      <div class="event-feed" *ngIf="liveEvents.length > 0 || recentEvents.length > 0">
+        <!-- Live events first -->
+        <div *ngFor="let ev of liveEvents" class="feed-item live" [ngClass]="getCategoryColor(ev.eventType)">
+          <span class="feed-icon">{{ getEventIcon(ev.eventType) }}</span>
+          <div class="feed-body">
+            <span class="feed-type">{{ ev.eventType }}</span>
+            <span class="feed-source" *ngIf="ev.source">{{ ev.source }}</span>
+          </div>
+          <span class="feed-time">{{ ev.timestamp | date:'HH:mm:ss' }}</span>
+        </div>
+        <!-- Historical events (dimmed) -->
+        <div *ngFor="let ev of recentEvents" class="feed-item historical" [ngClass]="getCategoryColor(ev.eventType)">
+          <span class="feed-icon">{{ getEventIcon(ev.eventType) }}</span>
+          <div class="feed-body">
+            <span class="feed-type">{{ ev.eventType }}</span>
+          </div>
+          <span class="feed-time">{{ ev.timestamp | date:'HH:mm:ss' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -323,6 +323,8 @@ export class TranslationService {
         'nav.resumeGen': 'Resume Generator',
         'nav.analytics': 'Analytics',
         'nav.portfolioMgr': 'Portfolio Manager',
+        'nav.payments': 'Payments',
+        'nav.eventAnalytics': 'Event Analytics',
 
         // ── Portfolio Manager ──
         'pm.title': 'Portfolio Manager',
@@ -718,6 +720,8 @@ export class TranslationService {
         'nav.resumeGen': 'Generador de CV',
         'nav.analytics': 'Analíticas',
         'nav.portfolioMgr': 'Gestor de Portafolio',
+        'nav.payments': 'Pagos',
+        'nav.eventAnalytics': 'Analíticas de Eventos',
 
         // ── Portfolio Manager ──
         'pm.title': 'Gestor de Portafolio',
@@ -1112,6 +1116,8 @@ export class TranslationService {
         'nav.resumeGen': 'Lebenslauf-Generator',
         'nav.analytics': 'Analytik',
         'nav.portfolioMgr': 'Portfolio-Manager',
+        'nav.payments': 'Zahlungen',
+        'nav.eventAnalytics': 'Ereignisanalysen',
 
         // ── Portfolio Manager ──
         'pm.title': 'Portfolio-Manager',
@@ -1502,6 +1508,8 @@ export class TranslationService {
         'nav.resumeGen': 'रिज्यूमे जनरेटर',
         'nav.analytics': 'विश्लेषण',
         'nav.portfolioMgr': 'पोर्टफोलियो प्रबंधक',
+        'nav.payments': 'भुगतान',
+        'nav.eventAnalytics': 'इवेंट विश्लेषण',
 
         // ── Portfolio Manager ──
         'pm.title': 'पोर्टफोलियो प्रबंधक',

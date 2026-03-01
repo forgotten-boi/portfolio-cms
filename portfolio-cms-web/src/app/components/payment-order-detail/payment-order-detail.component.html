@@ -1,0 +1,96 @@
+<div class="order-detail">
+  <div class="page-header">
+    <h1 class="page-title">📋 Order Details</h1>
+    <a class="btn btn-secondary" routerLink="/dashboard/payments/orders">← Back</a>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading order...</span>
+  </div>
+
+  <div *ngIf="!loading && order">
+    <!-- Order Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Order Information</h3>
+        <div class="action-btns">
+          <button class="btn btn-refresh" (click)="loadOrder()">↻ Refresh</button>
+          <button class="btn btn-confirm"
+            *ngIf="order.status === 'PaymentAuthorized'"
+            (click)="confirm()" [disabled]="acting">✓ Confirm</button>
+          <button class="btn btn-cancel"
+            *ngIf="order.status === 'PaymentAuthorized' || order.status === 'Pending'"
+            (click)="cancel()" [disabled]="acting">✗ Cancel</button>
+        </div>
+      </div>
+      <dl class="detail-grid">
+        <dt>Order ID</dt>
+        <dd class="mono">{{ order.id }}</dd>
+        <dt>Customer</dt>
+        <dd class="mono">{{ order.customerId }}</dd>
+        <dt>Amount</dt>
+        <dd>{{ formatCurrency(order.amount, order.currency) }}</dd>
+        <dt>Currency</dt>
+        <dd>{{ order.currency }}</dd>
+        <dt>Status</dt>
+        <dd><span class="badge" [class]="getStatusBadgeClass(order.status)">{{ order.status }}</span></dd>
+        <dt *ngIf="order.failureReason">Failure</dt>
+        <dd *ngIf="order.failureReason" class="text-red">{{ order.failureReason }}</dd>
+      </dl>
+    </div>
+
+    <!-- Payment Card -->
+    <div class="card" *ngIf="order.paymentId">
+      <div class="card-header">
+        <h3>Payment Details</h3>
+        <button class="btn btn-secondary btn-sm" (click)="loadPayment()">Load Payment</button>
+      </div>
+      <div *ngIf="payment">
+        <dl class="detail-grid">
+          <dt>Payment ID</dt>
+          <dd class="mono">{{ payment.id }}</dd>
+          <dt>Status</dt>
+          <dd><span class="badge" [class]="getStatusBadgeClass(payment.status)">{{ payment.status }}</span></dd>
+          <dt>Provider Txn</dt>
+          <dd class="mono">{{ payment.providerTransactionId || 'N/A' }}</dd>
+          <dt>Created</dt>
+          <dd>{{ payment.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</dd>
+          <dt *ngIf="payment.failureReason">Failure</dt>
+          <dd *ngIf="payment.failureReason" class="text-red">{{ payment.failureReason }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Ledger Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Ledger Entries</h3>
+        <button class="btn btn-secondary btn-sm" (click)="loadLedger()">Load Ledger</button>
+      </div>
+      <div *ngIf="ledgerEntries.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Debit</th>
+              <th>Credit</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of ledgerEntries">
+              <td>{{ entry.accountName }}</td>
+              <td class="text-amber">{{ entry.debitAmount > 0 ? formatCurrency(entry.debitAmount, entry.currency) : '—' }}</td>
+              <td class="text-green">{{ entry.creditAmount > 0 ? formatCurrency(entry.creditAmount, entry.currency) : '—' }}</td>
+              <td>{{ entry.description }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p *ngIf="ledgerEntries.length === 0" class="empty-text">
+        Click "Load Ledger" to view double-entry records. Entries appear after payment capture.
+      </p>
+    </div>
+  </div>
+</div>

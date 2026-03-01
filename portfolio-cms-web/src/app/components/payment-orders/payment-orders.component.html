@@ -1,0 +1,60 @@
+<div class="payment-orders">
+  <div class="page-header">
+    <h1 class="page-title">📦 Payment Orders</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="refreshAll()">↻ Refresh All</button>
+      <a class="btn btn-primary" routerLink="/dashboard/payments/orders/new">➕ New Order</a>
+    </div>
+  </div>
+
+  <div *ngIf="orders.length === 0" class="empty-state">
+    <span class="empty-icon">📦</span>
+    <h3>No Orders Tracked</h3>
+    <p>Create a new order to start tracking payment lifecycle events.</p>
+    <a class="btn btn-primary" routerLink="/dashboard/payments/orders/new">Create First Order</a>
+  </div>
+
+  <div class="orders-table" *ngIf="orders.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Amount</th>
+          <th>Currency</th>
+          <th>Status</th>
+          <th>Payment ID</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders; let i = index">
+          <td class="mono">
+            <a [routerLink]="'/dashboard/payments/orders/' + order.orderId">
+              {{ order.orderId | slice:0:8 }}...
+            </a>
+          </td>
+          <td>{{ formatCurrency(order.detail?.amount, order.detail?.currency) }}</td>
+          <td>{{ order.detail?.currency || '—' }}</td>
+          <td>
+            <span class="badge" [class]="getStatusBadgeClass(order.detail?.status)">
+              {{ order.detail?.status || 'Loading...' }}
+            </span>
+          </td>
+          <td class="mono">
+            {{ order.detail?.paymentId ? (order.detail?.paymentId | slice:0:8) + '...' : '—' }}
+          </td>
+          <td class="actions">
+            <button class="btn-sm btn-confirm"
+              *ngIf="order.detail?.status === 'PaymentAuthorized'"
+              (click)="confirmOrder(order)">✓ Confirm</button>
+            <button class="btn-sm btn-cancel"
+              *ngIf="order.detail?.status === 'PaymentAuthorized' || order.detail?.status === 'Pending'"
+              (click)="cancelOrder(order)">✗ Cancel</button>
+            <button class="btn-sm btn-refresh" (click)="refreshOrder(order)">↻</button>
+            <button class="btn-sm btn-remove" (click)="removeOrder(i)">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

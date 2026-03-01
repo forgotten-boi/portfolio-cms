@@ -1,0 +1,91 @@
+<div class="accounting">
+  <div class="page-header">
+    <h1 class="page-title">📒 Accounting & Ledger</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="loadBalances()">↻ Refresh</button>
+      <a class="btn btn-secondary" routerLink="/dashboard/payments">← Dashboard</a>
+    </div>
+  </div>
+
+  <p class="subtitle">Double-entry ledger — the financial source of truth. Every debit has a matching credit.</p>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading balances...</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Balance Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-amber">
+        <div class="stat-value">{{ receivable ? formatCurrency(receivable.totalDebits) : '—' }}</div>
+        <div class="stat-label">Customer Receivable (Debits)</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-value">{{ revenue ? formatCurrency(revenue.totalCredits) : '—' }}</div>
+        <div class="stat-label">Revenue (Credits)</div>
+      </div>
+      <div class="stat-card stat-blue">
+        <div class="stat-value">{{ receivable?.entryCount || 0 }}</div>
+        <div class="stat-label">Ledger Entries</div>
+      </div>
+    </div>
+
+    <!-- Reconciliation -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Reconciliation</h3>
+        <button class="btn btn-accent" (click)="runReconciliation()">▶ Run Reconciliation</button>
+      </div>
+      <p class="card-desc">
+        Compares total debits vs credits across all ledger entries.
+        In a balanced system, the difference is always zero.
+      </p>
+      <div *ngIf="reconciliation" class="reconciliation-result" [class.balanced]="reconciliation.isBalanced" [class.unbalanced]="!reconciliation.isBalanced">
+        <div class="recon-row">
+          <span>Status</span>
+          <span class="recon-value">{{ reconciliation.isBalanced ? '✅ Balanced' : '❌ Unbalanced' }}</span>
+        </div>
+        <div class="recon-row">
+          <span>Total Debits</span>
+          <span class="recon-value">{{ formatCurrency(reconciliation.totalDebits) }}</span>
+        </div>
+        <div class="recon-row">
+          <span>Total Credits</span>
+          <span class="recon-value">{{ formatCurrency(reconciliation.totalCredits) }}</span>
+        </div>
+        <div class="recon-row">
+          <span>Difference</span>
+          <span class="recon-value">{{ formatCurrency(reconciliation.difference) }}</span>
+        </div>
+        <div class="recon-row">
+          <span>Entry Count</span>
+          <span class="recon-value">{{ reconciliation.entryCount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Double Entry Explanation -->
+    <div class="card">
+      <h3>How Double-Entry Works</h3>
+      <div class="de-diagram">
+        <div class="de-entry de-debit">
+          <span class="de-label">Debit</span>
+          <span class="de-account">CustomerReceivable</span>
+          <span class="de-amount">$100.00</span>
+        </div>
+        <span class="de-equals">=</span>
+        <div class="de-entry de-credit">
+          <span class="de-label">Credit</span>
+          <span class="de-account">Revenue</span>
+          <span class="de-amount">$100.00</span>
+        </div>
+      </div>
+      <p class="de-desc">
+        When a payment is captured, the accounting service creates two ledger entries:
+        a debit to CustomerReceivable (asset) and a credit to Revenue (income).
+        The sum of all debits must always equal the sum of all credits.
+      </p>
+    </div>
+  </div>
+</div>

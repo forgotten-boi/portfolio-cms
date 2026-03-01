@@ -167,3 +167,106 @@ export interface AuthResult {
   userId?: string;
   error?: string;
 }
+
+// ─── Payment / Event Models ──────────────────────────────────────
+
+export interface CreateOrderRequest {
+  customerId: string;
+  amount: number;
+  currency: string;
+  idempotencyKey: string;
+}
+
+export interface OrderResult {
+  orderId: string;
+  status: string;
+}
+
+export interface OrderDetail {
+  id: string;
+  customerId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  paymentId?: string;
+  failureReason?: string;
+}
+
+export interface PaymentDetail {
+  id: string;
+  orderId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  providerTransactionId?: string;
+  failureReason?: string;
+  createdAt: string;
+}
+
+export interface LedgerEntry {
+  id: string;
+  transactionId: string;
+  paymentId: string;
+  accountName: string;
+  debitAmount: number;
+  creditAmount: number;
+  currency: string;
+  description: string;
+  createdAt: string;
+}
+
+export interface AccountBalance {
+  account: string;
+  totalDebits: number;
+  totalCredits: number;
+  netBalance: number;
+  entryCount: number;
+}
+
+export interface ReconciliationResult {
+  isBalanced: boolean;
+  totalDebits: number;
+  totalCredits: number;
+  difference: number;
+  entryCount: number;
+}
+
+// ─── Event Stream Models ─────────────────────────────────────────
+
+export interface IntegrationEvent {
+  eventId: string;
+  eventType: string;
+  source: 'portfolio' | 'payment';
+  timestamp: string;
+  correlationId: string;
+  causationId?: string;
+  payload: Record<string, unknown>;
+}
+
+// ─── Analytics Models ────────────────────────────────────────────
+
+export interface PaymentMetrics {
+  totalOrders: number;
+  authorizedCount: number;
+  capturedCount: number;
+  failedCount: number;
+  cancelledCount: number;
+  capturedVolume: number;
+  currency: string;
+}
+
+export interface PortfolioMetrics {
+  blogPublishedCount: number;
+  blogViewCount: number;
+  cvUpdateCount: number;
+  resumeGeneratedCount: number;
+  jobMatchCount: number;
+  avgMatchScore: number;
+}
+
+export interface AggregatedAnalytics {
+  payment: PaymentMetrics;
+  portfolio: PortfolioMetrics;
+  recentEvents: IntegrationEvent[];
+  lastUpdated: string;
+}

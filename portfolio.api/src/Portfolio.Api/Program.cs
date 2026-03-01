@@ -54,6 +54,7 @@ builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleAssignmentRepository, UserRoleAssignmentRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // Message Bus (check if Kafka is enabled or use in-memory)
 var useMocks = configuration.GetValue<bool>("USE_MOCKS", false);
@@ -85,6 +86,9 @@ builder.Services.AddScoped<ICommandHandler<GeneratePortfolioCommand, PortfolioDt
 builder.Services.AddScoped<ICommandHandler<UpdatePortfolioCommand, PortfolioDto>, UpdatePortfolioCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<ImportLinkedInCommand, PortfolioDto>, ImportLinkedInCommandHandler>();
 builder.Services.AddScoped<ICommandHandler<ImportResumeCommand, PortfolioDto>, ImportResumeCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<CreateNotificationCommand, NotificationDto>, CreateNotificationCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<MarkAllNotificationsReadCommand, bool>, MarkAllNotificationsReadCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<ClearNotificationsCommand, bool>, ClearNotificationsCommandHandler>();
 
 // Query Handlers
 builder.Services.AddScoped<IQueryHandler<GetTenantByIdQuery, TenantDto?>, GetTenantByIdQueryHandler>();
@@ -101,6 +105,8 @@ builder.Services.AddScoped<IQueryHandler<GetPortfolioByIdQuery, PortfolioDto?>, 
 builder.Services.AddScoped<IQueryHandler<GetPortfolioByUserIdQuery, PortfolioDto?>, GetPortfolioByUserIdQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetPortfoliosByTenantQuery, IEnumerable<PortfolioDto>>, GetPortfoliosByTenantQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetPortfolioBySlugQuery, PortfolioDto?>, GetPortfolioBySlugQueryHandler>();
+builder.Services.AddScoped<IQueryHandler<GetNotificationsByUserQuery, IEnumerable<NotificationDto>>, GetNotificationsByUserQueryHandler>();
+builder.Services.AddScoped<IQueryHandler<GetUnreadNotificationCountQuery, int>, GetUnreadNotificationCountQueryHandler>();
 
 // JWT Authentication
 var jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-key-min-32-chars-long-for-security";
@@ -190,6 +196,7 @@ app.MapGroup("/api").MapBlogEndpoints();
 app.MapGroup("/api").MapPortfolioEndpoints();
 app.MapGroup("/api").MapAuthEndpoints();
 app.MapGroup("/api").MapAdminEndpoints();
+app.MapGroup("/api").MapNotificationEndpoints();
 
 Console.WriteLine("STEP 6: Starting application...");
 app.Run();

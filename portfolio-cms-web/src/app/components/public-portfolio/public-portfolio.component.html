@@ -10,9 +10,99 @@
     <a routerLink="/" class="back-home">Back to Home</a>
   </div>
 
-  <div *ngIf="!loading && !error && renderedHtml" 
-       class="portfolio-content" 
+  <!-- Template-based rendering -->
+  <div *ngIf="!loading && !error && hasTemplate && renderedHtml"
+       class="portfolio-content"
        [innerHTML]="renderedHtml">
+  </div>
+
+  <!-- Fallback: structured portfolio view -->
+  <div *ngIf="!loading && !error && portfolio && !hasTemplate" class="portfolio-fallback">
+    <header class="pf-header">
+      <h1 class="pf-title">{{ portfolio.title || portfolio.fullName || 'Portfolio' }}</h1>
+      <p class="pf-subtitle" *ngIf="portfolio.subtitle">{{ portfolio.subtitle }}</p>
+      <p class="pf-bio" *ngIf="portfolio.bio">{{ portfolio.bio }}</p>
+      <div class="pf-contact" *ngIf="portfolio.email || portfolio.phone || portfolio.location">
+        <span *ngIf="portfolio.email">{{ portfolio.email }}</span>
+        <span *ngIf="portfolio.phone">{{ portfolio.phone }}</span>
+        <span *ngIf="portfolio.location">{{ portfolio.location }}</span>
+      </div>
+      <div class="pf-social" *ngIf="portfolio.linkedIn || portfolio.github || portfolio.twitter || portfolio.website">
+        <a *ngIf="portfolio.linkedIn" [href]="portfolio.linkedIn" target="_blank" class="social-link">LinkedIn</a>
+        <a *ngIf="portfolio.github" [href]="portfolio.github" target="_blank" class="social-link">GitHub</a>
+        <a *ngIf="portfolio.twitter" [href]="portfolio.twitter" target="_blank" class="social-link">Twitter</a>
+        <a *ngIf="portfolio.website" [href]="portfolio.website" target="_blank" class="social-link">Website</a>
+      </div>
+    </header>
+
+    <!-- Work Experience -->
+    <section class="pf-section" *ngIf="workExperiences.length > 0">
+      <h2 class="pf-section-title">Work Experience</h2>
+      <div class="pf-item" *ngFor="let exp of workExperiences">
+        <div class="pf-item-header">
+          <strong>{{ exp.position || exp.title }}</strong>
+          <span class="pf-item-sub">{{ exp.company }}</span>
+        </div>
+        <p class="pf-item-period" *ngIf="exp.startDate">
+          {{ exp.startDate | date:'MMM yyyy' }} - {{ exp.endDate ? (exp.endDate | date:'MMM yyyy') : 'Present' }}
+        </p>
+        <p class="pf-item-desc" *ngIf="exp.description">{{ exp.description }}</p>
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="pf-section" *ngIf="educationList.length > 0">
+      <h2 class="pf-section-title">Education</h2>
+      <div class="pf-item" *ngFor="let edu of educationList">
+        <div class="pf-item-header">
+          <strong>{{ edu.degree }}</strong>
+          <span class="pf-item-sub">{{ edu.institution }}</span>
+        </div>
+        <p class="pf-item-period" *ngIf="edu.fieldOfStudy">{{ edu.fieldOfStudy }}</p>
+        <p class="pf-item-period" *ngIf="edu.graduationDate">Graduated: {{ edu.graduationDate | date:'yyyy' }}</p>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="pf-section" *ngIf="skillsList.length > 0">
+      <h2 class="pf-section-title">Skills</h2>
+      <div class="pf-skills-grid">
+        <div class="pf-skill" *ngFor="let skill of skillsList">
+          <span class="pf-skill-name">{{ skill.name }}</span>
+          <div class="pf-skill-bar">
+            <div class="pf-skill-fill" [style.width.%]="skill.level"></div>
+          </div>
+          <span class="pf-skill-level">{{ skill.level }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="pf-section" *ngIf="projectsList.length > 0">
+      <h2 class="pf-section-title">Projects</h2>
+      <div class="pf-projects-grid">
+        <div class="pf-project" *ngFor="let project of projectsList">
+          <h3>{{ project.name }}</h3>
+          <p *ngIf="project.description">{{ project.description }}</p>
+          <div class="pf-tech-chips" *ngIf="project.technologies?.length">
+            <span class="pf-tech" *ngFor="let t of project.technologies">{{ t }}</span>
+          </div>
+          <a *ngIf="project.url" [href]="project.url" target="_blank" class="pf-project-link">View Project</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Certifications -->
+    <section class="pf-section" *ngIf="certificationsList.length > 0">
+      <h2 class="pf-section-title">Certifications</h2>
+      <div class="pf-item" *ngFor="let cert of certificationsList">
+        <div class="pf-item-header">
+          <strong>{{ cert.name }}</strong>
+          <span class="pf-item-sub">{{ cert.issuingOrganization }}</span>
+        </div>
+        <p class="pf-item-period" *ngIf="cert.issueDate">Issued: {{ cert.issueDate | date:'MMM yyyy' }}</p>
+      </div>
+    </section>
   </div>
 
   <!-- Share Bar -->
@@ -28,7 +118,7 @@
         Facebook
       </button>
       <button class="share-btn copy" (click)="copyLink()">
-        📋 Copy Link
+        {{ linkCopied ? 'Copied!' : 'Copy Link' }}
       </button>
     </div>
   </div>

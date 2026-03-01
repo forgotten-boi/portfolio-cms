@@ -203,3 +203,38 @@ public class ImportResumeCommand : Command<PortfolioDto>
         Data = data;
     }
 }
+
+// Notification Commands
+public class CreateNotificationCommand : Command<NotificationDto>
+{
+    public Guid TenantId { get; }
+    public Guid UserId { get; }
+    public CreateNotificationDto Data { get; }
+
+    public CreateNotificationCommand(Guid tenantId, Guid userId, CreateNotificationDto data)
+    {
+        TenantId = tenantId;
+        UserId = userId;
+        Data = data;
+    }
+}
+
+public class MarkAllNotificationsReadCommand : Command<bool>
+{
+    public Guid UserId { get; }
+
+    public MarkAllNotificationsReadCommand(Guid userId)
+    {
+        UserId = userId;
+    }
+}
+
+public class ClearNotificationsCommand : Command<bool>
+{
+    public Guid UserId { get; }
+
+    public ClearNotificationsCommand(Guid userId)
+    {
+        UserId = userId;
+    }
+}

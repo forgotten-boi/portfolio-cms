@@ -68,6 +68,264 @@
   max-width: 100%;
 }
 
+// ── Fallback Portfolio View ──
+.portfolio-fallback {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 0;
+
+  .pf-header {
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 2px solid #e2e8f0;
+
+    .pf-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin: 0 0 0.5rem;
+    }
+
+    .pf-subtitle {
+      font-size: 1.25rem;
+      color: #667eea;
+      font-weight: 600;
+      margin: 0 0 1rem;
+    }
+
+    .pf-bio {
+      font-size: 1.05rem;
+      color: #4a5568;
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .pf-contact {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: #718096;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+
+    .pf-social {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+
+      .social-link {
+        padding: 0.4rem 1rem;
+        background: #edf2f7;
+        color: #667eea;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #667eea;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .pf-section {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .pf-section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin: 0 0 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #667eea;
+      display: inline-block;
+    }
+  }
+
+  .pf-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .pf-item-header {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      strong {
+        font-size: 1.05rem;
+        color: #1a202c;
+      }
+
+      .pf-item-sub {
+        font-size: 0.95rem;
+        color: #667eea;
+        font-weight: 500;
+      }
+    }
+
+    .pf-item-period {
+      font-size: 0.85rem;
+      color: #a0aec0;
+      margin: 0.25rem 0;
+    }
+
+    .pf-item-desc {
+      font-size: 0.95rem;
+      color: #4a5568;
+      line-height: 1.6;
+      margin: 0.5rem 0 0;
+    }
+  }
+
+  .pf-skills-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .pf-skill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .pf-skill-name {
+      min-width: 120px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .pf-skill-bar {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+
+      .pf-skill-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+    }
+
+    .pf-skill-level {
+      font-size: 0.8rem;
+      color: #a0aec0;
+      min-width: 36px;
+      text-align: right;
+    }
+  }
+
+  .pf-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .pf-project {
+    padding: 1.25rem;
+    background: #f7fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+
+    h3 {
+      font-size: 1.05rem;
+      color: #1a202c;
+      margin: 0 0 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #4a5568;
+      line-height: 1.6;
+      margin: 0 0 0.75rem;
+    }
+
+    .pf-tech-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .pf-tech {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      background: #edf2f7;
+      color: #667eea;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .pf-project-link {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: #667eea;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .portfolio-fallback {
+    .pf-header {
+      padding: 2rem 1.5rem;
+
+      .pf-title {
+        font-size: 1.875rem;
+      }
+    }
+
+    .pf-section {
+      padding: 1.5rem;
+    }
+
+    .pf-skill {
+      flex-wrap: wrap;
+
+      .pf-skill-name {
+        min-width: 100%;
+      }
+    }
+
+    .pf-projects-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

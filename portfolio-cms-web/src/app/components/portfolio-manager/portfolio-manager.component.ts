@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { NotificationService } from '../../services/notification.service';
+import { ActivityNotificationService } from '../../services/activity-notification.service';
 import { Portfolio, PortfolioData, WorkExperience, Education, Skill, Project, Certification } from '../../models';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
@@ -82,7 +83,8 @@ export class PortfolioManagerComponent implements OnInit {
     private portfolioService: PortfolioService,
     private router: Router,
     private translationService: TranslationService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private activityNotificationService: ActivityNotificationService
   ) {}
 
   ngOnInit(): void {
@@ -201,6 +203,46 @@ export class PortfolioManagerComponent implements OnInit {
     if (p.slug) {
       window.open(`/portfolio/${p.slug}`, '_blank');
     }
+  }
+
+  togglePublishFromList(p: Portfolio): void {
+    const newState = !p.isPublished;
+    const payload = {
+      title: p.title,
+      subtitle: p.subtitle,
+      bio: p.bio,
+      template: p.template,
+      isPublished: newState,
+      featuredBlogsEnabled: p.featuredBlogsEnabled || false,
+      data: p.data
+    };
+    this.portfolioService.update(p.id, payload).subscribe({
+      next: (updated: Portfolio) => {
+        const idx = this.portfolios.findIndex(x => x.id === p.id);
+        if (idx !== -1) {
+          this.portfolios[idx] = updated;
+        }
+        this.notificationService.success(
+          newState ? `"${p.title}" published successfully` : `"${p.title}" unpublished`
+        );
+        if (newState) {
+          this.activityNotificationService.add(`Portfolio "${p.title}" was published`, 'portfolio_published');
+        }
+      },
+      error: () => {
+        this.notificationService.error(`Failed to ${newState ? 'publish' : 'unpublish'} portfolio`);
+      }
+    });
+  }
+
+  shareOnLinkedInFromList(p: Portfolio): void {
+    const url = encodeURIComponent(this.getPortfolioPublicUrl(p));
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  }
+
+  shareOnFacebookFromList(p: Portfolio): void {
+    const url = encodeURIComponent(this.getPortfolioPublicUrl(p));
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
   }
 
   private resetForm(): void {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
 import { NotificationService } from '../../services/notification.service';
+import { ActivityNotificationService } from '../../services/activity-notification.service';
 import { Blog } from '../../models';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
@@ -23,7 +24,8 @@ export class BlogsComponent implements OnInit {
     private blogService: BlogService,
     private router: Router,
     private translationService: TranslationService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private activityNotificationService: ActivityNotificationService
   ) {}
 
   ngOnInit(): void {
@@ -79,6 +81,11 @@ export class BlogsComponent implements OnInit {
         this.notificationService.success(
           newState ? `"${blog.title}" published successfully` : `"${blog.title}" unpublished`
         );
+        if (newState) {
+          this.activityNotificationService.add(`Blog "${blog.title}" was published`, 'blog_published');
+        } else {
+          this.activityNotificationService.add(`Blog "${blog.title}" was unpublished`, 'blog_unpublished');
+        }
       },
       error: (err) => {
         this.notificationService.error(`Failed to ${newState ? 'publish' : 'unpublish'} blog`);

@@ -87,7 +87,23 @@
           <button class="btn-action btn-edit" (click)="editPortfolio(p)">✏️ {{ 'blogs.edit' | translate }}</button>
           <button *ngIf="p.isPublished && p.slug" class="btn-action btn-view" (click)="viewPublicPortfolio(p)">🔗 {{ 'blogs.view' | translate }}</button>
           <button *ngIf="p.isPublished && p.slug" class="btn-action btn-copy" (click)="copyPortfolioLink(p.slug)">📋 {{ 'blogs.copyLink' | translate }}</button>
+          <button
+            class="btn-action btn-publish"
+            [class.btn-unpublish]="p.isPublished"
+            (click)="togglePublishFromList(p)">
+            {{ p.isPublished ? ('pm.unpublish' | translate) : ('pm.publish' | translate) }}
+          </button>
           <button class="btn-action btn-delete" (click)="requestDelete(p.id)">{{ 'pm.delete' | translate }}</button>
+        </div>
+
+        <div class="share-actions" *ngIf="p.isPublished && p.slug">
+          <span class="share-label">Share:</span>
+          <button class="btn-share btn-linkedin" (click)="shareOnLinkedInFromList(p)" title="Share on LinkedIn">
+            <span class="share-icon">in</span> LinkedIn
+          </button>
+          <button class="btn-share btn-facebook" (click)="shareOnFacebookFromList(p)" title="Share on Facebook">
+            <span class="share-icon">f</span> Facebook
+          </button>
         </div>
       </div>
     </div>

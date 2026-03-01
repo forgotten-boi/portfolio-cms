@@ -17,6 +17,7 @@ public class PortfolioDbContext : DbContext
     public DbSet<PortfolioEntity> Portfolios => Set<PortfolioEntity>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -164,6 +165,26 @@ public class PortfolioDbContext : DbContext
             entity.HasOne(ura => ura.Role)
                 .WithMany(r => r.UserRoleAssignments)
                 .HasForeignKey(ura => ura.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Notification configuration
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("Notifications");
+            entity.HasKey(n => n.Id);
+            entity.HasIndex(n => new { n.UserId, n.CreatedAt });
+            entity.Property(n => n.Type).IsRequired().HasMaxLength(50);
+            entity.Property(n => n.Message).IsRequired().HasMaxLength(500);
+
+            entity.HasOne(n => n.Tenant)
+                .WithMany()
+                .HasForeignKey(n => n.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

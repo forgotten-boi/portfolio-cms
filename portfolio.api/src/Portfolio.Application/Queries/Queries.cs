@@ -162,3 +162,24 @@ public class GetPortfolioBySlugQuery : Query<PortfolioDto?>
     }
 }
 
+
+// Notification Queries
+public class GetNotificationsByUserQuery : Query<IEnumerable<NotificationDto>>
+{
+    public Guid UserId { get; }
+
+    public GetNotificationsByUserQuery(Guid userId)
+    {
+        UserId = userId;
+    }
+}
+
+public class GetUnreadNotificationCountQuery : Query<int>
+{
+    public Guid UserId { get; }
+
+    public GetUnreadNotificationCountQuery(Guid userId)
+    {
+        UserId = userId;
+    }
+}

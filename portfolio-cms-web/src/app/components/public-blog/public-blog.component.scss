@@ -279,6 +279,87 @@
       }
     }
   }
+
+  .related-section {
+    padding: 3rem 2rem;
+    border-top: 2px solid #e2e8f0;
+    background: #f7fafc;
+
+    .related-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin: 0 0 1.5rem;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .related-card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      text-decoration: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+        border-color: #667eea;
+      }
+
+      .related-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin: 0 0 0.5rem;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .related-card-summary {
+        font-size: 0.85rem;
+        color: #4a5568;
+        margin: 0 0 0.75rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+      }
+
+      .related-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-bottom: 0.5rem;
+
+        .related-tag {
+          font-size: 0.72rem;
+          padding: 0.15rem 0.5rem;
+          background: #edf2f7;
+          color: #667eea;
+          border-radius: 4px;
+          font-weight: 500;
+        }
+      }
+
+      .related-card-date {
+        font-size: 0.78rem;
+        color: #a0aec0;
+      }
+    }
+  }
 }
 
 @media (max-width: 768px) {

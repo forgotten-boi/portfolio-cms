@@ -15,6 +15,7 @@ export class PublicPortfolioComponent implements OnInit {
   loading = true;
   error: string | null = null;
   renderedHtml: SafeHtml | null = null;
+  hasTemplate = false;
   linkCopied = false;
 
   constructor(
@@ -41,7 +42,10 @@ export class PublicPortfolioComponent implements OnInit {
         }
 
         this.portfolio = portfolio;
-        this.renderTemplate();
+        if (portfolio.templateHtml) {
+          this.hasTemplate = true;
+          this.renderTemplate();
+        }
         this.loading = false;
       },
       error: (err) => {
@@ -54,13 +58,11 @@ export class PublicPortfolioComponent implements OnInit {
 
   private renderTemplate(): void {
     if (!this.portfolio || !this.portfolio.templateHtml) {
-      this.error = 'Template not found';
       return;
     }
 
     let html = this.portfolio.templateHtml;
 
-    // Replace variables in template
     const replacements: Record<string, any> = {
       'FULL_NAME': this.portfolio.fullName || '',
       'TITLE': this.portfolio.title || '',
@@ -75,13 +77,11 @@ export class PublicPortfolioComponent implements OnInit {
       'WEBSITE': this.portfolio.website || '#'
     };
 
-    // Replace simple variables
     Object.keys(replacements).forEach(key => {
       const regex = new RegExp(`{{${key}}}`, 'g');
       html = html.replace(regex, replacements[key]);
     });
 
-    // Handle work experience array
     if (this.portfolio.workExperience && Array.isArray(this.portfolio.workExperience)) {
       const experienceHtml = this.portfolio.workExperience.map((exp: any) => `
         <div class="experience-item">
@@ -94,7 +94,6 @@ export class PublicPortfolioComponent implements OnInit {
       html = html.replace(/{{#each WORK_EXPERIENCE}}.*?{{\/each}}/gs, experienceHtml);
     }
 
-    // Handle education array
     if (this.portfolio.education && Array.isArray(this.portfolio.education)) {
       const educationHtml = this.portfolio.education.map((edu: any) => `
         <div class="education-item">
@@ -107,7 +106,6 @@ export class PublicPortfolioComponent implements OnInit {
       html = html.replace(/{{#each EDUCATION}}.*?{{\/each}}/gs, educationHtml);
     }
 
-    // Handle skills array
     if (this.portfolio.skills && Array.isArray(this.portfolio.skills)) {
       const skillsHtml = this.portfolio.skills.map((skill: any) => `
         <span class="skill-tag">${skill.name || skill}</span>
@@ -115,7 +113,6 @@ export class PublicPortfolioComponent implements OnInit {
       html = html.replace(/{{#each SKILLS}}.*?{{\/each}}/gs, skillsHtml);
     }
 
-    // Handle projects array
     if (this.portfolio.projects && Array.isArray(this.portfolio.projects)) {
       const projectsHtml = this.portfolio.projects.map((project: any) => `
         <div class="project-item">
@@ -132,6 +129,26 @@ export class PublicPortfolioComponent implements OnInit {
 
   get currentUrl(): string {
     return window.location.href;
+  }
+
+  get workExperiences(): any[] {
+    return this.portfolio?.data?.workExperiences || this.portfolio?.workExperience || [];
+  }
+
+  get educationList(): any[] {
+    return this.portfolio?.data?.education || this.portfolio?.education || [];
+  }
+
+  get skillsList(): any[] {
+    return this.portfolio?.data?.skills || this.portfolio?.skills || [];
+  }
+
+  get projectsList(): any[] {
+    return this.portfolio?.data?.projects || this.portfolio?.projects || [];
+  }
+
+  get certificationsList(): any[] {
+    return this.portfolio?.data?.certifications || [];
   }
 
   shareOnLinkedIn(): void {

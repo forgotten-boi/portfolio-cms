@@ -44,6 +44,11 @@ export class DashboardComponent implements OnInit {
   resumeCount = 0;
   lastResumeDate = 'N/A';
 
+  // Portfolio manager snapshot
+  publishedPortfolios = 0;
+  draftPortfolios = 0;
+  lastPortfolioUpdate = 'N/A';
+
   // CV sections
   cvSections = [
     { icon: '📝', name: 'Summary', active: true },
@@ -111,12 +116,19 @@ export class DashboardComponent implements OnInit {
       next: (portfolios) => {
         this.stats.totalPortfolios = portfolios.length;
         this.resumeCount = portfolios.length;
+        this.publishedPortfolios = portfolios.filter(p => p.isPublished).length;
+        this.draftPortfolios = portfolios.length - this.publishedPortfolios;
         if (portfolios.length > 0) {
           const p = portfolios[0];
           this.cvName = p.title || 'My Portfolio CV';
           this.skillCount = p.data?.skills?.length || 0;
           this.lastCvUpdate = this.timeAgo(p.updatedAt || p.createdAt);
           this.lastResumeDate = this.timeAgo(p.updatedAt || p.createdAt);
+          // Find most recently updated portfolio
+          const sorted = [...portfolios].sort((a, b) =>
+            new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime()
+          );
+          this.lastPortfolioUpdate = this.timeAgo(sorted[0].updatedAt || sorted[0].createdAt);
         }
       },
       error: (err) => {

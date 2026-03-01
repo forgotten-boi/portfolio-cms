@@ -167,3 +167,11 @@ export interface AuthResult {
   userId?: string;
   error?: string;
 }
+
+export interface ActivityNotification {
+  id: string;
+  type: 'blog_published' | 'blog_unpublished' | 'portfolio_published' | 'portfolio_unpublished' | 'info';
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}

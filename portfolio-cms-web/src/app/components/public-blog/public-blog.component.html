@@ -47,5 +47,20 @@
         </div>
       </div>
     </footer>
+
+    <!-- Related Articles -->
+    <section class="related-section" *ngIf="relatedBlogs.length > 0">
+      <h2 class="related-title">Related Articles</h2>
+      <div class="related-grid">
+        <a *ngFor="let rb of relatedBlogs" class="related-card" [routerLink]="['/blog', rb.slug]">
+          <h3 class="related-card-title">{{ rb.title }}</h3>
+          <p class="related-card-summary">{{ rb.summary }}</p>
+          <div class="related-card-tags" *ngIf="rb.tags && rb.tags.length > 0">
+            <span *ngFor="let tag of rb.tags.slice(0, 3)" class="related-tag">{{ tag }}</span>
+          </div>
+          <span class="related-card-date">{{ formatDate(rb.publishedAt || rb.createdAt) }}</span>
+        </a>
+      </div>
+    </section>
   </article>
 </div>

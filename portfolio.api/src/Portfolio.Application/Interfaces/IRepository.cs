@@ -51,3 +51,12 @@ public interface IUserRoleAssignmentRepository
     Task RemoveAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default);
     Task<IEnumerable<UserRoleAssignment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 }
+
+public interface INotificationRepository : IRepository<Notification>
+{
+    Task<IEnumerable<Notification>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Notification>> GetUnreadByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<int> GetUnreadCountAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task MarkAllAsReadAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task DeleteAllByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+}

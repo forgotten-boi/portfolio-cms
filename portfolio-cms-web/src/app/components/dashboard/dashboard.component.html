@@ -55,15 +55,17 @@
 
     <div class="snap-card">
       <div class="snap-card-header">
-        <h3>{{ 'dashboard.resumeVariants' | translate }}</h3>
-        <span class="snap-icon">📑</span>
+        <h3>Portfolio Manager</h3>
+        <span class="snap-icon">🌐</span>
       </div>
       <div class="snap-card-body">
-        <p class="snap-stat">{{ 'dashboard.totalGenerated' | translate }}: <strong>{{ resumeCount }}</strong></p>
-        <p class="snap-meta">{{ 'dashboard.lastGenerated' | translate }}: {{ lastResumeDate }}</p>
+        <p class="snap-stat">› Total: <strong>{{ stats.totalPortfolios }}</strong></p>
+        <p class="snap-stat">› Published: <strong>{{ publishedPortfolios }}</strong></p>
+        <p class="snap-stat">› Drafts: <strong>{{ draftPortfolios }}</strong></p>
+        <p class="snap-meta">Last updated: {{ lastPortfolioUpdate }}</p>
       </div>
       <div class="snap-card-footer">
-        <button class="btn-snap btn-gradient" routerLink="/dashboard/resume-generator">{{ 'dashboard.generateNew' | translate }} ›</button>
+        <button class="btn-snap btn-gradient" routerLink="/dashboard/portfolio-manager">Manage Portfolios ›</button>
       </div>
     </div>
   </div>

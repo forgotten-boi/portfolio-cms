@@ -428,3 +428,70 @@ public static class AuthEndpoints
 }
 
 public record LoginRequest(string Email, string Password, Guid? TenantId);
+
+public static class NotificationEndpoints
+{
+    public static RouteGroupBuilder MapNotificationEndpoints(this RouteGroupBuilder group)
+    {
+        var notifications = group.MapGroup("/notifications").WithTags("Notifications").RequireAuthorization();
+
+        notifications.MapGet("/", async (HttpContext context,
+            IQueryHandler<GetNotificationsByUserQuery, IEnumerable<NotificationDto>> handler) =>
+        {
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || !Guid.TryParse(userId, out var parsedUserId))
+                return Results.Unauthorized();
+
+            var result = await handler.HandleAsync(new GetNotificationsByUserQuery(parsedUserId));
+            return Results.Ok(result);
+        });
+
+        notifications.MapGet("/unread-count", async (HttpContext context,
+            IQueryHandler<GetUnreadNotificationCountQuery, int> handler) =>
+        {
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || !Guid.TryParse(userId, out var parsedUserId))
+                return Results.Unauthorized();
+
+            var result = await handler.HandleAsync(new GetUnreadNotificationCountQuery(parsedUserId));
+            return Results.Ok(new { count = result });
+        });
+
+        notifications.MapPost("/", async (CreateNotificationDto dto, HttpContext context,
+            ICommandHandler<CreateNotificationCommand, NotificationDto> handler) =>
+        {
+            var tenantId = context.GetTenantId() ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
+
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || !Guid.TryParse(userId, out var parsedUserId))
+                return Results.Unauthorized();
+
+            var result = await handler.HandleAsync(new CreateNotificationCommand(tenantId, parsedUserId, dto));
+            return Results.Created($"/api/notifications/{result.Id}", result);
+        });
+
+        notifications.MapPut("/read-all", async (HttpContext context,
+            ICommandHandler<MarkAllNotificationsReadCommand, bool> handler) =>
+        {
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || !Guid.TryParse(userId, out var parsedUserId))
+                return Results.Unauthorized();
+
+            await handler.HandleAsync(new MarkAllNotificationsReadCommand(parsedUserId));
+            return Results.Ok(new { success = true });
+        });
+
+        notifications.MapDelete("/", async (HttpContext context,
+            ICommandHandler<ClearNotificationsCommand, bool> handler) =>
+        {
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || !Guid.TryParse(userId, out var parsedUserId))
+                return Results.Unauthorized();
+
+            await handler.HandleAsync(new ClearNotificationsCommand(parsedUserId));
+            return Results.NoContent();
+        });
+
+        return group;
+    }
+}
